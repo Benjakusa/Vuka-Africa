@@ -1,12 +1,11 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import * as courseService from '@backend/services/course.service';
-import { authenticate } from '@backend/middleware/auth';
+import { authenticate, requireRole } from '@backend/middleware/auth';
 import { handleError } from '@frontend/utils/error-handler';
 import { created, success } from '@backend/lib/api-response';
 import { ValidationError } from '@backend/lib/errors';
-import { prisma } from '@backend/lib/prisma';
-import { requireRole } from '@backend/middleware/auth';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 const createSchema = z.object({
   title: z.string().min(3).max(200),
@@ -33,7 +32,12 @@ export async function POST(req: NextRequest) {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) throw new ValidationError(parsed.error.issues);
 
-    const trainer = await prisma.trainer.findUnique({ where: { userId: auth.id } });
+    const admin = createAdminClient();
+    const { data: trainer } = await admin
+      .from('Trainer')
+      .select('id')
+      .eq('userId', auth.id)
+      .single();
     if (!trainer) throw new ValidationError('Trainer profile not found');
 
     const course = await courseService.createCourse({

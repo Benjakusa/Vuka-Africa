@@ -94,8 +94,6 @@ export default function AuthPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
         *, *::before, *::after { box-sizing: border-box; }
 
         .ap-root {

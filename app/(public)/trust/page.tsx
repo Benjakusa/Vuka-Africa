@@ -80,7 +80,7 @@ export default function TrustSafetyPage() {
             <ArrowLeft size={16} /> Back to Home
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center">
               <Shield size={24} className="text-primary" />
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Trust & Safety</h1>
@@ -96,7 +96,7 @@ export default function TrustSafetyPage() {
           {sections.map((section, i) => (
             <div key={i} className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
               <div className="flex items-start gap-4">
-                <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${section.bg} flex items-center justify-center ${section.color}`}>
+                <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${section.color}`}>
                   <section.icon size={22} />
                 </div>
                 <div className="min-w-0 flex-1">

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { AuthenticationError, ForbiddenError } from '@backend/lib/errors';
-import { prisma } from '@backend/lib/prisma';
 
 export interface AuthUser {
   id: string;
@@ -39,12 +39,14 @@ export async function authenticate(req: NextRequest): Promise<AuthUser> {
     throw new AuthenticationError('Not authenticated');
   }
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
-    select: { id: true, role: true, isActive: true, suspendedAt: true, suspensionReason: true },
-  });
+  const admin = createAdminClient();
+  const { data: dbUser, error: dbError } = await admin
+    .from('User')
+    .select('id, role, isActive, suspendedAt, suspensionReason')
+    .eq('id', supabaseUser.id)
+    .single();
 
-  if (!dbUser) {
+  if (dbError || !dbUser) {
     throw new AuthenticationError('User not found');
   }
 

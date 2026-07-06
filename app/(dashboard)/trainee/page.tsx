@@ -35,38 +35,26 @@ export default function TraineeDashboard() {
       <h1 className="text-2xl font-bold text-dark">Hello, {user?.fullName?.split(' ')[0]}!</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <BookOpen size={20} className="text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-dark">{activeEnrolments.length}</p>
-              <p className="text-xs text-muted-foreground">Active Trainings</p>
-            </div>
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+            <BookOpen size={20} className="text-primary" />
           </div>
+          <p className="text-2xl font-bold text-dark">{activeEnrolments.length}</p>
+          <p className="text-xs text-muted-foreground">Active Trainings</p>
         </div>
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-              <CheckCircle size={20} className="text-body" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-dark">{completedEnrolments.length}</p>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </div>
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+            <CheckCircle size={20} className="text-primary" />
           </div>
+          <p className="text-2xl font-bold text-dark">{completedEnrolments.length}</p>
+          <p className="text-xs text-muted-foreground">Completed</p>
         </div>
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-              <Wallet size={20} className="text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-dark">{formatCurrency(totalSpent)}</p>
-              <p className="text-xs text-muted-foreground">Total Spent</p>
-            </div>
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+            <Wallet size={20} className="text-primary" />
           </div>
+          <p className="text-2xl font-bold text-dark">{formatCurrency(totalSpent)}</p>
+          <p className="text-xs text-muted-foreground">Total Spent</p>
         </div>
       </div>
 

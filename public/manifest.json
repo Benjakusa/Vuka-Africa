@@ -1,0 +1,10 @@
+{
+  "name": "Vuka",
+  "short_name": "Vuka",
+  "description": "Learn skills from trusted trainers near you",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#FF4D00",
+  "icons": []
+}

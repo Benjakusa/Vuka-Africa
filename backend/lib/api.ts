@@ -11,7 +11,7 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = '/api/v1';
+const BASE_URL = '/api';
 
 async function request<T>(method: string, path: string, options?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${path}`;

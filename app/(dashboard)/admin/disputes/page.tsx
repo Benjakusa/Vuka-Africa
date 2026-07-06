@@ -63,9 +63,7 @@ export default function AdminDisputesPage() {
           {filtered.map((d: any) => (
             <div key={d.id} className="bg-white rounded-card shadow-card p-4">
               <div className="flex items-start gap-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  d.status === 'ACTIVE' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
-                }`}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
                   <AlertTriangle size={20} />
                 </div>
                 <div className="flex-1 min-w-0">

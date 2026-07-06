@@ -21,13 +21,13 @@ export default function VerificationPage() {
 
   const statusBadge = () => {
     if (!p?.verificationStatus || p.verificationStatus === 'NONE') {
-      return { label: 'Not Verified', color: 'bg-accent text-muted-foreground', icon: XCircle };
+      return { label: 'Not Verified', color: 'text-muted-foreground', icon: XCircle };
     }
     const map: Record<string, { label: string; color: string; icon: any }> = {
-      PENDING: { label: 'Pending Review', color: 'bg-warning/10 text-warning', icon: Clock },
-      APPROVED: { label: 'Verified', color: 'bg-primary/10 text-primary', icon: CheckCircle },
-      REJECTED: { label: 'Rejected', color: 'bg-destructive/10 text-destructive', icon: XCircle },
-      PAID: { label: 'Fee Paid (Pending Review)', color: 'bg-primary/10 text-primary', icon: Clock },
+      PENDING: { label: 'Pending Review', color: 'text-warning', icon: Clock },
+      APPROVED: { label: 'Verified', color: 'text-primary', icon: CheckCircle },
+      REJECTED: { label: 'Rejected', color: 'text-destructive', icon: XCircle },
+      PAID: { label: 'Fee Paid (Pending Review)', color: 'text-primary', icon: Clock },
     };
     return map[p.verificationStatus] || map.PENDING;
   };

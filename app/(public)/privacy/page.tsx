@@ -86,7 +86,7 @@ export default function PrivacyPage() {
             <ArrowLeft size={16} /> Back to Home
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center">
               <Shield size={24} className="text-primary" />
             </div>
             <div>
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
           {sections.map((section, i) => (
             <div key={i} className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 transition-all duration-300 hover:shadow-xl">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-primary">
                   <section.icon size={20} />
                 </div>
                 <div className="min-w-0 flex-1">

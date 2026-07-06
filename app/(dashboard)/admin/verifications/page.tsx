@@ -66,7 +66,7 @@ export default function AdminVerificationsPage() {
           {filtered.map((v: any) => (
             <div key={v.id} className="bg-white rounded-card shadow-card p-4">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-primary font-bold text-sm">
                   {v.trainer?.fullName?.[0]}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -80,7 +80,7 @@ export default function AdminVerificationsPage() {
                   <button
                     onClick={() => approveMutation.mutate(v.id)}
                     disabled={approveMutation.isPending}
-                    className="p-2 bg-primary/10 text-primary rounded-btn hover:bg-primary/20 disabled:opacity-50 transition-colors"
+                    className="p-2 text-primary rounded-btn hover:bg-primary/20 disabled:opacity-50 transition-colors"
                     title="Approve"
                   >
                     {approveMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -91,7 +91,7 @@ export default function AdminVerificationsPage() {
                       if (reason) rejectMutation.mutate({ id: v.id, reason });
                     }}
                     disabled={rejectMutation.isPending}
-                    className="p-2 bg-destructive/10 text-destructive rounded-btn hover:bg-destructive/20 disabled:opacity-50 transition-colors"
+                    className="p-2 text-destructive rounded-btn hover:bg-destructive/20 disabled:opacity-50 transition-colors"
                     title="Reject"
                   >
                     <XCircle size={16} />

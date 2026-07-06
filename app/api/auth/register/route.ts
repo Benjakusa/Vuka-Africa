@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { prisma } from '@backend/lib/prisma';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { handleError } from '@frontend/utils/error-handler';
 import { ValidationError, ConflictError } from '@backend/lib/errors';
 
@@ -18,7 +18,12 @@ export async function POST(req: NextRequest) {
       throw new ValidationError('Password must be at least 8 characters');
     }
 
-    const existingEmail = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+    const admin = createAdminClient();
+    const { data: existingEmail } = await admin
+      .from('User')
+      .select('id')
+      .eq('email', email.toLowerCase().trim())
+      .maybeSingle();
     if (existingEmail) throw new ConflictError('Email already registered');
 
     const supabase = createClient();
@@ -40,16 +45,20 @@ export async function POST(req: NextRequest) {
 
     const supabaseUser = data.user;
 
-    const user = await prisma.user.create({
-      data: {
+    const { data: user, error: createError } = await admin
+      .from('User')
+      .insert({
         id: supabaseUser.id,
         email: supabaseUser.email!,
         phone: phone.replace(/[^0-9]/g, ''),
         fullName: fullName.trim(),
         role: role || 'TRAINEE',
-        lastLoginAt: new Date(),
-      },
-    });
+        lastLoginAt: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (createError || !user) throw new Error('Failed to create user record');
 
     return NextResponse.json({
       data: {

@@ -32,22 +32,22 @@ export default function EarningsPage() {
       <h1 className="text-2xl font-bold text-dark">Earnings & Payouts</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="flex flex-col items-center gap-1 mb-2">
             <Wallet size={20} className="text-primary" />
             <span className="text-sm text-muted-foreground">Available</span>
           </div>
           <p className="text-2xl font-bold text-dark">{formatCurrency(e?.availableBalance || 0)}</p>
         </div>
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="flex flex-col items-center gap-1 mb-2">
             <Clock size={20} className="text-warning" />
             <span className="text-sm text-muted-foreground">Pending Release</span>
           </div>
           <p className="text-2xl font-bold text-dark">{formatCurrency(e?.pendingRelease || 0)}</p>
         </div>
-        <div className="bg-white rounded-card shadow-card p-4">
-          <div className="flex items-center gap-3 mb-2">
+        <div className="bg-white rounded-card shadow-card p-4 text-center">
+          <div className="flex flex-col items-center gap-1 mb-2">
             <TrendingUp size={20} className="text-primary" />
             <span className="text-sm text-muted-foreground">Total Earned</span>
           </div>

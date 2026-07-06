@@ -16,12 +16,12 @@ export default function AdminDashboard() {
   const s = stats?.data;
 
   const cards = [
-    { label: 'Total Users', value: s?.totalUsers || 0, icon: Users, color: 'bg-primary/10 text-primary', href: '/dashboard/admin/users' },
-    { label: 'Total Courses', value: s?.totalCourses || 0, icon: BookOpen, color: 'bg-accent text-body', href: '#' },
-    { label: 'Total Revenue', value: formatCurrency(s?.totalRevenue || 0), icon: DollarSign, color: 'bg-primary/10 text-primary', href: '/dashboard/admin/ledger' },
-    { label: 'Pending Verifications', value: s?.pendingVerifications || 0, icon: ShieldCheck, color: 'bg-warning/10 text-warning', href: '/dashboard/admin/verifications' },
-    { label: 'Active Disputes', value: s?.activeDisputes || 0, icon: AlertTriangle, color: 'bg-destructive/10 text-destructive', href: '/dashboard/admin/disputes' },
-    { label: 'Commission Earned', value: formatCurrency(s?.commissionEarned || 0), icon: TrendingUp, color: 'bg-surface text-body', href: '/dashboard/admin/ledger' },
+    { label: 'Total Users', value: s?.totalUsers || 0, icon: Users, href: '/dashboard/admin/users' },
+    { label: 'Total Courses', value: s?.totalCourses || 0, icon: BookOpen, href: '#' },
+    { label: 'Total Revenue', value: formatCurrency(s?.totalRevenue || 0), icon: DollarSign, href: '/dashboard/admin/ledger' },
+    { label: 'Pending Verifications', value: s?.pendingVerifications || 0, icon: ShieldCheck, href: '/dashboard/admin/verifications' },
+    { label: 'Active Disputes', value: s?.activeDisputes || 0, icon: AlertTriangle, href: '/dashboard/admin/disputes' },
+    { label: 'Commission Earned', value: formatCurrency(s?.commissionEarned || 0), icon: TrendingUp, href: '/dashboard/admin/ledger' },
   ];
 
   return (
@@ -36,16 +36,12 @@ export default function AdminDashboard() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {cards.map(c => (
-            <Link key={c.label} href={c.href} className="bg-white rounded-card shadow-card p-4 hover:shadow-cardHover transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 ${c.color} rounded-full flex items-center justify-center`}>
-                  <c.icon size={20} />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-dark">{c.value}</p>
-                  <p className="text-xs text-muted-foreground">{c.label}</p>
-                </div>
+            <Link key={c.label} href={c.href} className="bg-white rounded-card shadow-card p-4 hover:shadow-cardHover transition-shadow block text-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2">
+                <c.icon size={20} className="text-primary" />
               </div>
+              <p className="text-2xl font-bold text-dark">{c.value}</p>
+              <p className="text-xs text-muted-foreground">{c.label}</p>
             </Link>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { prisma } from '@backend/lib/prisma';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { handleError } from '@frontend/utils/error-handler';
 import { AuthenticationError, NotFoundError } from '@backend/lib/errors';
 
@@ -13,24 +13,26 @@ export async function GET(_req: NextRequest) {
       throw new AuthenticationError('Not authenticated');
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { id: supabaseUser.id },
-      include: {
-        trainer: {
-          select: {
-            id: true,
-            isVerified: true,
-            verificationStatus: true,
-            commissionRate: true,
-            availableBalance: true,
-            bio: true,
-            skills: true,
-          },
-        },
-      },
-    });
+    const admin = createAdminClient();
 
-    if (!dbUser) {
+    const { data: dbUser, error: dbError } = await admin
+      .from('User')
+      .select(`
+        *,
+        trainer:Trainer(
+          id,
+          isVerified,
+          verificationStatus,
+          commissionRate,
+          availableBalance,
+          bio,
+          skills
+        )
+      `)
+      .eq('id', supabaseUser.id)
+      .single();
+
+    if (dbError || !dbUser) {
       throw new NotFoundError('User');
     }
 

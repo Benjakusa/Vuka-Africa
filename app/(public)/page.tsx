@@ -32,10 +32,10 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((item) => (
               <div key={item.step} className="text-center p-6">
-                <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4">
                   <item.icon size={28} className="text-primary" />
                 </div>
-                <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold text-primary">
                   {item.step}
                 </div>
                 <h3 className="font-semibold text-dark mb-1">{item.title}</h3>
@@ -80,7 +80,7 @@ export default async function HomePage() {
               {featuredTrainers.map((t: any) => (
                 <Link key={t.id} href={`/trainer/${t.id}`} className="snap-start flex-shrink-0 w-56">
                   <div className="rounded-card bg-white shadow-card hover:shadow-cardHover transition-shadow p-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold mb-3 mx-auto">
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-primary font-bold mb-3 mx-auto">
                       {t.fullName?.[0]}
                     </div>
                     <h3 className="font-semibold text-dark text-center truncate">{t.fullName}</h3>
@@ -90,7 +90,7 @@ export default async function HomePage() {
                     </div>
                     <div className="flex flex-wrap justify-center gap-1 mt-2">
                       {t.skills?.slice(0, 2).map((s: string) => (
-                        <span key={s} className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">{s}</span>
+                        <span key={s} className="px-2 py-0.5 text-primary text-xs rounded-full">{s}</span>
                       ))}
                     </div>
                   </div>
