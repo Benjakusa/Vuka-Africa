@@ -1,0 +1,364 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  TRAINEE
+  TRAINER
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNSUBMITTED
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CourseMode {
+  PHYSICAL
+  VIRTUAL
+  HYBRID
+}
+
+enum EnrolmentStatus {
+  PENDING_PAYMENT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum MilestoneStatus {
+  PENDING
+  TRAINER_CONFIRMED
+  TRAINEE_CONFIRMED
+  RELEASED
+  DISPUTED
+}
+
+enum LedgerEntryType {
+  TRAINEE_PAYMENT
+  TRAINER_PAYOUT
+  COMMISSION
+  VERIFICATION_FEE
+  REFUND
+}
+
+enum LedgerDirection {
+  CREDIT
+  DEBIT
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED_TRAINER
+  RESOLVED_TRAINEE
+  RESOLVED_SPLIT
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  phone         String    @unique
+  fullName      String
+  avatarUrl     String?
+  role          UserRole  @default(TRAINEE)
+  passwordHash  String
+  isActive      Boolean   @default(true)
+  emailVerified Boolean   @default(false)
+  emailVerificationToken String?  @unique
+  emailVerificationSentAt DateTime?
+  tokenVersion  Int      @default(0)
+  suspendedAt   DateTime?
+  suspensionReason String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  trainer                Trainer?
+  traineeEnrolments      Enrolment[]         @relation("TraineeEnrolments")
+  reviews                Review[]
+  disputesRaised         Dispute[]           @relation("DisputeRaisedBy")
+  disputesResolved       Dispute[]           @relation("DisputeResolvedBy")
+  notifications          Notification[]
+  transactionLedgers     TransactionLedger[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([role])
+}
+
+model Trainer {
+  id                  String             @id @default(uuid())
+  userId              String             @unique
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio                 String?
+  skills              String[]
+  idDocumentUrl       String?
+  verificationVideoUrl String?
+  isVerified          Boolean            @default(false)
+  verificationStatus  VerificationStatus @default(UNSUBMITTED)
+  verificationFeePaid Boolean            @default(false)
+  verificationFeeAmount Decimal          @default(5000.00) @db.Decimal(12, 2)
+  commissionRate      Decimal            @default(20.00) @db.Decimal(5, 2)
+  averageRating       Float              @default(0)
+  totalReviews        Int                @default(0)
+  totalStudents       Int                @default(0)
+  availableBalance    Decimal            @default(0.00) @db.Decimal(12, 2)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+
+  courses      Course[]
+  enrolments   Enrolment[]  @relation("TrainerEnrolments")
+  payouts      Payout[]
+  reviews      Review[]
+
+  @@index([userId])
+  @@index([isVerified])
+  @@index([averageRating])
+  @@index([isVerified, averageRating(sort: Desc)])
+}
+
+model Course {
+  id               String     @id @default(uuid())
+  trainerId        String
+  trainer          Trainer    @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  title            String
+  slug             String     @unique
+  description      String
+  learningOutcomes String[]
+  prerequisites    String?
+  category         String
+  mode             CourseMode
+  location         String?
+  duration         String
+  sessionCount     Int
+  priceKes         Decimal    @db.Decimal(12, 2)
+  maxStudents      Int?
+  isPublished      Boolean    @default(false)
+  imageUrl         String?
+  deletedAt        DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  enrolments Enrolment[]
+
+  @@index([trainerId])
+  @@index([category])
+  @@index([mode])
+  @@index([isPublished])
+  @@index([slug])
+  @@index([category, mode, priceKes])
+  @@index([isPublished, category, mode])
+}
+
+model Enrolment {
+  id                String           @id @default(uuid())
+  courseId          String
+  course            Course           @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  traineeId         String
+  trainee           User             @relation("TraineeEnrolments", fields: [traineeId], references: [id], onDelete: Restrict)
+  trainerId         String
+  trainer           Trainer          @relation("TrainerEnrolments", fields: [trainerId], references: [id], onDelete: Restrict)
+  status            EnrolmentStatus  @default(PENDING_PAYMENT)
+  pricePaidKes         Decimal          @db.Decimal(12, 2)
+  commissionKes        Decimal          @db.Decimal(12, 2)
+  trainerPayoutKes     Decimal          @db.Decimal(12, 2)
+  mpesaTransactionId   String?
+  mpesaCheckoutRequestId String?
+  mpesaReceiptNumber   String?
+  currentMilestone  Int              @default(0)
+  startedAt         DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  milestones  Milestone[]
+  reviews     Review[]
+  disputes    Dispute[]
+  sessionLogs SessionLog[]
+
+  @@index([traineeId])
+  @@index([trainerId])
+  @@index([status])
+  @@index([courseId])
+  @@index([mpesaCheckoutRequestId])
+  @@index([mpesaReceiptNumber])
+  @@index([traineeId, status])
+  @@index([trainerId, status])
+  @@index([courseId, status, createdAt(sort: Desc)])
+  @@unique([traineeId, courseId])
+}
+
+model Milestone {
+  id                   String          @id @default(uuid())
+  enrolmentId          String
+  enrolment            Enrolment       @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  sequence             Int
+  label                String
+  percentage           Decimal         @db.Decimal(5, 2)
+  amountKes            Decimal         @db.Decimal(12, 2)
+  status               MilestoneStatus @default(PENDING)
+  trainerConfirmedAt   DateTime?
+  traineeConfirmedAt   DateTime?
+  releasedAt           DateTime?
+  payoutTransactionId  String?
+  disputeId            String?   @unique
+  dispute              Dispute?  @relation("MilestoneDispute")
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  sessionLog SessionLog?
+
+  @@index([enrolmentId])
+  @@index([status])
+  @@index([enrolmentId, sequence])
+}
+
+model TransactionLedger {
+  id                 String          @id @default(uuid())
+  userId             String
+  user               User            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  type               LedgerEntryType
+  direction          LedgerDirection
+  amountKes          Decimal         @db.Decimal(12, 2)
+  balanceBefore      Decimal         @db.Decimal(12, 2)
+  balanceAfter       Decimal         @db.Decimal(12, 2)
+  referenceType      String
+  referenceId        String
+  mpesaTransactionId String?
+  mpesaReceiptNumber String?
+  description        String?
+  meta               Json?
+  createdAt          DateTime        @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@index([mpesaTransactionId])
+  @@index([referenceType, referenceId])
+  @@index([type, direction])
+  @@index([userId, type, createdAt(sort: Desc)])
+}
+
+model Payout {
+  id                 String       @id @default(uuid())
+  trainerId          String
+  trainer            Trainer      @relation(fields: [trainerId], references: [id], onDelete: Restrict)
+  amountKes          Decimal      @db.Decimal(12, 2)
+  mpesaPhone         String
+  status             PayoutStatus @default(PENDING)
+  mpesaTransactionId String?
+  mpesaReceiptNumber String?
+  failureReason      String?
+  retryCount         Int          @default(0)
+  idempotencyKey     String       @unique
+  mpesaConversationId String?
+  createdAt          DateTime     @default(now())
+  completedAt        DateTime?
+
+  @@index([trainerId])
+  @@index([status])
+  @@index([idempotencyKey])
+  @@index([trainerId, status, createdAt(sort: Desc)])
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  enrolmentId String   @unique
+  enrolment   Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  trainerId   String
+  trainer     Trainer  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  traineeId   String
+  trainee     User     @relation(fields: [traineeId], references: [id], onDelete: Restrict)
+  rating      Int
+  comment     String?
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([trainerId])
+  @@index([enrolmentId])
+  @@index([trainerId, rating])
+}
+
+model Dispute {
+  id              String        @id @default(uuid())
+  enrolmentId     String
+  enrolment       Enrolment     @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  milestoneId     String?    @unique
+  milestone       Milestone? @relation("MilestoneDispute", fields: [milestoneId], references: [id])
+  raisedById      String
+  raisedBy        User          @relation("DisputeRaisedBy", fields: [raisedById], references: [id], onDelete: Restrict)
+  reason          String
+  status          DisputeStatus @default(OPEN)
+  resolutionNotes String?
+  resolvedById    String?
+  resolvedBy      User?         @relation("DisputeResolvedBy", fields: [resolvedById], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([enrolmentId])
+  @@index([status])
+}
+
+model SessionLog {
+  id                String    @id @default(uuid())
+  enrolmentId       String
+  enrolment         Enrolment @relation(fields: [enrolmentId], references: [id], onDelete: Cascade)
+  milestoneId       String    @unique
+  milestone         Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  mode              CourseMode
+  gpsCoordinates    String?
+  videoRoomId       String?
+  trainerCheckedIn  Boolean   @default(false)
+  traineeCheckedIn  Boolean   @default(false)
+  sessionDate       DateTime
+  createdAt         DateTime  @default(now())
+
+  @@index([enrolmentId])
+  @@index([milestoneId])
+}
+
+model Notification {
+  id        String             @id @default(uuid())
+  userId    String
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String             @default("EMAIL")
+  channel   String             @default("email")
+  subject   String
+  body      String
+  status    NotificationStatus @default(QUEUED)
+  meta      Json?
+  sentAt    DateTime?
+  createdAt DateTime           @default(now())
+
+  @@index([userId, status])
+  @@index([status])
+}
+
+model PlatformConfig {
+  id              Int  @id @default(1)
+  trainerCount    Int  @default(0)
+  freeTrainerLimit Int @default(100)
+}
