@@ -38,13 +38,13 @@ export default function CreateCoursePage() {
       learningOutcomes: outcomes.filter(Boolean),
       imageUrl: imageUrl || undefined,
     }),
-    onSuccess: () => { toast.success('Course created!'); router.push('/dashboard/trainer/courses'); },
+    onSuccess: () => { toast.success('Course created!'); router.push('/trainer/courses'); },
     onError: (err: any) => toast.error(err.message),
   });
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <Link href="/dashboard/trainer/courses" className="text-sm text-primary hover:underline">&larr; Back to Courses</Link>
+      <Link href="/trainer/courses" className="text-sm text-primary hover:underline">&larr; Back to Courses</Link>
       <h1 className="text-2xl font-bold text-dark">Create New Course</h1>
 
       <div className="bg-white rounded-card shadow-card p-6 space-y-4">

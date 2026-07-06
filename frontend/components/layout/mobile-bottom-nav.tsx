@@ -4,29 +4,31 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, BookOpen, Book, Users, Wallet, ShieldCheck,
-  AlertTriangle, List, Star, Receipt,
+  AlertTriangle, List, Star, Receipt, Search,
 } from 'lucide-react';
 import { cn } from '@backend/lib/utils';
 import { useAuthStore } from '@frontend/stores/auth-store';
 
 const traineeTabs = [
-  { href: '/dashboard/trainee', label: 'Home', icon: LayoutDashboard },
-  { href: '/dashboard/trainee/enrolments', label: 'Courses', icon: BookOpen },
-  { href: '/dashboard/trainee/reviews', label: 'Reviews', icon: Star },
+  { href: '/trainee', label: 'Home', icon: LayoutDashboard },
+  { href: '/trainee/enrolments', label: 'Courses', icon: BookOpen },
+  { href: '/trainee/reviews', label: 'Reviews', icon: Star },
+  { href: '/trainers', label: 'Browse', icon: Search },
 ];
 
 const trainerTabs = [
-  { href: '/dashboard/trainer', label: 'Home', icon: LayoutDashboard },
-  { href: '/dashboard/trainer/courses', label: 'Courses', icon: Book },
-  { href: '/dashboard/trainer/enrolments', label: 'Students', icon: Users },
-  { href: '/dashboard/trainer/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/trainer', label: 'Home', icon: LayoutDashboard },
+  { href: '/trainer/courses', label: 'Courses', icon: Book },
+  { href: '/trainer/enrolments', label: 'Students', icon: Users },
+  { href: '/trainer/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/trainer/reviews', label: 'Reviews', icon: Star },
 ];
 
 const adminTabs = [
-  { href: '/dashboard/admin', label: 'Home', icon: LayoutDashboard },
-  { href: '/dashboard/admin/verifications', label: 'Verify', icon: ShieldCheck },
-  { href: '/dashboard/admin/disputes', label: 'Issues', icon: AlertTriangle },
-  { href: '/dashboard/admin/transactions', label: 'Ledger', icon: List },
+  { href: '/admin', label: 'Home', icon: LayoutDashboard },
+  { href: '/admin/verifications', label: 'Verify', icon: ShieldCheck },
+  { href: '/admin/disputes', label: 'Issues', icon: AlertTriangle },
+  { href: '/admin/transactions', label: 'Ledger', icon: List },
 ];
 
 export function MobileBottomNav() {

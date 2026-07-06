@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { Menu, X, LogOut, User, LayoutDashboard, Users, LogIn } from 'lucide-react';
 import { useAuthStore } from '@frontend/stores/auth-store';
 import { useUIStore } from '@frontend/stores/ui-store';
 import { useRouter } from 'next/navigation';
@@ -18,10 +18,10 @@ export function Navbar() {
   };
 
   const dashboardLink = user?.role === 'TRAINER'
-    ? '/dashboard/trainer'
+    ? '/trainer'
     : user?.role === 'ADMIN'
-    ? '/dashboard/admin'
-    : '/dashboard/trainee';
+    ? '/admin'
+    : '/trainee';
 
   return (
     <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border">
@@ -32,11 +32,8 @@ export function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/trainers" className="text-sm text-body hover:text-dark transition-colors font-medium">
-              Browse Trainers
-            </Link>
-            <Link href="/trust" className="text-sm text-body hover:text-dark transition-colors font-medium">
-              How It Works
+            <Link href="/trainers" className="flex items-center gap-1.5 text-sm text-body hover:text-dark transition-colors font-medium">
+              <Users size={16} /> Browse Trainers
             </Link>
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
@@ -55,17 +52,12 @@ export function Navbar() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-3">
-                <Link href="/auth/login" className="text-sm text-body hover:text-dark font-medium">
-                  Login
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
-                >
-                  Get Started
-                </Link>
-              </div>
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
+              >
+                <LogIn size={16} /> Get Started
+              </Link>
             )}
           </div>
 
@@ -80,30 +72,22 @@ export function Navbar() {
 
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-border bg-white px-4 py-4 space-y-3">
-          <Link href="/trainers" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-body font-medium">
-            Browse Trainers
-          </Link>
-          <Link href="/trust" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-body font-medium">
-            How It Works
+          <Link href="/trainers" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-sm text-body font-medium">
+            <Users size={16} /> Browse Trainers
           </Link>
           {isAuthenticated ? (
             <>
-              <Link href={dashboardLink} onClick={() => setMobileMenuOpen(false)} className="block text-sm text-primary font-medium">
-                Dashboard
+              <Link href={dashboardLink} onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-sm text-primary font-medium">
+                <LayoutDashboard size={16} /> Dashboard
               </Link>
-              <button onClick={handleLogout} className="block text-sm text-destructive font-medium">
-                Logout
+              <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-destructive font-medium">
+                <LogOut size={16} /> Logout
               </button>
             </>
           ) : (
-            <>
-              <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-body font-medium">
-                Login
-              </Link>
-              <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)} className="block text-sm text-primary font-medium">
-                Get Started
-              </Link>
-            </>
+            <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-sm text-primary font-medium">
+              <LogIn size={16} /> Get Started
+            </Link>
           )}
         </div>
       )}

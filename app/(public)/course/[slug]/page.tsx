@@ -78,13 +78,13 @@ export default function CourseDetailPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium
-                  ${course.mode === 'PHYSICAL' ? 'text-body' :
-                    course.mode === 'VIRTUAL' ? 'text-primary' :
-                    'text-body'}`}>
+                  ${course.mode === 'PHYSICAL' ? 'bg-surface text-body' :
+                    course.mode === 'VIRTUAL' ? 'bg-primary/10 text-primary' :
+                    'bg-accent text-body'}`}>
                   <ModeIcon size={12} className="inline mr-1" />
                   {cfg?.label}
                 </span>
-                <span className="px-2.5 py-0.5 text-muted-foreground text-xs rounded-full">
+                <span className="px-2.5 py-0.5 bg-accent text-muted-foreground text-xs rounded-full">
                   {course.category}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default function CourseDetailPage() {
 
             {course.trainer && (
               <Link href={`/trainer/${course.trainer.id}`} className="flex items-center gap-3 p-3 bg-accent rounded-card hover:bg-accent/80 transition-colors">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-primary font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
                   {course.trainer.fullName?.[0]}
                 </div>
                 <div>

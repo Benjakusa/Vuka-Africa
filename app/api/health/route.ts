@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { prisma } from '@backend/lib/prisma';
 import { redis } from '@backend/lib/redis';
 import { env } from '@backend/lib/env';
 
@@ -12,9 +12,7 @@ export async function GET() {
   };
 
   try {
-    const admin = createAdminClient();
-    const { error } = await admin.from('PlatformConfig').select('id').limit(1).single();
-    if (error) throw new Error(error.message);
+    await prisma.$queryRaw`SELECT 1`;
     checks.database.status = 'ok';
   } catch (e) {
     checks.database.status = 'error';

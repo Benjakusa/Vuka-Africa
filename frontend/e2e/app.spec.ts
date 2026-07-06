@@ -38,7 +38,7 @@ test.describe('Vuka E2E', () => {
     });
 
     test('protected route redirects unauthenticated users', async ({ page }) => {
-      await page.goto('/dashboard/trainee');
+      await page.goto('/trainee');
       await page.waitForURL(/\/login/);
       expect(page.url()).toContain('/login');
     });
@@ -46,13 +46,13 @@ test.describe('Vuka E2E', () => {
 
   test.describe('Dashboard - Unauthenticated', () => {
     test('trainer dashboard redirects to login', async ({ page }) => {
-      await page.goto('/dashboard/trainer');
+      await page.goto('/trainer');
       await page.waitForURL(/\/login/);
       expect(page.url()).toContain('/login');
     });
 
     test('admin dashboard redirects to login', async ({ page }) => {
-      await page.goto('/dashboard/admin');
+      await page.goto('/admin');
       await page.waitForURL(/\/login/);
       expect(page.url()).toContain('/login');
     });

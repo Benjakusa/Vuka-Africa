@@ -55,7 +55,7 @@ export default function AuthPage() {
       if (!res.ok) throw new Error(data.error?.message || 'Invalid email or password');
       setUser(data.data);
       toast.success('Welcome back!');
-      const redirect = searchParams.get('redirect') || '/dashboard/trainee';
+      const redirect = searchParams.get('redirect') || '/trainee';
       router.push(redirect);
     } catch (err: any) {
       setLoginError(err.message || 'Invalid email or password');
@@ -83,7 +83,7 @@ export default function AuthPage() {
       if (!res.ok) throw new Error(data.error?.message || 'Registration failed');
       setUser(data.data);
       toast.success('Account created! Welcome to Vuka.');
-      router.push('/dashboard/trainee');
+      router.push('/trainee');
     } catch (err: any) {
       setRegError(err.message || 'Registration failed');
     } finally {
@@ -94,6 +94,8 @@ export default function AuthPage() {
   return (
     <>
       <style>{`
+        /* Font loaded via next/font/google in root layout */
+
         *, *::before, *::after { box-sizing: border-box; }
 
         .ap-root {

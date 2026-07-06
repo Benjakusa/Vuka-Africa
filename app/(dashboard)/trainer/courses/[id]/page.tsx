@@ -30,7 +30,7 @@ export default function EditCoursePage() {
       queryClient.invalidateQueries({ queryKey: ['course', id] });
       queryClient.invalidateQueries({ queryKey: ['trainer-courses'] });
       toast.success('Course updated');
-      router.push('/dashboard/trainer/courses');
+      router.push('/trainer/courses');
     },
     onError: (err: any) => toast.error(err.message),
   });
@@ -40,7 +40,7 @@ export default function EditCoursePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trainer-courses'] });
       toast.success('Course deleted');
-      router.push('/dashboard/trainer/courses');
+      router.push('/trainer/courses');
     },
     onError: (err: any) => toast.error(err.message),
   });
@@ -63,7 +63,7 @@ export default function EditCoursePage() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <Link href="/dashboard/trainer/courses" className="flex items-center gap-1.5 text-sm text-primary hover:underline">
+      <Link href="/trainer/courses" className="flex items-center gap-1.5 text-sm text-primary hover:underline">
         <ArrowLeft size={16} /> Back to Courses
       </Link>
 

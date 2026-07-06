@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { prisma } from '@backend/lib/prisma';
 import { getCached, setCached } from '@backend/lib/cache';
 import { success } from '@backend/lib/api-response';
 import { handleError } from '@frontend/utils/error-handler';
@@ -11,13 +11,7 @@ export async function GET(req: NextRequest) {
     let config = await getCached<any>(cacheKey);
 
     if (!config) {
-      const admin = createAdminClient();
-      const { data: platformConfig } = await admin
-        .from('PlatformConfig')
-        .select('*')
-        .eq('id', 1)
-        .single();
-
+      const platformConfig = await prisma.platformConfig.findUnique({ where: { id: 1 } });
       if (!platformConfig) {
         config = { freeTrainerLimit: COMMISSION.FREE_TRAINER_LIMIT, trainerCount: 0, remainingFreeSpots: COMMISSION.FREE_TRAINER_LIMIT };
       } else {

@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/lib/supabase/admin';
+import { prisma } from '@backend/lib/prisma';
 import { generateSlug } from '@frontend/utils/slug';
 import { setCached, getCached, invalidateCache } from '@backend/lib/cache';
 import { NotFoundError, ValidationError, ForbiddenError } from '@backend/lib/errors';
@@ -20,21 +20,14 @@ interface CreateCourseInput {
   imageUrl?: string;
 }
 
-const db = () => createAdminClient();
-
 export async function createCourse(input: CreateCourseInput) {
-  const { data: trainer } = await db()
-    .from('Trainer')
-    .select('id')
-    .eq('id', input.trainerId)
-    .single();
+  const trainer = await prisma.trainer.findUnique({ where: { id: input.trainerId } });
   if (!trainer) throw new NotFoundError('Trainer');
 
   const slug = generateSlug(input.title);
 
-  const { data: course, error } = await db()
-    .from('Course')
-    .insert({
+  const course = await prisma.course.create({
+    data: {
       trainerId: input.trainerId,
       title: input.title,
       slug,
@@ -49,11 +42,8 @@ export async function createCourse(input: CreateCourseInput) {
       location: input.location,
       prerequisites: input.prerequisites,
       imageUrl: input.imageUrl,
-    })
-    .select()
-    .single();
-
-  if (error || !course) throw new Error('Failed to create course');
+    },
+  });
 
   await invalidateCache('courses:list:*');
   await invalidateCache(`trainer:${trainer.id}:*`);
@@ -66,30 +56,28 @@ export async function getCourseBySlug(slug: string) {
   const cached = await getCached<any>(cacheKey);
   if (cached) return cached;
 
-  const { data: course, error } = await db()
-    .from('Course')
-    .select(`
-      *,
-      trainer:Trainer(
-        id,
-        isVerified,
-        averageRating,
-        totalReviews,
-        user:User(fullName, avatarUrl)
-      )
-    `)
-    .eq('slug', slug)
-    .is('deletedAt', null)
-    .single();
+  const course = await prisma.course.findUnique({
+    where: { slug, deletedAt: null },
+    include: {
+      trainer: {
+        include: {
+          user: {
+            select: { fullName: true, avatarUrl: true },
+          },
+        },
+      },
+      _count: { select: { enrolments: true } },
+    },
+  });
 
-  if (error || !course) throw new NotFoundError('Course');
+  if (!course) throw new NotFoundError('Course');
 
   const result = {
     ...course,
     trainer: {
       id: course.trainer.id,
-      fullName: course.trainer.user?.fullName,
-      avatarUrl: course.trainer.user?.avatarUrl,
+      fullName: course.trainer.user.fullName,
+      avatarUrl: course.trainer.user.avatarUrl,
       isVerified: course.trainer.isVerified,
       averageRating: course.trainer.averageRating,
       totalReviews: course.trainer.totalReviews,
@@ -101,27 +89,22 @@ export async function getCourseBySlug(slug: string) {
 }
 
 export async function updateCourse(courseId: string, userId: string, data: Partial<CreateCourseInput>) {
-  const { data: course, error: findError } = await db()
-    .from('Course')
-    .select('*, trainer:Trainer(userId)')
-    .eq('id', courseId)
-    .single();
-
-  if (findError || !course) throw new NotFoundError('Course');
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: { trainer: true },
+  });
+  if (!course) throw new NotFoundError('Course');
   if (course.trainer.userId !== userId) throw new ForbiddenError('Not your course');
   if (course.deletedAt) throw new NotFoundError('Course');
 
-  const updateData: any = { ...data };
-  if (data.priceKes !== undefined) updateData.priceKes = data.priceKes;
-
-  const { data: updated, error: updateError } = await db()
-    .from('Course')
-    .update(updateData)
-    .eq('id', courseId)
-    .select()
-    .single();
-
-  if (updateError || !updated) throw new Error('Failed to update course');
+  const updated = await prisma.course.update({
+    where: { id: courseId },
+    data: {
+      ...data,
+      priceKes: data.priceKes ? data.priceKes : undefined,
+      maxStudents: data.maxStudents,
+    },
+  });
 
   await invalidateCache(`courses:slug:${course.slug}`);
   await invalidateCache('courses:list:*');
@@ -130,30 +113,21 @@ export async function updateCourse(courseId: string, userId: string, data: Parti
 }
 
 export async function softDeleteCourse(courseId: string, userId: string) {
-  const { data: course, error: findError } = await db()
-    .from('Course')
-    .select('*, trainer:Trainer(userId), slug, deletedAt')
-    .eq('id', courseId)
-    .single();
-
-  if (findError || !course) throw new NotFoundError('Course');
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    include: { trainer: true, _count: { select: { enrolments: true } } },
+  });
+  if (!course) throw new NotFoundError('Course');
   if (course.trainer.userId !== userId) throw new ForbiddenError('Not your course');
 
-  const { count } = await db()
-    .from('Enrolment')
-    .select('*', { count: 'exact', head: true })
-    .eq('courseId', courseId);
-
-  if (count && count > 0) {
+  if (course._count.enrolments > 0) {
     throw new ValidationError('Cannot delete course with active enrolments');
   }
 
-  const { error: deleteError } = await db()
-    .from('Course')
-    .update({ deletedAt: new Date().toISOString() })
-    .eq('id', courseId);
-
-  if (deleteError) throw new Error('Failed to delete course');
+  await prisma.course.update({
+    where: { id: courseId },
+    data: { deletedAt: new Date() },
+  });
 
   await invalidateCache(`courses:slug:${course.slug}`);
   await invalidateCache('courses:list:*');
@@ -175,54 +149,50 @@ export async function listCourses(filters: CourseListFilters) {
   const cached = await getCached<any>(cacheKey);
   if (cached) return cached;
 
-  let query = db()
-    .from('Course')
-    .select(`
-      *,
-      trainer:Trainer(
-        id,
-        isVerified,
-        averageRating,
-        totalReviews,
-        user:User(fullName, avatarUrl)
-      )
-    `, { count: 'exact' })
-    .eq('isPublished', true)
-    .is('deletedAt', null);
+  const where: any = {
+    isPublished: true,
+    deletedAt: null,
+  };
 
   if (filters.search) {
-    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+    where.OR = [
+      { title: { contains: filters.search, mode: 'insensitive' } },
+      { description: { contains: filters.search, mode: 'insensitive' } },
+    ];
   }
-  if (filters.category) {
-    query = query.eq('category', filters.category);
-  }
-  if (filters.mode) {
-    query = query.eq('mode', filters.mode);
-  }
-  if (filters.minPrice) {
-    query = query.gte('priceKes', filters.minPrice);
-  }
-  if (filters.maxPrice) {
-    query = query.lte('priceKes', filters.maxPrice);
-  }
+  if (filters.category) where.category = filters.category;
+  if (filters.mode) where.mode = filters.mode;
+  if (filters.minPrice) where.priceKes = { ...where.priceKes, gte: filters.minPrice };
+  if (filters.maxPrice) where.priceKes = { ...where.priceKes, lte: filters.maxPrice };
 
+  let orderBy: any = { createdAt: 'desc' };
   switch (filters.sortBy) {
-    case 'price_asc': query = query.order('priceKes', { ascending: true }); break;
-    case 'price_desc': query = query.order('priceKes', { ascending: false }); break;
-    case 'rating': query = query.order('averageRating', { ascending: false, foreignTable: 'trainer' }); break;
-    default: query = query.order('createdAt', { ascending: false });
+    case 'price_asc': orderBy = { priceKes: 'asc' }; break;
+    case 'price_desc': orderBy = { priceKes: 'desc' }; break;
+    case 'newest': orderBy = { createdAt: 'desc' }; break;
+    case 'rating': orderBy = { trainer: { averageRating: 'desc' } }; break;
   }
 
-  const from = (filters.page - 1) * filters.perPage;
-  const to = from + filters.perPage - 1;
-  query = query.range(from, to);
-
-  const { data: courses, count: total, error } = await query;
-
-  if (error) throw new Error('Failed to list courses');
+  const [courses, total] = await Promise.all([
+    prisma.course.findMany({
+      where,
+      include: {
+        trainer: {
+          include: {
+            user: { select: { fullName: true, avatarUrl: true } },
+          },
+        },
+        _count: { select: { enrolments: true } },
+      },
+      orderBy,
+      skip: (filters.page - 1) * filters.perPage,
+      take: filters.perPage,
+    }),
+    prisma.course.count({ where }),
+  ]);
 
   const result = {
-    data: (courses || []).map((c: any) => ({
+    data: courses.map(c => ({
       id: c.id,
       title: c.title,
       slug: c.slug,
@@ -232,19 +202,19 @@ export async function listCourses(filters: CourseListFilters) {
       duration: c.duration,
       sessionCount: c.sessionCount,
       imageUrl: c.imageUrl,
-      trainerName: c.trainer?.user?.fullName,
-      trainerAvatar: c.trainer?.user?.avatarUrl,
-      trainerId: c.trainer?.id,
-      isVerified: c.trainer?.isVerified,
-      averageRating: c.trainer?.averageRating,
-      totalReviews: c.trainer?.totalReviews,
-      enrolmentCount: 0,
+      trainerName: c.trainer.user.fullName,
+      trainerAvatar: c.trainer.user.avatarUrl,
+      trainerId: c.trainer.id,
+      isVerified: c.trainer.isVerified,
+      averageRating: c.trainer.averageRating,
+      totalReviews: c.trainer.totalReviews,
+      enrolmentCount: c._count.enrolments,
     })),
     meta: {
       page: filters.page,
       perPage: filters.perPage,
-      total: total || 0,
-      totalPages: Math.ceil((total || 0) / filters.perPage),
+      total,
+      totalPages: Math.ceil(total / filters.perPage),
     },
   };
 
@@ -253,19 +223,16 @@ export async function listCourses(filters: CourseListFilters) {
 }
 
 export async function getTrainerCourses(trainerId: string, includeUnpublished = false) {
-  let query = db()
-    .from('Course')
-    .select('*')
-    .eq('trainerId', trainerId)
-    .order('createdAt', { ascending: false });
-
+  const where: any = { trainerId };
   if (!includeUnpublished) {
-    query = query.is('deletedAt', null);
+    where.deletedAt = null;
   }
 
-  const { data: courses, error } = await query;
-
-  if (error) throw new Error('Failed to get trainer courses');
-
-  return courses || [];
+  return prisma.course.findMany({
+    where,
+    include: {
+      _count: { select: { enrolments: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
 }

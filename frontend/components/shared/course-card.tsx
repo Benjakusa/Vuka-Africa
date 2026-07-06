@@ -19,9 +19,9 @@ interface CourseCardProps {
 }
 
 const modeConfig = {
-  PHYSICAL: { icon: MapPin, label: 'Physical', className: 'text-body' },
-  VIRTUAL: { icon: Monitor, label: 'Virtual', className: 'text-primary' },
-  HYBRID: { icon: Globe, label: 'Hybrid', className: 'text-body' },
+  PHYSICAL: { icon: MapPin, label: 'Physical', className: 'bg-surface text-body' },
+  VIRTUAL: { icon: Monitor, label: 'Virtual', className: 'bg-primary/10 text-primary' },
+  HYBRID: { icon: Globe, label: 'Hybrid', className: 'bg-accent text-body' },
 };
 
 export function CourseCard({ id, title, slug, mode, duration, sessionCount, priceKes, imageUrl, averageRating, totalReviews }: CourseCardProps) {
@@ -37,7 +37,7 @@ export function CourseCard({ id, title, slug, mode, duration, sessionCount, pric
             <ModeIcon size={12} /> {cfg.label}
           </span>
         </div>
-        <div className="p-4 flex-1 flex flex-col items-center text-center">
+        <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-semibold text-dark mb-1 line-clamp-2">{title}</h3>
           <p className="text-xs text-muted-foreground mb-2">{duration}, {sessionCount} sessions</p>
           {averageRating !== undefined && (

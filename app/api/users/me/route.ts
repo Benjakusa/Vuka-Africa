@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { prisma } from '@backend/lib/prisma';
 import { authenticate } from '@backend/middleware/auth';
 import { handleError } from '@frontend/utils/error-handler';
 import { success } from '@backend/lib/api-response';
@@ -15,27 +15,26 @@ const updateSchema = z.object({
 export async function GET(req: NextRequest) {
   try {
     const user = await authenticate(req);
-    const admin = createAdminClient();
-    const { data: profile, error } = await admin
-      .from('User')
-      .select(`
-        *,
-        trainer:Trainer(
-          id,
-          bio,
-          skills,
-          isVerified,
-          verificationStatus,
-          commissionRate,
-          availableBalance,
-          averageRating,
-          totalReviews,
-          totalStudents
-        )
-      `)
-      .eq('id', user.id)
-      .single();
-    if (error || !profile) throw new NotFoundError('User');
+    const profile = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        trainer: {
+          select: {
+            id: true,
+            bio: true,
+            skills: true,
+            isVerified: true,
+            verificationStatus: true,
+            commissionRate: true,
+            availableBalance: true,
+            averageRating: true,
+            totalReviews: true,
+            totalStudents: true,
+          },
+        },
+      },
+    });
+    if (!profile) throw new NotFoundError('User');
     return success(profile);
   } catch (err) {
     return handleError(err);
@@ -61,15 +60,10 @@ export async function PATCH(req: NextRequest) {
       })));
     }
 
-    const admin = createAdminClient();
-    const { data: updated, error: updateError } = await admin
-      .from('User')
-      .update(parsed.data)
-      .eq('id', auth.id)
-      .select()
-      .single();
-
-    if (updateError || !updated) throw new Error('Failed to update user');
+    const updated = await prisma.user.update({
+      where: { id: auth.id },
+      data: parsed.data,
+    });
 
     return success(updated);
   } catch (err) {

@@ -4,32 +4,35 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, BookOpen, Book, Users, Wallet, ShieldCheck,
-  AlertTriangle, List, Star, Receipt, LogOut,
+  AlertTriangle, List, Star, Receipt, LogOut, Search, Settings,
 } from 'lucide-react';
 import { cn } from '@backend/lib/utils';
 import { useAuthStore } from '@frontend/stores/auth-store';
 
 const traineeLinks = [
-  { href: '/dashboard/trainee', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/trainee/enrolments', label: 'My Enrolments', icon: BookOpen },
-  { href: '/dashboard/trainee/payments', label: 'Payments', icon: Receipt },
-  { href: '/dashboard/trainee/reviews', label: 'Reviews', icon: Star },
+  { href: '/trainee', label: 'Overview', icon: LayoutDashboard },
+  { href: '/trainee/enrolments', label: 'My Enrolments', icon: BookOpen },
+  { href: '/trainee/payments', label: 'Payments', icon: Receipt },
+  { href: '/trainee/reviews', label: 'Reviews', icon: Star },
+  { href: '/trainers', label: 'Browse Trainers', icon: Search },
 ];
 
 const trainerLinks = [
-  { href: '/dashboard/trainer', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/trainer/courses', label: 'My Courses', icon: Book },
-  { href: '/dashboard/trainer/enrolments', label: 'Enrolments', icon: Users },
-  { href: '/dashboard/trainer/earnings', label: 'Earnings', icon: Wallet },
-  { href: '/dashboard/trainer/verification', label: 'Verification', icon: ShieldCheck },
+  { href: '/trainer', label: 'Overview', icon: LayoutDashboard },
+  { href: '/trainer/courses', label: 'My Courses', icon: Book },
+  { href: '/trainer/enrolments', label: 'Enrolments', icon: Users },
+  { href: '/trainer/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/trainer/verification', label: 'Verification', icon: ShieldCheck },
+  { href: '/trainer/reviews', label: 'Reviews', icon: Star },
 ];
 
 const adminLinks = [
-  { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/admin/verifications', label: 'Verifications', icon: ShieldCheck },
-  { href: '/dashboard/admin/disputes', label: 'Disputes', icon: AlertTriangle },
-  { href: '/dashboard/admin/transactions', label: 'Transactions', icon: List },
-  { href: '/dashboard/admin/users', label: 'Users', icon: Users },
+  { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/verifications', label: 'Verifications', icon: ShieldCheck },
+  { href: '/admin/disputes', label: 'Disputes', icon: AlertTriangle },
+  { href: '/admin/users', label: 'Users', icon: Users },
+  { href: '/admin/transactions', label: 'Transactions', icon: List },
+  { href: '/admin/config', label: 'Platform Config', icon: Settings },
 ];
 
 export function DashboardSidebar() {

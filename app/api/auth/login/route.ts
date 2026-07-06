@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
+import { prisma } from '@backend/lib/prisma';
 import { handleError } from '@frontend/utils/error-handler';
 import { ValidationError, AuthenticationError } from '@backend/lib/errors';
 
@@ -20,40 +20,26 @@ export async function POST(req: NextRequest) {
     }
 
     const supabaseUser = data.user;
-    const admin = createAdminClient();
 
-    const { data: existing } = await admin
-      .from('User')
-      .select('*')
-      .eq('id', supabaseUser.id)
-      .single();
+    let dbUser = await prisma.user.findUnique({ where: { id: supabaseUser.id } });
 
-    let dbUser;
-    if (!existing) {
+    if (!dbUser) {
       const metadata = supabaseUser.user_metadata || {};
-      const { data: created, error: createError } = await admin
-        .from('User')
-        .insert({
+      dbUser = await prisma.user.create({
+        data: {
           id: supabaseUser.id,
           email: supabaseUser.email!,
           phone: metadata.phone || '',
           fullName: metadata.full_name || supabaseUser.email!.split('@')[0],
           role: metadata.role || 'TRAINEE',
-          lastLoginAt: new Date().toISOString(),
-        })
-        .select()
-        .single();
-      if (createError || !created) throw new Error('Failed to create user');
-      dbUser = created;
+          lastLoginAt: new Date(),
+        },
+      });
     } else {
-      const { data: updated, error: updateError } = await admin
-        .from('User')
-        .update({ lastLoginAt: new Date().toISOString() })
-        .eq('id', supabaseUser.id)
-        .select()
-        .single();
-      if (updateError || !updated) throw new Error('Failed to update user');
-      dbUser = updated;
+      dbUser = await prisma.user.update({
+        where: { id: supabaseUser.id },
+        data: { lastLoginAt: new Date() },
+      });
     }
 
     return NextResponse.json({

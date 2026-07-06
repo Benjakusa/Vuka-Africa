@@ -1,10 +1,16 @@
 {
-  "name": "Vuka",
+  "name": "Vuka - Skill Training Marketplace",
   "short_name": "Vuka",
-  "description": "Learn skills from trusted trainers near you",
+  "description": "Find and enrol in hands-on skill training courses led by verified Kenyan trainers",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FAFAFA",
-  "theme_color": "#FF4D00",
-  "icons": []
+  "background_color": "#FFFFFF",
+  "theme_color": "#FF5349",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-384x384.png", "sizes": "384x384", "type": "image/png" },
+    { "src": "/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }
