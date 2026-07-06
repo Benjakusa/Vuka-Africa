@@ -16,12 +16,12 @@ export default function AdminDashboard() {
   const s = stats?.data;
 
   const cards = [
-    { label: 'Total Users', value: s?.totalUsers || 0, icon: Users, color: 'bg-blue-100 text-blue-600', href: '/dashboard/admin/users' },
-    { label: 'Total Courses', value: s?.totalCourses || 0, icon: BookOpen, color: 'bg-green-100 text-green-600', href: '#' },
+    { label: 'Total Users', value: s?.totalUsers || 0, icon: Users, color: 'bg-primary/10 text-primary', href: '/dashboard/admin/users' },
+    { label: 'Total Courses', value: s?.totalCourses || 0, icon: BookOpen, color: 'bg-accent text-body', href: '#' },
     { label: 'Total Revenue', value: formatCurrency(s?.totalRevenue || 0), icon: DollarSign, color: 'bg-primary/10 text-primary', href: '/dashboard/admin/ledger' },
-    { label: 'Pending Verifications', value: s?.pendingVerifications || 0, icon: ShieldCheck, color: 'bg-yellow-100 text-yellow-600', href: '/dashboard/admin/verifications' },
-    { label: 'Active Disputes', value: s?.activeDisputes || 0, icon: AlertTriangle, color: 'bg-red-100 text-red-600', href: '/dashboard/admin/disputes' },
-    { label: 'Commission Earned', value: formatCurrency(s?.commissionEarned || 0), icon: TrendingUp, color: 'bg-purple-100 text-purple-600', href: '/dashboard/admin/ledger' },
+    { label: 'Pending Verifications', value: s?.pendingVerifications || 0, icon: ShieldCheck, color: 'bg-warning/10 text-warning', href: '/dashboard/admin/verifications' },
+    { label: 'Active Disputes', value: s?.activeDisputes || 0, icon: AlertTriangle, color: 'bg-destructive/10 text-destructive', href: '/dashboard/admin/disputes' },
+    { label: 'Commission Earned', value: formatCurrency(s?.commissionEarned || 0), icon: TrendingUp, color: 'bg-surface text-body', href: '/dashboard/admin/ledger' },
   ];
 
   return (
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
                     <p className="font-medium text-dark truncate">{u.fullName}</p>
                     <p className="text-xs text-muted-foreground">{u.email}</p>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.role === 'TRAINER' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>{u.role}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.role === 'TRAINER' ? 'bg-accent text-body' : 'bg-surface text-body'}`}>{u.role}</span>
                 </div>
               ))}
             </div>

@@ -3,7 +3,6 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react';
-import { api } from '@backend/lib/api';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -21,7 +20,9 @@ function ResetForm() {
     if (!token) { toast.error('Invalid reset link'); return; }
     setLoading(true);
     try {
-      await api.post('/auth/reset-password', { token, password });
+      const res = await fetch('/api/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Failed to reset password');
       setDone(true);
       setTimeout(() => router.push('/auth/login'), 3000);
     } catch (err: any) {

@@ -49,7 +49,7 @@ export default function TrainerProfilePage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <BackButton href="/trainers" label="Back to Trainers" />
       <div className="bg-white rounded-card shadow-card overflow-hidden">
-        <div className="h-48 bg-gradient-to-br from-primary/10 to-primary/30" />
+        <div className="h-48 bg-surface" />
         <div className="px-6 pb-6 -mt-16">
           <div className="flex items-end gap-4">
             <div className="w-24 h-24 rounded-full border-4 border-white bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0">
@@ -133,7 +133,7 @@ export default function TrainerProfilePage() {
                       <div key={star} className="flex items-center gap-2 text-xs">
                         <span className="w-8 text-right">{star}★</span>
                         <div className="flex-1 h-2 bg-gray-200 rounded-full">
-                          <div className="h-2 bg-yellow-400 rounded-full" style={{ width: `${pct}%` }} />
+                          <div className="h-2 bg-primary rounded-full" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="w-8 text-muted-foreground">{count}</span>
                       </div>

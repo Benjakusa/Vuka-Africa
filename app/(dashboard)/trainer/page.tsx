@@ -44,8 +44,8 @@ export default function TrainerDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <Users size={20} className="text-blue-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Users size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-dark">{e?.totalStudents || 0}</p>
@@ -55,8 +55,8 @@ export default function TrainerDashboard() {
         </div>
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-              <Wallet size={20} className="text-green-600" />
+            <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+              <Wallet size={20} className="text-body" />
             </div>
             <div>
               <p className="text-2xl font-bold text-dark">{formatCurrency(e?.totalEarned || 0)}</p>
@@ -83,8 +83,8 @@ export default function TrainerDashboard() {
         </div>
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-              <Star size={20} className="text-yellow-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Star size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-dark">{e?.averageRating?.toFixed(1) || '0.0'}</p>

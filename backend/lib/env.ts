@@ -6,12 +6,9 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
 
-  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
-  JWT_REFRESH_SECRET: z.string().min(32, 'JWT_REFRESH_SECRET must be at least 32 characters'),
-  JWT_ACCESS_EXPIRY: z.string().default('15m'),
-  JWT_REFRESH_EXPIRY: z.string().default('7d'),
-  JWT_ISSUER: z.string().default('vuka'),
-
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   CSRF_SECRET: z.string().min(32).default(''),
 
   ENCRYPTION_KEY: z.string().min(32, 'ENCRYPTION_KEY must be 32 bytes (base64)').default(''),

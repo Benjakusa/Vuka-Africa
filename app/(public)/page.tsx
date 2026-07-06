@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Search, BookOpen, CheckCircle, ChefHat, Camera, Code, Dumbbell, Music, Languages } from 'lucide-react';
+import HeroCarousel from '@frontend/components/shared/hero-carousel';
 
 async function getFeaturedTrainers() {
   try {
@@ -23,32 +24,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <section className="bg-gradient-to-b from-white to-primary/5 py-20 md:py-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-dark leading-tight">
-              Learn from Africa&apos;s best. Vuka today.
-            </h1>
-            <p className="mt-4 text-lg text-body max-w-xl">
-              Master practical skills with vetted trainers across Africa.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/trainers"
-                className="px-6 py-3 bg-primary text-white font-medium rounded-btn text-center hover:bg-primary/90 transition-colors"
-              >
-                Find a Trainer
-              </Link>
-              <Link
-                href="/auth/register"
-                className="px-6 py-3 border-2 border-primary text-primary font-medium rounded-btn text-center hover:bg-primary/5 transition-colors"
-              >
-                Become a Trainer
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel />
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,7 +85,7 @@ export default async function HomePage() {
                     </div>
                     <h3 className="font-semibold text-dark text-center truncate">{t.fullName}</h3>
                     <div className="flex items-center justify-center gap-1 mt-1">
-                      <span className="text-yellow-400 text-sm">{'★'.repeat(Math.round(t.averageRating))}</span>
+                      <span className="text-primary text-sm">{'★'.repeat(Math.round(t.averageRating))}</span>
                       <span className="text-xs text-muted-foreground">({t.totalReviews})</span>
                     </div>
                     <div className="flex flex-wrap justify-center gap-1 mt-2">

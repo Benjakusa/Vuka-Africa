@@ -79,13 +79,13 @@ export default function AdminLedgerPage() {
                   <tr key={e.id} className="hover:bg-accent/50">
                     <td className="p-3 text-muted-foreground whitespace-nowrap">{formatDateTime(e.createdAt)}</td>
                     <td className="p-3">
-                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary whitespace-nowrap">
                         {e.type.split('_').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
                       </span>
                     </td>
                     <td className="p-3 text-dark whitespace-nowrap">{e.user?.fullName || 'System'}</td>
-                    <td className="p-3 text-right text-red-600 font-medium whitespace-nowrap">{e.debitKes ? formatCurrency(e.debitKes) : '-'}</td>
-                    <td className="p-3 text-right text-green-600 font-medium whitespace-nowrap">{e.creditKes ? formatCurrency(e.creditKes) : '-'}</td>
+                    <td className="p-3 text-right text-destructive font-medium whitespace-nowrap">{e.debitKes ? formatCurrency(e.debitKes) : '-'}</td>
+                    <td className="p-3 text-right text-primary font-medium whitespace-nowrap">{e.creditKes ? formatCurrency(e.creditKes) : '-'}</td>
                     <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">{e.reference || '-'}</td>
                   </tr>
                 ))}

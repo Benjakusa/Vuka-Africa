@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@frontend/stores/auth-store';
-import { api } from '@backend/lib/api';
 import { toast } from 'sonner';
 
 export default function AuthPage() {
@@ -46,11 +45,15 @@ export default function AuthPage() {
     setLoginError('');
     setLoginLoading(true);
     try {
-      const res = await api.post<{ data: any }>('/auth/login', {
-        email: loginEmail,
-        password: loginPassword,
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
       });
-      setUser(res.data.user);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Invalid email or password');
+      setUser(data.data);
       toast.success('Welcome back!');
       const redirect = searchParams.get('redirect') || '/dashboard/trainee';
       router.push(redirect);
@@ -70,8 +73,15 @@ export default function AuthPage() {
     setRegError('');
     setRegLoading(true);
     try {
-      const res = await api.post<{ data: any }>('/auth/register', regForm);
-      setUser(res.data.user);
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(regForm),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Registration failed');
+      setUser(data.data);
       toast.success('Account created! Welcome to Vuka.');
       router.push('/dashboard/trainee');
     } catch (err: any) {
@@ -94,7 +104,7 @@ export default function AuthPage() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg,#FEF2EB 0%,#fff 55%,#FEF2EB 100%);
+          background: #FAFAFA;
           padding: 1rem;
           font-family: 'Inter', system-ui, sans-serif;
         }
@@ -106,7 +116,7 @@ export default function AuthPage() {
           max-width: 860px;
           height: 600px;
           border-radius: 1.5rem;
-          box-shadow: 0 24px 64px -12px rgba(232,97,26,.20),
+          box-shadow: 0 24px 64px -12px rgba(255,83,73,.18),
                       0 8px 24px -4px rgba(0,0,0,.10);
           overflow: hidden;
           background: #fff;
@@ -141,7 +151,7 @@ export default function AuthPage() {
           left: 50%;          /* anchor to centre */
           width: 50%;
           height: 100%;
-          background: linear-gradient(145deg,#E8611A 0%,#C94F13 55%,#A9400E 100%);
+          background: #FF5349;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -193,7 +203,7 @@ export default function AuthPage() {
           align-items: center;
           gap: .3rem;
           font-size: .78rem;
-          color: #E8611A;
+          color: #FF5349;
           text-decoration: none;
           font-weight: 500;
           margin-bottom: 1rem;
@@ -221,8 +231,8 @@ export default function AuthPage() {
           font-family: inherit;
         }
         .ap-input:focus {
-          border-color: #E8611A;
-          box-shadow: 0 0 0 3px rgba(232,97,26,.12);
+          border-color: #FF5349;
+          box-shadow: 0 0 0 3px rgba(255,83,73,.15);
           background: #fff;
         }
         .ap-input-wrap { position: relative; }
@@ -241,10 +251,10 @@ export default function AuthPage() {
           padding: 0;
           line-height: 1;
         }
-        .ap-eye:hover { color: #E8611A; }
+.ap-eye:hover { color: #FF5349; }
 
-        .ap-forgot { text-align: right; margin-top: .2rem; }
-        .ap-forgot a { font-size: .75rem; color: #E8611A; text-decoration: none; }
+.ap-forgot { text-align: right; margin-top: .2rem; }
+.ap-forgot a { font-size: .75rem; color: #FF5349; text-decoration: none; font-weight: 600; }
         .ap-forgot a:hover { text-decoration: underline; }
 
         .ap-error {
@@ -259,7 +269,7 @@ export default function AuthPage() {
         .ap-submit {
           width: 100%;
           padding: .72rem;
-          background: #E8611A;
+          background: #FF5349;
           color: #fff;
           font-weight: 700;
           font-size: .9rem;
@@ -274,7 +284,7 @@ export default function AuthPage() {
           transition: background .2s, transform .15s;
           font-family: inherit;
         }
-        .ap-submit:hover:not(:disabled) { background: #C94F13; transform: translateY(-1px); }
+        .ap-submit:hover:not(:disabled) { background: #E0483F; transform: translateY(-1px); }
         .ap-submit:active:not(:disabled) { transform: translateY(0); }
         .ap-submit:disabled { opacity: .55; cursor: not-allowed; }
 
@@ -283,10 +293,12 @@ export default function AuthPage() {
 
         /* ── MOBILE ── */
         @media (max-width: 640px) {
+          .ap-root { padding: 0; }
+
           .ap-card {
             height: auto;
-            border-radius: 1rem;
-            overflow: visible;   /* let content grow */
+            border-radius: 0;
+            overflow: visible;
             box-shadow: none;
             background: transparent;
           }
@@ -312,11 +324,12 @@ export default function AuthPage() {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(145deg,#E8611A 0%,#C94F13 55%,#A9400E 100%);
-            border-radius: 1rem 1rem 0 0;
-            padding: 1.75rem 1.5rem;
+            background: #FF5349;
+            border-radius: 0;
+            padding: 3rem 1.5rem 2.5rem;
             text-align: center;
             margin-bottom: 0;
+            min-height: 200px;
           }
           .ap-mobile-header__logo {
             font-size: 2rem;
@@ -332,8 +345,8 @@ export default function AuthPage() {
 
           .ap-mobile-card {
             background: #fff;
-            border-radius: 0 0 1rem 1rem;
-            box-shadow: 0 12px 40px -8px rgba(232,97,26,.18), 0 4px 12px rgba(0,0,0,.08);
+            border-radius: 0;
+            box-shadow: 0 12px 40px -8px rgba(255,83,73,.16), 0 4px 12px rgba(0,0,0,.08);
             padding: 1.75rem 1.5rem 2rem;
           }
 
@@ -355,7 +368,7 @@ export default function AuthPage() {
           .ap-mobile-toggle button {
             background: none;
             border: none;
-            color: #E8611A;
+            color: #FF5349;
             font-weight: 700;
             cursor: pointer;
             padding: 0;

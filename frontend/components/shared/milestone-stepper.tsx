@@ -44,9 +44,9 @@ const statusConfig = {
     icon: Clock,
   },
   RELEASED: {
-    circle: 'bg-green-500 text-white',
-    line: 'bg-green-500',
-    text: 'text-green-600 font-medium',
+    circle: 'bg-primary text-white',
+    line: 'bg-primary',
+    text: 'text-primary font-medium',
     icon: Check,
   },
   DISPUTED: {
@@ -103,7 +103,7 @@ export function MilestoneStepper({ milestones, enrolmentStatus, role, onTraineeC
                 </div>
               )}
               {milestone.status === 'RELEASED' && (
-                <p className="text-xs text-green-600 font-medium">Funds released ✓</p>
+                <p className="text-xs text-primary font-medium">Funds released ✓</p>
               )}
               {milestone.status === 'DISPUTED' && (
                 <p className="text-xs text-red-600 font-medium">Under dispute</p>

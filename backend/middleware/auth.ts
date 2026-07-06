@@ -1,91 +1,58 @@
 import { NextRequest } from 'next/server';
-import { verifyAccessToken, isTokenBlacklisted, getTokenVersion } from '@backend/lib/jwt';
-import { AuthenticationError, ForbiddenError, AccountSuspendedError, EmailNotVerifiedError } from '@backend/lib/errors';
+import { createServerClient } from '@supabase/ssr';
+import { AuthenticationError, ForbiddenError } from '@backend/lib/errors';
 import { prisma } from '@backend/lib/prisma';
-import { env } from '@backend/lib/env';
 
 export interface AuthUser {
   id: string;
   role: 'TRAINEE' | 'TRAINER' | 'ADMIN';
-  emailVerified: boolean;
   isActive: boolean;
 }
 
-const PUBLIC_CACHE = new Map<string, { user: AuthUser; expiresAt: number }>();
+function getSupabaseClient(request: NextRequest) {
+  const cookieHeader = request.headers.get('cookie') || '';
+  const cookies: Record<string, string> = {};
+  cookieHeader.split(';').forEach(c => {
+    const [name, ...rest] = c.trim().split('=');
+    if (name) cookies[name] = rest.join('=');
+  });
 
-function getCachedUser(userId: string): AuthUser | null {
-  const cached = PUBLIC_CACHE.get(userId);
-  if (cached && cached.expiresAt > Date.now()) {
-    return cached.user;
-  }
-  PUBLIC_CACHE.delete(userId);
-  return null;
-}
-
-function setCachedUser(user: AuthUser): void {
-  PUBLIC_CACHE.set(user.id, { user, expiresAt: Date.now() + 30000 });
-}
-
-export function getTokenFromRequest(req: NextRequest): string | null {
-  const authHeader = req.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.slice(7);
-  }
-  return null;
-}
-
-function getJtiFromRequest(req: NextRequest): string | null {
-  const jti = req.headers.get('x-jti');
-  return jti;
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return Object.entries(cookies).map(([name, value]) => ({ name, value }));
+        },
+        setAll() {},
+      },
+    }
+  );
 }
 
 export async function authenticate(req: NextRequest): Promise<AuthUser> {
-  const token = getTokenFromRequest(req);
-  if (!token) {
-    throw new AuthenticationError('No authentication token provided. Use Authorization: Bearer <token>');
+  const supabase = getSupabaseClient(req);
+  const { data: { user: supabaseUser }, error } = await supabase.auth.getUser();
+
+  if (error || !supabaseUser) {
+    throw new AuthenticationError('Not authenticated');
   }
 
-  let payload;
-  try {
-    payload = verifyAccessToken(token);
-  } catch (err: any) {
-    throw new AuthenticationError(err.message);
-  }
-
-  if (payload.jti) {
-    const blacklisted = await isTokenBlacklisted(payload.jti);
-    if (blacklisted) {
-      throw new AuthenticationError('Token has been revoked');
-    }
-  }
-
-  const cached = getCachedUser(payload.userId);
-  if (cached) {
-    return cached;
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: payload.userId },
-    select: { id: true, role: true, emailVerified: true, isActive: true, suspendedAt: true, suspensionReason: true },
+  const dbUser = await prisma.user.findUnique({
+    where: { id: supabaseUser.id },
+    select: { id: true, role: true, isActive: true, suspendedAt: true, suspensionReason: true },
   });
 
-  if (!user) {
+  if (!dbUser) {
     throw new AuthenticationError('User not found');
   }
 
-  if (!user.isActive || user.suspendedAt) {
-    throw new AccountSuspendedError(user.suspensionReason || undefined);
+  if (!dbUser.isActive || dbUser.suspendedAt) {
+    throw new AuthenticationError('Account is suspended');
   }
 
-  const authUser: AuthUser = {
-    id: user.id,
-    role: user.role,
-    emailVerified: user.emailVerified,
-    isActive: user.isActive,
-  };
-
-  setCachedUser(authUser);
-  return authUser;
+  return { id: dbUser.id, role: dbUser.role, isActive: dbUser.isActive };
 }
 
 export function requireRole(...roles: string[]) {
@@ -96,36 +63,10 @@ export function requireRole(...roles: string[]) {
   };
 }
 
-export function requireEmailVerified(user: AuthUser): void {
-  if (env.REQUIRE_EMAIL_VERIFICATION === 'true' && !user.emailVerified) {
-    throw new EmailNotVerifiedError();
-  }
-}
-
 export async function optionalAuth(req: NextRequest): Promise<AuthUser | null> {
-  try {
-    return await authenticate(req);
-  } catch {
-    return null;
-  }
+  try { return await authenticate(req); } catch { return null; }
 }
 
 export function getUserId(user: AuthUser): string {
   return user.id;
-}
-
-export function isAdmin(user: AuthUser): boolean {
-  return user.role === 'ADMIN';
-}
-
-export function isTrainer(user: AuthUser): boolean {
-  return user.role === 'TRAINER';
-}
-
-export function isTrainee(user: AuthUser): boolean {
-  return user.role === 'TRAINEE';
-}
-
-export function clearAuthCache(userId: string): void {
-  PUBLIC_CACHE.delete(userId);
 }

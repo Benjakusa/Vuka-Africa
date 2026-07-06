@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { api } from '@backend/lib/api';
 
 export interface User {
   id: string;
@@ -7,7 +6,6 @@ export interface User {
   phone: string;
   fullName: string;
   role: 'TRAINEE' | 'TRAINER' | 'ADMIN';
-  emailVerified: boolean;
   avatarUrl: string | null;
   trainer?: {
     id: string;
@@ -29,7 +27,20 @@ interface AuthState {
   logout: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(path, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    ...options,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: { message: 'Unknown error' } }));
+    throw new Error(body.error?.message || 'Request failed');
+  }
+  return res.json();
+}
+
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
@@ -38,21 +49,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const res = await api.get<{ data: User }>('/auth/me');
+      const res = await apiFetch<{ data: User }>('/api/auth/me');
       set({ user: res.data, isAuthenticated: true, isLoading: false });
     } catch {
-      try {
-        const res = await api.post<{ data: User }>('/auth/refresh');
-        set({ user: res.data, isAuthenticated: true, isLoading: false });
-      } catch {
-        set({ user: null, isAuthenticated: false, isLoading: false });
-      }
+      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch {}
     set({ user: null, isAuthenticated: false });
   },

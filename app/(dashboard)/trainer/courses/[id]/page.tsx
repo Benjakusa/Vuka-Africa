@@ -71,7 +71,7 @@ export default function EditCoursePage() {
         <h1 className="text-2xl font-bold text-dark">Edit Course</h1>
         <button onClick={() => { if (confirm('Delete this course?')) deleteMutation.mutate(); }}
           disabled={deleteMutation.isPending}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-700 text-sm font-medium rounded-btn hover:bg-red-200 disabled:opacity-50">
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 text-destructive text-sm font-medium rounded-btn hover:bg-destructive/20 disabled:opacity-50">
           <Trash2 size={14} /> Delete
         </button>
       </div>

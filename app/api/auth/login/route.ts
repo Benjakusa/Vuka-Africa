@@ -1,53 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import * as authService from '@backend/services/auth.service';
+import { createClient } from '@/lib/supabase/server';
+import { prisma } from '@backend/lib/prisma';
 import { handleError } from '@frontend/utils/error-handler';
-import { ValidationError } from '@backend/lib/errors';
-import { env } from '@backend/lib/env';
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
-});
+import { ValidationError, AuthenticationError } from '@backend/lib/errors';
 
 export async function POST(req: NextRequest) {
   try {
     let body;
-    try {
-      body = await req.json();
-    } catch {
-      throw new ValidationError('Invalid JSON body');
+    try { body = await req.json(); } catch { throw new ValidationError('Invalid JSON body'); }
+
+    const { email, password } = body;
+    if (!email || !password) throw new ValidationError('Email and password required');
+
+    const supabase = createClient();
+    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (authError || !data.user) {
+      throw new AuthenticationError(authError?.message || 'Invalid email or password');
     }
 
-    const parsed = loginSchema.safeParse(body);
-    if (!parsed.success) {
-      throw new ValidationError(parsed.error.issues.map(i => ({
-        path: i.path.join('.'),
-        message: i.message,
-      })));
+    const supabaseUser = data.user;
+
+    let dbUser = await prisma.user.findUnique({ where: { id: supabaseUser.id } });
+
+    if (!dbUser) {
+      const metadata = supabaseUser.user_metadata || {};
+      dbUser = await prisma.user.create({
+        data: {
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          phone: metadata.phone || '',
+          fullName: metadata.full_name || supabaseUser.email!.split('@')[0],
+          role: metadata.role || 'TRAINEE',
+          lastLoginAt: new Date(),
+        },
+      });
+    } else {
+      dbUser = await prisma.user.update({
+        where: { id: supabaseUser.id },
+        data: { lastLoginAt: new Date() },
+      });
     }
 
-    const result = await authService.login(parsed.data);
-
-    const response = NextResponse.json({ data: result }, { status: 200 });
-
-    response.cookies.set('access_token', result.accessToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/',
-      maxAge: 15 * 60,
+    return NextResponse.json({
+      data: {
+        id: dbUser.id,
+        email: dbUser.email,
+        phone: dbUser.phone,
+        fullName: dbUser.fullName,
+        role: dbUser.role,
+        avatarUrl: dbUser.avatarUrl,
+      },
     });
-
-    response.cookies.set('refresh_token', result.refreshToken, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/api/auth',
-      maxAge: 7 * 24 * 60 * 60,
-    });
-
-    return response;
   } catch (err) {
     return handleError(err);
   }

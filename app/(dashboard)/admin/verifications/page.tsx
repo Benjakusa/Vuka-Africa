@@ -80,7 +80,7 @@ export default function AdminVerificationsPage() {
                   <button
                     onClick={() => approveMutation.mutate(v.id)}
                     disabled={approveMutation.isPending}
-                    className="p-2 bg-green-100 text-green-700 rounded-btn hover:bg-green-200 disabled:opacity-50 transition-colors"
+                    className="p-2 bg-primary/10 text-primary rounded-btn hover:bg-primary/20 disabled:opacity-50 transition-colors"
                     title="Approve"
                   >
                     {approveMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -91,7 +91,7 @@ export default function AdminVerificationsPage() {
                       if (reason) rejectMutation.mutate({ id: v.id, reason });
                     }}
                     disabled={rejectMutation.isPending}
-                    className="p-2 bg-red-100 text-red-700 rounded-btn hover:bg-red-200 disabled:opacity-50 transition-colors"
+                    className="p-2 bg-destructive/10 text-destructive rounded-btn hover:bg-destructive/20 disabled:opacity-50 transition-colors"
                     title="Reject"
                   >
                     <XCircle size={16} />

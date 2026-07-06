@@ -49,9 +49,9 @@ export default function TrainerEnrolmentDetailPage() {
             <p className="text-sm text-muted-foreground">{enr.course?.title}</p>
           </div>
           <span className={`ml-auto px-3 py-1 rounded-full text-xs font-medium ${
-            enr.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-            enr.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' :
-            enr.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+            enr.status === 'COMPLETED' ? 'bg-accent text-body' :
+            enr.status === 'IN_PROGRESS' ? 'bg-primary/10 text-primary' :
+            enr.status === 'PENDING' ? 'bg-warning/10 text-warning' :
             'bg-accent text-muted-foreground'
           }`}>
             {enr.status === 'IN_PROGRESS' ? 'In Progress' : enr.status.charAt(0) + enr.status.slice(1).toLowerCase()}

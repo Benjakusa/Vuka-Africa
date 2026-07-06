@@ -1,29 +1,29 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { createClient } from './lib/supabase/middleware';
 
-const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+const publicPaths = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  const { supabase, supabaseResponse } = createClient(request);
   const { pathname } = request.nextUrl;
-  const accessToken = request.cookies.get('access_token')?.value;
-  const refreshToken = request.cookies.get('refresh_token')?.value;
-  const isLoggedIn = !!(accessToken || refreshToken);
+
+  const { data: { session } } = await supabase.auth.getSession();
 
   if (pathname.startsWith('/dashboard/')) {
-    if (!isLoggedIn) {
-      const loginUrl = new URL('/login', request.url);
+    if (!session) {
+      const loginUrl = new URL('/auth/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
   }
 
-  if (publicPaths.includes(pathname) && isLoggedIn) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (publicPaths.includes(pathname) && session) {
+    return NextResponse.redirect(new URL('/dashboard/trainee', request.url));
   }
 
-  return NextResponse.next();
+  return supabaseResponse;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/register', '/forgot-password', '/reset-password'],
+  matcher: ['/dashboard/:path*', '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'],
 };

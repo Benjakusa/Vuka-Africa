@@ -9,7 +9,7 @@ const CSRF_COOKIE = 'csrf-token';
 
 export function generateCsrfToken(userId: string): string {
   const raw = `${userId}:${randomBytes(16).toString('hex')}:${Date.now()}`;
-  const hmac = createHmac('sha256', env.CSRF_SECRET || env.JWT_ACCESS_SECRET)
+  const hmac = createHmac('sha256', env.CSRF_SECRET || 'csrf-secret-change-in-prod')
     .update(raw)
     .digest('hex');
   return `${userId}.${hmac}`;

@@ -59,9 +59,9 @@ export default function TrainerEnrolmentsPage() {
                 <div className="text-right">
                   <p className="text-sm font-medium text-dark">{formatCurrency(e.totalPaid || 0)}</p>
                   <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                    e.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                    e.status === 'IN_PROGRESS' ? 'bg-blue-100 text-blue-700' :
-                    e.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                    e.status === 'COMPLETED' ? 'bg-accent text-body' :
+                    e.status === 'IN_PROGRESS' ? 'bg-primary/10 text-primary' :
+                    e.status === 'PENDING' ? 'bg-warning/10 text-warning' :
                     'bg-accent text-muted-foreground'
                   }`}>
                     {e.status === 'IN_PROGRESS' ? 'In Progress' : e.status.charAt(0) + e.status.slice(1).toLowerCase()}

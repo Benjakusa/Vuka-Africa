@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: 'Master practical skills with vetted trainers across Africa.',
   manifest: '/manifest.json',
   other: {
-    'theme-color': '#E8611A',
+    'theme-color': '#FF5349',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'default',
     'apple-mobile-web-app-title': 'Vuka',

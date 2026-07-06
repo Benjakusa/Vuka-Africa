@@ -29,7 +29,7 @@ export function RatingStars({ rating, maxRating = 5, size = 16, interactive, onC
               key={i}
               type="button"
               onClick={() => onChange?.(starValue)}
-              className={cn('transition-colors', starValue <= rating ? 'text-yellow-400' : 'text-gray-200')}
+              className={cn('transition-colors', starValue <= rating ? 'text-primary' : 'text-gray-200')}
             >
               <Star size={size} fill={starValue <= rating ? 'currentColor' : 'none'} />
             </button>
@@ -40,7 +40,7 @@ export function RatingStars({ rating, maxRating = 5, size = 16, interactive, onC
           <Star
             key={i}
             size={size}
-            className={cn(filled ? 'text-yellow-400 fill-yellow-400' : half ? 'text-yellow-400' : 'text-gray-200')}
+            className={cn(filled || half ? 'text-primary' : 'text-gray-200')}
           />
         );
       })}

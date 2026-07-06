@@ -37,8 +37,8 @@ export default function TraineeDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <BookOpen size={20} className="text-blue-600" />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <BookOpen size={20} className="text-primary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-dark">{activeEnrolments.length}</p>
@@ -48,8 +48,8 @@ export default function TraineeDashboard() {
         </div>
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle size={20} className="text-green-600" />
+            <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+              <CheckCircle size={20} className="text-body" />
             </div>
             <div>
               <p className="text-2xl font-bold text-dark">{completedEnrolments.length}</p>

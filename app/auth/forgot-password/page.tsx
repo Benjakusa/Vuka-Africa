@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Mail, ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
-import { api } from '@backend/lib/api';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -15,7 +14,9 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/auth/forgot-password', { email });
+      const res = await fetch('/api/auth/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'Something went wrong');
       setSent(true);
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong');

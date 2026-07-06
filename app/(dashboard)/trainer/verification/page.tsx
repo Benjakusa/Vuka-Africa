@@ -24,10 +24,10 @@ export default function VerificationPage() {
       return { label: 'Not Verified', color: 'bg-accent text-muted-foreground', icon: XCircle };
     }
     const map: Record<string, { label: string; color: string; icon: any }> = {
-      PENDING: { label: 'Pending Review', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-      APPROVED: { label: 'Verified', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-      REJECTED: { label: 'Rejected', color: 'bg-red-100 text-red-700', icon: XCircle },
-      PAID: { label: 'Fee Paid (Pending Review)', color: 'bg-blue-100 text-blue-700', icon: Clock },
+      PENDING: { label: 'Pending Review', color: 'bg-warning/10 text-warning', icon: Clock },
+      APPROVED: { label: 'Verified', color: 'bg-primary/10 text-primary', icon: CheckCircle },
+      REJECTED: { label: 'Rejected', color: 'bg-destructive/10 text-destructive', icon: XCircle },
+      PAID: { label: 'Fee Paid (Pending Review)', color: 'bg-primary/10 text-primary', icon: Clock },
     };
     return map[p.verificationStatus] || map.PENDING;
   };
@@ -61,9 +61,9 @@ export default function VerificationPage() {
               A non-refundable verification fee of KES 5,000 is required.
             </p>
             <ul className="space-y-2 text-sm text-body">
-              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-600" /> Verified badge on your profile</li>
-              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-600" /> Higher search ranking</li>
-              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-green-600" /> Reduced commission rate ({p?.isFirst100 ? '0%' : '12%'})</li>
+              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-primary" /> Verified badge on your profile</li>
+              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-primary" /> Higher search ranking</li>
+              <li className="flex items-center gap-2"><CheckCircle size={14} className="text-primary" /> Reduced commission rate ({p?.isFirst100 ? '0%' : '12%'})</li>
             </ul>
             <button
               onClick={() => setShowPayment(true)}
@@ -80,7 +80,7 @@ export default function VerificationPage() {
 
         {p?.verificationStatus === 'APPROVED' && (
           <div className="bg-green-50 border border-green-200 rounded-card p-4">
-            <p className="text-sm text-green-800 font-medium">You are a verified trainer!</p>
+            <p className="text-sm text-primary font-medium">You are a verified trainer!</p>
           </div>
         )}
 

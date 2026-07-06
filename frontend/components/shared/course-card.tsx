@@ -19,9 +19,9 @@ interface CourseCardProps {
 }
 
 const modeConfig = {
-  PHYSICAL: { icon: MapPin, label: 'Physical', className: 'bg-blue-100 text-blue-700' },
-  VIRTUAL: { icon: Monitor, label: 'Virtual', className: 'bg-purple-100 text-purple-700' },
-  HYBRID: { icon: Globe, label: 'Hybrid', className: 'bg-green-100 text-green-700' },
+  PHYSICAL: { icon: MapPin, label: 'Physical', className: 'bg-surface text-body' },
+  VIRTUAL: { icon: Monitor, label: 'Virtual', className: 'bg-primary/10 text-primary' },
+  HYBRID: { icon: Globe, label: 'Hybrid', className: 'bg-accent text-body' },
 };
 
 export function CourseCard({ id, title, slug, mode, duration, sessionCount, priceKes, imageUrl, averageRating, totalReviews }: CourseCardProps) {
@@ -31,7 +31,7 @@ export function CourseCard({ id, title, slug, mode, duration, sessionCount, pric
   return (
     <Link href={`/course/${slug}`} className="block">
       <div className="rounded-card bg-white shadow-card hover:shadow-cardHover transition-shadow overflow-hidden h-full flex flex-col">
-        <div className="h-36 bg-gradient-to-br from-primary/5 to-primary/20 relative">
+        <div className="h-36 bg-surface relative">
           {imageUrl && <img src={imageUrl} alt={title} className="w-full h-full object-cover" />}
           <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${cfg.className}`}>
             <ModeIcon size={12} /> {cfg.label}

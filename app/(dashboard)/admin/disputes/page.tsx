@@ -64,7 +64,7 @@ export default function AdminDisputesPage() {
             <div key={d.id} className="bg-white rounded-card shadow-card p-4">
               <div className="flex items-start gap-4">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  d.status === 'ACTIVE' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'
+                  d.status === 'ACTIVE' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
                 }`}>
                   <AlertTriangle size={20} />
                 </div>
@@ -79,13 +79,13 @@ export default function AdminDisputesPage() {
                     <div className="mt-3 flex gap-2">
                       <button onClick={() => resolveMutation.mutate({ id: d.id, resolution: 'REFUND_TRAINEE' })}
                         disabled={resolveMutation.isPending}
-                        className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-btn hover:bg-red-200 transition-colors">
+                        className="flex items-center gap-1 px-3 py-1 bg-destructive/10 text-destructive text-xs font-medium rounded-btn hover:bg-destructive/20 transition-colors">
                         {resolveMutation.isPending ? <Loader2 size={12} className="animate-spin" /> : <XCircle size={12} />}
                         Refund Trainee
                       </button>
                       <button onClick={() => resolveMutation.mutate({ id: d.id, resolution: 'RELEASE_TRAINER' })}
                         disabled={resolveMutation.isPending}
-                        className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-btn hover:bg-green-200 transition-colors">
+                        className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-btn hover:bg-primary/20 transition-colors">
                         <CheckCircle size={12} /> Release to Trainer
                       </button>
                     </div>
@@ -97,7 +97,7 @@ export default function AdminDisputesPage() {
                   )}
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  d.status === 'ACTIVE' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                  d.status === 'ACTIVE' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
                 }`}>{d.status}</span>
               </div>
             </div>

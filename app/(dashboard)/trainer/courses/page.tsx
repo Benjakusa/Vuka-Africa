@@ -57,7 +57,7 @@ export default function CourseManagementPage() {
           {courses.map((course: any) => (
             <div key={course.id} className="bg-white rounded-card shadow-card p-4 hover:shadow-cardHover transition-shadow">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary/5 to-primary/20 rounded-card flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 bg-primary/10 rounded-card flex items-center justify-center flex-shrink-0">
                   {course.imageUrl ? (
                     <img src={course.imageUrl} alt="" className="w-full h-full object-cover rounded-card" />
                   ) : (
@@ -76,7 +76,7 @@ export default function CourseManagementPage() {
                   <button
                     onClick={() => publishMutation.mutate({ id: course.id, isPublished: !course.isPublished })}
                     className={`p-2 rounded-btn text-xs font-medium transition-colors ${
-                      course.isPublished ? 'bg-green-100 text-green-700' : 'bg-accent text-muted-foreground'
+                      course.isPublished ? 'bg-primary/10 text-primary' : 'bg-accent text-muted-foreground'
                     }`}
                     title={course.isPublished ? 'Published' : 'Draft'}
                   >

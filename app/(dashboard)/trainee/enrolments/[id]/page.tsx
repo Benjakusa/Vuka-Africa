@@ -72,10 +72,10 @@ export default function EnrolmentDetailPage() {
       <BackButton href="/dashboard/trainee/enrolments" label="Back to Enrolments" />
       <div className="flex items-center gap-2">
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          enrolment.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
-          enrolment.status === 'COMPLETED' ? 'bg-blue-100 text-blue-700' :
-          enrolment.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-          'bg-yellow-100 text-yellow-700'
+          enrolment.status === 'ACTIVE' ? 'bg-accent text-body' :
+          enrolment.status === 'COMPLETED' ? 'bg-primary/10 text-primary' :
+          enrolment.status === 'CANCELLED' ? 'bg-destructive/10 text-destructive' :
+          'bg-warning/10 text-warning'
         }`}>
           {enrolment.status}
         </span>

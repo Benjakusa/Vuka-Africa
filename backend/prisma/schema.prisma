@@ -77,18 +77,13 @@ enum NotificationStatus {
 }
 
 model User {
-  id            String    @id @default(uuid())
+  id            String    @id
   email         String    @unique
   phone         String    @unique
   fullName      String
   avatarUrl     String?
   role          UserRole  @default(TRAINEE)
-  passwordHash  String
   isActive      Boolean   @default(true)
-  emailVerified Boolean   @default(false)
-  emailVerificationToken String?  @unique
-  emailVerificationSentAt DateTime?
-  tokenVersion  Int      @default(0)
   suspendedAt   DateTime?
   suspensionReason String?
   lastLoginAt   DateTime?

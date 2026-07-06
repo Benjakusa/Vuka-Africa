@@ -48,7 +48,7 @@ export default function EarningsPage() {
         </div>
         <div className="bg-white rounded-card shadow-card p-4">
           <div className="flex items-center gap-3 mb-2">
-            <TrendingUp size={20} className="text-green-600" />
+            <TrendingUp size={20} className="text-primary" />
             <span className="text-sm text-muted-foreground">Total Earned</span>
           </div>
           <p className="text-2xl font-bold text-dark">{formatCurrency(e?.totalEarned || 0)}</p>
@@ -88,9 +88,9 @@ export default function EarningsPage() {
                     <td className="p-3 text-right font-medium text-dark">{formatCurrency(p.amountKes)}</td>
                     <td className="p-3 text-right">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        p.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                        p.status === 'FAILED' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
+                        p.status === 'COMPLETED' ? 'bg-accent text-body' :
+                        p.status === 'FAILED' ? 'bg-destructive/10 text-destructive' :
+                        'bg-warning/10 text-warning'
                       }`}>{p.status}</span>
                     </td>
                   </tr>

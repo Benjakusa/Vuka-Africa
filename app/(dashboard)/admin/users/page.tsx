@@ -104,13 +104,13 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                        u.role === 'TRAINER' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
+                        u.role === 'ADMIN' ? 'bg-primary/10 text-primary' :
+                        u.role === 'TRAINER' ? 'bg-accent text-body' : 'bg-surface text-body'
                       }`}>{u.role}</span>
                     </td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                        u.suspendedAt ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        u.suspendedAt ? 'bg-destructive/10 text-destructive' : 'bg-accent text-body'
                       }`}>{u.suspendedAt ? 'Suspended' : 'Active'}</span>
                     </td>
                     <td className="p-3 text-muted-foreground">{formatDateTime(u.createdAt)}</td>
@@ -119,13 +119,13 @@ export default function AdminUsersPage() {
                         u.suspendedAt ? (
                           <button onClick={() => activateMutation.mutate(u.id)}
                             disabled={activateMutation.isPending}
-                            className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-btn hover:bg-green-200 disabled:opacity-50">
+                            className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-btn hover:bg-primary/20 disabled:opacity-50">
                             <CheckCircle size={12} /> Activate
                           </button>
                         ) : (
                           <button onClick={() => suspendMutation.mutate(u.id)}
                             disabled={suspendMutation.isPending}
-                            className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-red-100 text-red-700 rounded-btn hover:bg-red-200 disabled:opacity-50">
+                            className="flex items-center gap-1 px-3 py-1 text-xs font-medium bg-destructive/10 text-destructive rounded-btn hover:bg-destructive/20 disabled:opacity-50">
                             <Ban size={12} /> Suspend
                           </button>
                         )

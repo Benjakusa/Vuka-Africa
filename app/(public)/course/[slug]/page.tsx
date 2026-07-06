@@ -78,9 +78,9 @@ export default function CourseDetailPage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium
-                  ${course.mode === 'PHYSICAL' ? 'bg-blue-100 text-blue-700' :
-                    course.mode === 'VIRTUAL' ? 'bg-purple-100 text-purple-700' :
-                    'bg-green-100 text-green-700'}`}>
+                  ${course.mode === 'PHYSICAL' ? 'bg-surface text-body' :
+                    course.mode === 'VIRTUAL' ? 'bg-primary/10 text-primary' :
+                    'bg-accent text-body'}`}>
                   <ModeIcon size={12} className="inline mr-1" />
                   {cfg?.label}
                 </span>
