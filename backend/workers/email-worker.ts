@@ -1,7 +1,7 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { redis } from '@backend/lib/redis';
 import { sendEmail } from '@backend/lib/email';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 
 const connection = redis;
 
@@ -27,7 +27,7 @@ export async function addEmailToQueue(data: EmailJobData) {
   let notificationId: string | undefined;
 
   if (data.userId) {
-    const notification = await prisma.notification.create({
+    const notification = await supabaseDb.notification.create({
       data: {
         userId: data.userId,
         subject: data.subject,
@@ -53,7 +53,7 @@ const worker = new Worker(
       const info = await sendEmail(to, subject, html);
 
       if (notificationId) {
-        await prisma.notification.update({
+        await supabaseDb.notification.update({
           where: { id: notificationId },
           data: {
             status: 'SENT',
@@ -64,7 +64,7 @@ const worker = new Worker(
       }
     } catch (error: any) {
       if (notificationId) {
-        await prisma.notification.update({
+        await supabaseDb.notification.update({
           where: { id: notificationId },
           data: {
             status: 'FAILED',
@@ -75,7 +75,7 @@ const worker = new Worker(
       throw error;
     }
   },
-  { connection }
+  { connection },
 );
 
 worker.on('completed', (job) => {

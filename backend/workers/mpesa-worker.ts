@@ -1,6 +1,6 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { redis } from '@backend/lib/redis';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { addEmailToQueue } from './email-worker';
 
 const connection = redis;
@@ -37,7 +37,7 @@ const worker = new Worker(
         console.warn(`[M-Pesa Worker] Unknown job type: ${type}`);
     }
   },
-  { connection }
+  { connection },
 );
 
 worker.on('completed', (job) => {
@@ -56,12 +56,14 @@ async function handleStkCallback(data: any) {
 
     if (accountReference?.startsWith('VUKA-ENR-') || accountReference?.startsWith('ENROL-')) {
       const enrolmentId = accountReference.replace(/^(VUKA-ENR-|ENROL-)/, '');
-      await prisma.enrolment.update({
-        where: { id: enrolmentId },
-        data: { status: 'CANCELLED', cancelledAt: new Date() },
-      }).catch(() => {});
+      await supabaseDb.enrolment
+        .update({
+          where: { id: enrolmentId },
+          data: { status: 'CANCELLED', cancelledAt: new Date() },
+        })
+        .catch(() => {});
 
-      const enrolment = await prisma.enrolment.findUnique({
+      const enrolment = await supabaseDb.enrolment.findUnique({
         where: { id: enrolmentId },
         include: { trainee: true, course: { select: { title: true } } },
       });
@@ -72,7 +74,7 @@ async function handleStkCallback(data: any) {
 
     if (accountReference?.startsWith('VUKA-VRFY-') || accountReference?.startsWith('VERIFY-')) {
       const trainerId = accountReference.replace(/^(VUKA-VRFY-|VERIFY-)/, '');
-      const trainer = await prisma.trainer.findUnique({
+      const trainer = await supabaseDb.trainer.findUnique({
         where: { id: trainerId },
         include: { user: true },
       });
@@ -111,9 +113,9 @@ async function processSuccessfulEnrolment(
   mpesaReceiptNumber: string,
   amount: number,
   phoneNumber: string,
-  checkoutRequestId: string
+  checkoutRequestId: string,
 ) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId, status: 'PENDING_PAYMENT' },
     include: {
       course: { select: { title: true } },
@@ -123,7 +125,7 @@ async function processSuccessfulEnrolment(
   });
 
   if (!enrolment) {
-    const existing = await prisma.enrolment.findUnique({ where: { id: enrolmentId } });
+    const existing = await supabaseDb.enrolment.findUnique({ where: { id: enrolmentId } });
     if (existing && existing.status === 'ACTIVE') {
       console.log(`[M-Pesa] Enrolment ${enrolmentId} already active, skipping`);
       return;
@@ -133,7 +135,9 @@ async function processSuccessfulEnrolment(
   }
 
   if (Math.abs(Number(enrolment.pricePaidKes) - amount) > 1) {
-    console.error(`[M-Pesa] Amount mismatch for enrolment ${enrolmentId}: expected ${enrolment.pricePaidKes}, got ${amount}`);
+    console.error(
+      `[M-Pesa] Amount mismatch for enrolment ${enrolmentId}: expected ${enrolment.pricePaidKes}, got ${amount}`,
+    );
     return;
   }
 
@@ -141,7 +145,7 @@ async function processSuccessfulEnrolment(
   const trainerPayoutTotal = Number(enrolment.trainerPayoutKes);
   const commissionAmount = Number(enrolment.commissionKes);
 
-  await prisma.$transaction(async (tx) => {
+  await supabaseDb.$transaction(async (tx) => {
     await tx.enrolment.update({
       where: { id: enrolmentId },
       data: {
@@ -154,9 +158,14 @@ async function processSuccessfulEnrolment(
     });
 
     const milestoneData = [
-      { sequence: 1, label: 'Start', percentage: 25.00, amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100 },
-      { sequence: 2, label: 'Progress', percentage: 50.00, amountKes: Math.round(trainerPayoutTotal * 0.50 * 100) / 100 },
-      { sequence: 3, label: 'Completion', percentage: 25.00, amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100 },
+      { sequence: 1, label: 'Start', percentage: 25.0, amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100 },
+      { sequence: 2, label: 'Progress', percentage: 50.0, amountKes: Math.round(trainerPayoutTotal * 0.5 * 100) / 100 },
+      {
+        sequence: 3,
+        label: 'Completion',
+        percentage: 25.0,
+        amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100,
+      },
     ];
 
     for (const m of milestoneData) {
@@ -225,12 +234,8 @@ async function processSuccessfulEnrolment(
   });
 }
 
-async function processVerificationFee(
-  trainerId: string,
-  mpesaReceiptNumber: string,
-  amount: number
-) {
-  const trainer = await prisma.trainer.findUnique({
+async function processVerificationFee(trainerId: string, mpesaReceiptNumber: string, amount: number) {
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerId },
     include: { user: true },
   });
@@ -250,7 +255,7 @@ async function processVerificationFee(
     return;
   }
 
-  await prisma.$transaction(async (tx) => {
+  await supabaseDb.$transaction(async (tx) => {
     await tx.trainer.update({
       where: { id: trainerId },
       data: {
@@ -284,7 +289,7 @@ async function processVerificationFee(
 <p>Our team will review your documents within 2 business days.</p>`,
   });
 
-  const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+  const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
   if (admin) {
     await addEmailToQueue({
       to: admin.email,
@@ -299,20 +304,21 @@ async function processVerificationFee(
 async function handleB2cResult(data: any) {
   const { resultCode, resultDesc, originatorConversationId, conversationId, transactionId } = data;
 
-  console.log(`[M-Pesa] B2C result: resultCode=${resultCode}, conversationId=${conversationId}, txnId=${transactionId}`);
+  console.log(
+    `[M-Pesa] B2C result: resultCode=${resultCode}, conversationId=${conversationId}, txnId=${transactionId}`,
+  );
 
-  const payout = await prisma.payout.findFirst({
+  const payout = await supabaseDb.payout.findFirst({
     where: {
-      OR: [
-        { mpesaConversationId: conversationId },
-        { idempotencyKey: originatorConversationId },
-      ],
+      OR: [{ mpesaConversationId: conversationId }, { idempotencyKey: originatorConversationId }],
     },
     include: { trainer: { include: { user: true } } },
   });
 
   if (!payout) {
-    console.warn(`[M-Pesa] Payout not found for conversationId=${conversationId} or originatorId=${originatorConversationId}`);
+    console.warn(
+      `[M-Pesa] Payout not found for conversationId=${conversationId} or originatorId=${originatorConversationId}`,
+    );
     return;
   }
 
@@ -322,7 +328,7 @@ async function handleB2cResult(data: any) {
   }
 
   if (resultCode === 0) {
-    await prisma.payout.update({
+    await supabaseDb.payout.update({
       where: { id: payout.id },
       data: {
         status: 'COMPLETED',
@@ -333,7 +339,7 @@ async function handleB2cResult(data: any) {
       },
     });
 
-    await prisma.transactionLedger.create({
+    await supabaseDb.transactionLedger.create({
       data: {
         userId: payout.trainer.userId,
         type: 'TRAINER_PAYOUT',
@@ -358,7 +364,7 @@ async function handleB2cResult(data: any) {
 
     console.log(`[M-Pesa] Payout ${payout.id} completed successfully`);
   } else {
-    await prisma.payout.update({
+    await supabaseDb.payout.update({
       where: { id: payout.id },
       data: {
         status: 'FAILED',
@@ -367,7 +373,7 @@ async function handleB2cResult(data: any) {
       },
     });
 
-    await prisma.$transaction(async (tx) => {
+    await supabaseDb.$transaction(async (tx) => {
       const trainer = await tx.trainer.findUnique({
         where: { id: payout.trainerId },
       });

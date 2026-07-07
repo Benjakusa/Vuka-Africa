@@ -1,4 +1,4 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { mpesaClient } from '@backend/lib/mpesa';
 import { ConflictError, NotFoundError, ValidationError } from '@backend/lib/errors';
 import { checkAndMarkIdempotent } from '@backend/lib/idempotency';
@@ -10,7 +10,7 @@ interface CreateEnrolmentInput {
 }
 
 export async function createEnrolment(input: CreateEnrolmentInput) {
-  const course = await prisma.course.findUnique({
+  const course = await supabaseDb.course.findUnique({
     where: { id: input.courseId, deletedAt: null },
     include: { trainer: true, _count: { select: { enrolments: true } } },
   });
@@ -24,7 +24,7 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
     throw new ValidationError('Course is full');
   }
 
-  const existing = await prisma.enrolment.findFirst({
+  const existing = await supabaseDb.enrolment.findFirst({
     where: {
       traineeId: input.traineeId,
       courseId: input.courseId,
@@ -33,10 +33,14 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
   });
   if (existing) throw new ConflictError('Already enrolled in this course');
 
-  const user = await prisma.user.findUnique({ where: { id: input.traineeId } });
+  const user = await supabaseDb.user.findUnique({ where: { id: input.traineeId } });
   if (!user) throw new NotFoundError('User');
 
-  const idempotent = await checkAndMarkIdempotent('enrolment', `${input.courseId}:${input.traineeId}`, CACHE.IDEMPOTENCY_TTL);
+  const idempotent = await checkAndMarkIdempotent(
+    'enrolment',
+    `${input.courseId}:${input.traineeId}`,
+    CACHE.IDEMPOTENCY_TTL,
+  );
   if (idempotent) {
     throw new ConflictError('Duplicate enrolment request. Please wait for M-Pesa prompt.');
   }
@@ -48,7 +52,7 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
   let enrolment;
 
   try {
-    enrolment = await prisma.enrolment.create({
+    enrolment = await supabaseDb.enrolment.create({
       data: {
         courseId: input.courseId,
         traineeId: input.traineeId,
@@ -67,7 +71,7 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
       transactionDesc: `Vuka Course Enrolment`,
     });
 
-    await prisma.enrolment.update({
+    await supabaseDb.enrolment.update({
       where: { id: enrolment.id },
       data: { mpesaCheckoutRequestId: response.CheckoutRequestID },
     });
@@ -78,14 +82,14 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
     };
   } catch (error: any) {
     if (enrolment) {
-      await prisma.enrolment.delete({ where: { id: enrolment.id } }).catch(() => {});
+      await supabaseDb.enrolment.delete({ where: { id: enrolment.id } }).catch(() => {});
     }
     throw error;
   }
 }
 
 export async function getEnrolmentStatus(enrolmentId: string, userId: string) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId },
     select: {
       id: true,
@@ -106,7 +110,7 @@ export async function getEnrolmentStatus(enrolmentId: string, userId: string) {
 }
 
 export async function getEnrolmentDetail(enrolmentId: string, userId: string) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId },
     include: {
       course: {
@@ -130,7 +134,7 @@ export async function getEnrolmentDetail(enrolmentId: string, userId: string) {
   if (!enrolment) throw new NotFoundError('Enrolment');
 
   if (enrolment.traineeId !== userId && enrolment.trainer.userId !== userId) {
-    const admin = await prisma.user.findUnique({ where: { id: userId } });
+    const admin = await supabaseDb.user.findUnique({ where: { id: userId } });
     if (!admin || admin.role !== 'ADMIN') {
       throw new ValidationError('Not authorized to view this enrolment');
     }
@@ -144,7 +148,7 @@ export async function listUserEnrolments(
   role: 'TRAINEE' | 'TRAINER',
   status?: string,
   page = 1,
-  perPage = 20
+  perPage = 20,
 ) {
   const where: any = {};
   if (role === 'TRAINEE') where.traineeId = userId;
@@ -153,7 +157,7 @@ export async function listUserEnrolments(
   if (status) where.status = status;
 
   const [enrolments, total] = await Promise.all([
-    prisma.enrolment.findMany({
+    supabaseDb.enrolment.findMany({
       where,
       include: {
         course: { select: { title: true, slug: true, imageUrl: true, mode: true } },
@@ -167,7 +171,7 @@ export async function listUserEnrolments(
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.enrolment.count({ where }),
+    supabaseDb.enrolment.count({ where }),
   ]);
 
   return {

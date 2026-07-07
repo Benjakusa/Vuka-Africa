@@ -1,4 +1,4 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { mpesaClient } from '@backend/lib/mpesa';
 import { setCached, getCached, invalidateCache } from '@backend/lib/cache';
 import { ConflictError, NotFoundError, ValidationError } from '@backend/lib/errors';
@@ -13,60 +13,63 @@ interface ApplyInput {
 }
 
 export async function apply(input: ApplyInput) {
-  const existing = await prisma.trainer.findUnique({ where: { userId: input.userId } });
+  const existing = await supabaseDb.trainer.findUnique({ where: { userId: input.userId } });
   if (existing) {
     throw new ConflictError('User already has a trainer profile');
   }
 
-  const user = await prisma.user.findUnique({ where: { id: input.userId } });
+  const user = await supabaseDb.user.findUnique({ where: { id: input.userId } });
   if (!user) throw new NotFoundError('User');
   if (user.role !== 'TRAINEE') {
     throw new ConflictError('User is already a trainer or admin');
   }
 
-  const result = await prisma.$transaction(async (tx) => {
-    const config = await tx.platformConfig.findUnique({ where: { id: 1 } });
-    if (!config) throw new Error('Platform configuration missing');
+  const result = await supabaseDb.$transaction(
+    async (tx) => {
+      const config = await tx.platformConfig.findUnique({ where: { id: 1 } });
+      if (!config) throw new Error('Platform configuration missing');
 
-    const isFoundingTrainer = config.trainerCount < COMMISSION.FREE_TRAINER_LIMIT;
+      const isFoundingTrainer = config.trainerCount < COMMISSION.FREE_TRAINER_LIMIT;
 
-    const trainer = await tx.trainer.create({
-      data: {
-        userId: input.userId,
-        bio: input.bio,
-        skills: input.skills,
-        idDocumentUrl: input.idDocumentUrl,
-        ...(isFoundingTrainer
-          ? {
-              isVerified: true,
-              verificationStatus: 'APPROVED' as const,
-              verificationFeePaid: false,
-              commissionRate: 0.00,
-            }
-          : {
-              isVerified: false,
-              verificationStatus: 'UNSUBMITTED' as const,
-              commissionRate: COMMISSION.DEFAULT,
-            }),
-      },
-    });
-
-    if (isFoundingTrainer) {
-      await tx.platformConfig.update({
-        where: { id: 1 },
-        data: { trainerCount: { increment: 1 } },
+      const trainer = await tx.trainer.create({
+        data: {
+          userId: input.userId,
+          bio: input.bio,
+          skills: input.skills,
+          idDocumentUrl: input.idDocumentUrl,
+          ...(isFoundingTrainer
+            ? {
+                isVerified: true,
+                verificationStatus: 'APPROVED' as const,
+                verificationFeePaid: false,
+                commissionRate: 0.0,
+              }
+            : {
+                isVerified: false,
+                verificationStatus: 'UNSUBMITTED' as const,
+                commissionRate: COMMISSION.DEFAULT,
+              }),
+        },
       });
-    }
 
-    await tx.user.update({
-      where: { id: input.userId },
-      data: { role: 'TRAINER' },
-    });
+      if (isFoundingTrainer) {
+        await tx.platformConfig.update({
+          where: { id: 1 },
+          data: { trainerCount: { increment: 1 } },
+        });
+      }
 
-    return { trainer, isFoundingTrainer };
-  }, {
-    isolationLevel: 'Serializable',
-  });
+      await tx.user.update({
+        where: { id: input.userId },
+        data: { role: 'TRAINER' },
+      });
+
+      return { trainer, isFoundingTrainer };
+    },
+    {
+      isolationLevel: 'Serializable',
+    },
+  );
 
   await invalidateCache('trainers:list:*');
 
@@ -88,7 +91,7 @@ export async function getPublicProfile(trainerId: string) {
   const cached = await getCached<any>(cacheKey);
   if (cached) return cached;
 
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerId },
     include: {
       user: {
@@ -134,10 +137,10 @@ export async function getPublicProfile(trainerId: string) {
 }
 
 export async function updateProfile(userId: string, data: { bio?: string; skills?: string[]; idDocumentUrl?: string }) {
-  const trainer = await prisma.trainer.findUnique({ where: { userId } });
+  const trainer = await supabaseDb.trainer.findUnique({ where: { userId } });
   if (!trainer) throw new NotFoundError('Trainer');
 
-  const updated = await prisma.trainer.update({
+  const updated = await supabaseDb.trainer.update({
     where: { userId },
     data,
   });
@@ -149,7 +152,7 @@ export async function updateProfile(userId: string, data: { bio?: string; skills
 }
 
 export async function initiateVerificationPayment(userId: string) {
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { userId },
     include: { user: true },
   });
@@ -172,7 +175,7 @@ export async function initiateVerificationPayment(userId: string) {
 }
 
 export async function getVerificationStatus(userId: string) {
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { userId },
     select: {
       isVerified: true,
@@ -185,7 +188,7 @@ export async function getVerificationStatus(userId: string) {
 }
 
 export async function processVerificationCallback(trainerId: string, mpesaTransactionId: string) {
-  await prisma.trainer.update({
+  await supabaseDb.trainer.update({
     where: { id: trainerId },
     data: {
       verificationFeePaid: true,
@@ -193,9 +196,9 @@ export async function processVerificationCallback(trainerId: string, mpesaTransa
     },
   });
 
-  await prisma.transactionLedger.create({
+  await supabaseDb.transactionLedger.create({
     data: {
-      userId: (await prisma.trainer.findUnique({ where: { id: trainerId }, select: { userId: true } }))!.userId,
+      userId: (await supabaseDb.trainer.findUnique({ where: { id: trainerId }, select: { userId: true } }))!.userId,
       type: 'VERIFICATION_FEE',
       direction: 'DEBIT',
       amountKes: FEES.VERIFICATION,
@@ -208,7 +211,7 @@ export async function processVerificationCallback(trainerId: string, mpesaTransa
     },
   });
 
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerId },
     include: { user: true },
   });
@@ -275,14 +278,22 @@ export async function listTrainers(filters: TrainerListFilters) {
 
   let orderBy: any = { averageRating: 'desc' };
   switch (filters.sortBy) {
-    case 'rating': orderBy = { averageRating: 'desc' }; break;
-    case 'price_asc': orderBy = { courses: { _count: 'asc' } }; break;
-    case 'price_desc': orderBy = { courses: { _count: 'desc' } }; break;
-    case 'newest': orderBy = { createdAt: 'desc' }; break;
+    case 'rating':
+      orderBy = { averageRating: 'desc' };
+      break;
+    case 'price_asc':
+      orderBy = { courses: { _count: 'asc' } };
+      break;
+    case 'price_desc':
+      orderBy = { courses: { _count: 'desc' } };
+      break;
+    case 'newest':
+      orderBy = { createdAt: 'desc' };
+      break;
   }
 
   const [trainers, total] = await Promise.all([
-    prisma.trainer.findMany({
+    supabaseDb.trainer.findMany({
       where,
       include: {
         user: {
@@ -299,11 +310,11 @@ export async function listTrainers(filters: TrainerListFilters) {
       skip: (filters.page - 1) * filters.perPage,
       take: filters.perPage,
     }),
-    prisma.trainer.count({ where }),
+    supabaseDb.trainer.count({ where }),
   ]);
 
   const result = {
-    data: trainers.map(t => ({
+    data: trainers.map((t) => ({
       id: t.id,
       fullName: t.user.fullName,
       avatarUrl: t.user.avatarUrl,

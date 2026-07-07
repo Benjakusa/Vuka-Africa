@@ -1,9 +1,9 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { NotFoundError, ValidationError, ForbiddenError } from '@backend/lib/errors';
 import { addMilestoneReleaseJob } from '@backend/workers/milestone-worker';
 
 export async function confirmByTrainer(milestoneId: string, enrolmentId: string, userId: string) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId },
     include: { trainer: true },
   });
@@ -11,13 +11,13 @@ export async function confirmByTrainer(milestoneId: string, enrolmentId: string,
   if (enrolment.trainer.userId !== userId) throw new ForbiddenError('Not your enrolment');
   if (enrolment.status !== 'ACTIVE') throw new ValidationError('Enrolment is not active');
 
-  const milestone = await prisma.milestone.findUnique({
+  const milestone = await supabaseDb.milestone.findUnique({
     where: { id: milestoneId, enrolmentId },
   });
   if (!milestone) throw new NotFoundError('Milestone');
   if (milestone.status !== 'PENDING') throw new ValidationError('Milestone is not pending');
 
-  const updated = await prisma.milestone.update({
+  const updated = await supabaseDb.milestone.update({
     where: { id: milestoneId },
     data: {
       status: 'TRAINER_CONFIRMED',
@@ -26,7 +26,7 @@ export async function confirmByTrainer(milestoneId: string, enrolmentId: string,
   });
 
   if (updated.status === 'TRAINER_CONFIRMED') {
-    const traineeConfirmed = await prisma.milestone.findFirst({
+    const traineeConfirmed = await supabaseDb.milestone.findFirst({
       where: { id: milestoneId, traineeConfirmedAt: { not: null } },
     });
 
@@ -44,7 +44,7 @@ export async function confirmByTrainer(milestoneId: string, enrolmentId: string,
 }
 
 export async function confirmByTrainee(milestoneId: string, enrolmentId: string, userId: string) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId },
     include: { trainer: true },
   });
@@ -52,7 +52,7 @@ export async function confirmByTrainee(milestoneId: string, enrolmentId: string,
   if (enrolment.traineeId !== userId) throw new ForbiddenError('Not your enrolment');
   if (enrolment.status !== 'ACTIVE') throw new ValidationError('Enrolment is not active');
 
-  const milestone = await prisma.milestone.findUnique({
+  const milestone = await supabaseDb.milestone.findUnique({
     where: { id: milestoneId, enrolmentId },
   });
   if (!milestone) throw new NotFoundError('Milestone');
@@ -60,7 +60,7 @@ export async function confirmByTrainee(milestoneId: string, enrolmentId: string,
     throw new ValidationError('Milestone cannot be confirmed');
   }
 
-  const updated = await prisma.milestone.update({
+  const updated = await supabaseDb.milestone.update({
     where: { id: milestoneId },
     data: {
       status: 'TRAINEE_CONFIRMED',
@@ -68,7 +68,7 @@ export async function confirmByTrainee(milestoneId: string, enrolmentId: string,
     },
   });
 
-  const trainerConfirmed = await prisma.milestone.findFirst({
+  const trainerConfirmed = await supabaseDb.milestone.findFirst({
     where: { id: milestoneId, trainerConfirmedAt: { not: null } },
   });
 
@@ -85,13 +85,13 @@ export async function confirmByTrainee(milestoneId: string, enrolmentId: string,
 }
 
 export async function releaseMilestone(milestoneId: string, enrolmentId: string, trainerId: string, amountKes: number) {
-  const milestone = await prisma.milestone.findUnique({
+  const milestone = await supabaseDb.milestone.findUnique({
     where: { id: milestoneId, enrolmentId },
     select: { id: true, sequence: true },
   });
   if (!milestone) throw new NotFoundError('Milestone');
 
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await supabaseDb.$transaction(async (tx) => {
     const updated = await tx.milestone.updateMany({
       where: { id: milestoneId, enrolmentId, status: 'TRAINEE_CONFIRMED' },
       data: { status: 'RELEASED', releasedAt: new Date() },

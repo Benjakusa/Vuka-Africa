@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq';
 import { redis } from '@backend/lib/redis';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { mpesaClient } from '@backend/lib/mpesa';
 import { addEmailToQueue } from './email-worker';
 import { createManagedWorker, setupGracefulShutdown } from './base';
@@ -37,7 +37,7 @@ async function processB2CInitiation(
   phoneNumber: string,
   idempotencyKey: string,
 ) {
-  const payout = await prisma.payout.findUnique({ where: { id: payoutId } });
+  const payout = await supabaseDb.payout.findUnique({ where: { id: payoutId } });
   if (!payout) {
     console.error(`[Payout Worker] Payout ${payoutId} not found`);
     return;
@@ -47,7 +47,7 @@ async function processB2CInitiation(
     return;
   }
 
-  await prisma.payout.update({
+  await supabaseDb.payout.update({
     where: { id: payoutId },
     data: { status: 'PROCESSING' },
   });
@@ -61,7 +61,7 @@ async function processB2CInitiation(
       idempotencyKey,
     });
 
-    await prisma.payout.update({
+    await supabaseDb.payout.update({
       where: { id: payoutId },
       data: { mpesaConversationId: b2cResponse.ConversationID, idempotencyKey },
     });
@@ -71,9 +71,11 @@ async function processB2CInitiation(
     const retryCount = payout.retryCount + 1;
 
     if (retryCount >= WORKER.PAYOUT_MAX_RETRIES) {
-      console.error(`[Payout Worker] B2C failed after ${WORKER.PAYOUT_MAX_RETRIES} retries for payout ${payoutId}: ${error.message}`);
+      console.error(
+        `[Payout Worker] B2C failed after ${WORKER.PAYOUT_MAX_RETRIES} retries for payout ${payoutId}: ${error.message}`,
+      );
 
-      await prisma.$transaction(async (tx) => {
+      await supabaseDb.$transaction(async (tx) => {
         await tx.payout.update({
           where: { id: payoutId },
           data: { status: 'FAILED', failureReason: error.message || 'B2C failed after retries', retryCount },
@@ -102,7 +104,7 @@ async function processB2CInitiation(
         });
       });
 
-      const trainerUser = await prisma.trainer.findUnique({
+      const trainerUser = await supabaseDb.trainer.findUnique({
         where: { id: trainerId },
         include: { user: { select: { email: true } } },
       });
@@ -114,7 +116,7 @@ async function processB2CInitiation(
         });
       }
     } else {
-      await prisma.payout.update({
+      await supabaseDb.payout.update({
         where: { id: payoutId },
         data: { retryCount },
       });

@@ -1,4 +1,4 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { NotFoundError, ValidationError, ForbiddenError } from '@backend/lib/errors';
 import { addEmailToQueue } from '@backend/workers/email-worker';
 
@@ -10,7 +10,7 @@ interface RaiseDisputeInput {
 }
 
 export async function raiseDispute(input: RaiseDisputeInput) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: input.enrolmentId },
     include: {
       course: { include: { trainer: { include: { user: true } } } },
@@ -24,14 +24,14 @@ export async function raiseDispute(input: RaiseDisputeInput) {
   if (enrolment.status !== 'ACTIVE') throw new ValidationError('Can only dispute active enrolments');
 
   if (input.milestoneId) {
-    const milestone = await prisma.milestone.findUnique({
+    const milestone = await supabaseDb.milestone.findUnique({
       where: { id: input.milestoneId, enrolmentId: input.enrolmentId },
     });
     if (!milestone) throw new NotFoundError('Milestone');
     if (milestone.status === 'RELEASED') throw new ValidationError('Cannot dispute released milestone');
   }
 
-  const dispute = await prisma.dispute.create({
+  const dispute = await supabaseDb.dispute.create({
     data: {
       enrolmentId: input.enrolmentId,
       milestoneId: input.milestoneId,
@@ -42,13 +42,13 @@ export async function raiseDispute(input: RaiseDisputeInput) {
   });
 
   if (input.milestoneId) {
-    await prisma.milestone.update({
+    await supabaseDb.milestone.update({
       where: { id: input.milestoneId },
       data: { status: 'DISPUTED', disputeId: dispute.id },
     });
   }
 
-  const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+  const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
   if (admin) {
     await addEmailToQueue({
       to: admin.email,
@@ -61,7 +61,7 @@ export async function raiseDispute(input: RaiseDisputeInput) {
 }
 
 export async function getDisputesForEnrolment(enrolmentId: string, userId: string) {
-  const enrolment = await prisma.enrolment.findUnique({
+  const enrolment = await supabaseDb.enrolment.findUnique({
     where: { id: enrolmentId },
     include: { course: { include: { trainer: true } } },
   });
@@ -69,11 +69,11 @@ export async function getDisputesForEnrolment(enrolmentId: string, userId: strin
 
   const isParticipant = enrolment.traineeId === userId || enrolment.course.trainer.userId === userId;
   if (!isParticipant) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await supabaseDb.user.findUnique({ where: { id: userId } });
     if (!user || user.role !== 'ADMIN') throw new ForbiddenError();
   }
 
-  return prisma.dispute.findMany({
+  return supabaseDb.dispute.findMany({
     where: { enrolmentId },
     include: {
       raisedBy: { select: { id: true, fullName: true } },

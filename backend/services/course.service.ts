@@ -1,4 +1,4 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { generateSlug } from '@frontend/utils/slug';
 import { setCached, getCached, invalidateCache } from '@backend/lib/cache';
 import { NotFoundError, ValidationError, ForbiddenError } from '@backend/lib/errors';
@@ -21,12 +21,12 @@ interface CreateCourseInput {
 }
 
 export async function createCourse(input: CreateCourseInput) {
-  const trainer = await prisma.trainer.findUnique({ where: { id: input.trainerId } });
+  const trainer = await supabaseDb.trainer.findUnique({ where: { id: input.trainerId } });
   if (!trainer) throw new NotFoundError('Trainer');
 
   const slug = generateSlug(input.title);
 
-  const course = await prisma.course.create({
+  const course = await supabaseDb.course.create({
     data: {
       trainerId: input.trainerId,
       title: input.title,
@@ -56,7 +56,7 @@ export async function getCourseBySlug(slug: string) {
   const cached = await getCached<any>(cacheKey);
   if (cached) return cached;
 
-  const course = await prisma.course.findUnique({
+  const course = await supabaseDb.course.findUnique({
     where: { slug, deletedAt: null },
     include: {
       trainer: {
@@ -89,7 +89,7 @@ export async function getCourseBySlug(slug: string) {
 }
 
 export async function updateCourse(courseId: string, userId: string, data: Partial<CreateCourseInput>) {
-  const course = await prisma.course.findUnique({
+  const course = await supabaseDb.course.findUnique({
     where: { id: courseId },
     include: { trainer: true },
   });
@@ -97,7 +97,7 @@ export async function updateCourse(courseId: string, userId: string, data: Parti
   if (course.trainer.userId !== userId) throw new ForbiddenError('Not your course');
   if (course.deletedAt) throw new NotFoundError('Course');
 
-  const updated = await prisma.course.update({
+  const updated = await supabaseDb.course.update({
     where: { id: courseId },
     data: {
       ...data,
@@ -113,7 +113,7 @@ export async function updateCourse(courseId: string, userId: string, data: Parti
 }
 
 export async function softDeleteCourse(courseId: string, userId: string) {
-  const course = await prisma.course.findUnique({
+  const course = await supabaseDb.course.findUnique({
     where: { id: courseId },
     include: { trainer: true, _count: { select: { enrolments: true } } },
   });
@@ -124,7 +124,7 @@ export async function softDeleteCourse(courseId: string, userId: string) {
     throw new ValidationError('Cannot delete course with active enrolments');
   }
 
-  await prisma.course.update({
+  await supabaseDb.course.update({
     where: { id: courseId },
     data: { deletedAt: new Date() },
   });
@@ -167,14 +167,22 @@ export async function listCourses(filters: CourseListFilters) {
 
   let orderBy: any = { createdAt: 'desc' };
   switch (filters.sortBy) {
-    case 'price_asc': orderBy = { priceKes: 'asc' }; break;
-    case 'price_desc': orderBy = { priceKes: 'desc' }; break;
-    case 'newest': orderBy = { createdAt: 'desc' }; break;
-    case 'rating': orderBy = { trainer: { averageRating: 'desc' } }; break;
+    case 'price_asc':
+      orderBy = { priceKes: 'asc' };
+      break;
+    case 'price_desc':
+      orderBy = { priceKes: 'desc' };
+      break;
+    case 'newest':
+      orderBy = { createdAt: 'desc' };
+      break;
+    case 'rating':
+      orderBy = { trainer: { averageRating: 'desc' } };
+      break;
   }
 
   const [courses, total] = await Promise.all([
-    prisma.course.findMany({
+    supabaseDb.course.findMany({
       where,
       include: {
         trainer: {
@@ -188,11 +196,11 @@ export async function listCourses(filters: CourseListFilters) {
       skip: (filters.page - 1) * filters.perPage,
       take: filters.perPage,
     }),
-    prisma.course.count({ where }),
+    supabaseDb.course.count({ where }),
   ]);
 
   const result = {
-    data: courses.map(c => ({
+    data: courses.map((c) => ({
       id: c.id,
       title: c.title,
       slug: c.slug,
@@ -228,7 +236,7 @@ export async function getTrainerCourses(trainerId: string, includeUnpublished = 
     where.deletedAt = null;
   }
 
-  return prisma.course.findMany({
+  return supabaseDb.course.findMany({
     where,
     include: {
       _count: { select: { enrolments: true } },

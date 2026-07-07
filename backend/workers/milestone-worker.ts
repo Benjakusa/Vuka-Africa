@@ -2,7 +2,7 @@ import { Queue } from 'bullmq';
 import { redis } from '@backend/lib/redis';
 import * as milestoneService from '@backend/services/milestone.service';
 import { addEmailToQueue } from './email-worker';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { createManagedWorker, setupGracefulShutdown } from './base';
 import { WORKER, MILESTONE } from '@backend/lib/config';
 
@@ -31,9 +31,17 @@ export async function addMilestoneReleaseJob(data: {
 }
 
 export async function processDelayedRelease(milestoneId: string) {
-  const milestone = await prisma.milestone.findUnique({
+  const milestone = await supabaseDb.milestone.findUnique({
     where: { id: milestoneId },
-    include: { enrolment: { include: { course: { select: { title: true } }, trainee: { select: { email: true, fullName: true } }, trainer: { include: { user: { select: { email: true, fullName: true } } } } } } },
+    include: {
+      enrolment: {
+        include: {
+          course: { select: { title: true } },
+          trainee: { select: { email: true, fullName: true } },
+          trainer: { include: { user: { select: { email: true, fullName: true } } } },
+        },
+      },
+    },
   });
 
   if (!milestone) {

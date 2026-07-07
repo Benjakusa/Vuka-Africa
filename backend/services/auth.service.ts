@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { redis } from '@backend/lib/redis';
 import { ValidationError } from '@backend/lib/errors';
 import { addEmailToQueue } from '@backend/workers/email-worker';
@@ -25,7 +25,7 @@ export async function forgotPassword(email: string) {
   validateEmail(email);
 
   const normalizedEmail = email.toLowerCase().trim();
-  const user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  const user = await supabaseDb.user.findUnique({ where: { email: normalizedEmail } });
   if (!user) {
     return { message: 'If an account with that email exists, a reset link has been sent.' };
   }
@@ -62,8 +62,8 @@ export async function resetPassword(token: string, newPassword: string) {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'apikey': serviceKey!,
-      'Authorization': `Bearer ${serviceKey}`,
+      apikey: serviceKey!,
+      Authorization: `Bearer ${serviceKey}`,
     },
     body: JSON.stringify({ password: newPassword }),
   });

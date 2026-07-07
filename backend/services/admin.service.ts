@@ -1,4 +1,4 @@
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { NotFoundError, ValidationError } from '@backend/lib/errors';
 import { addEmailToQueue } from '@backend/workers/email-worker';
 
@@ -13,14 +13,14 @@ export async function getStats() {
     openDisputes,
     revenue,
   ] = await Promise.all([
-    prisma.user.count(),
-    prisma.trainer.count(),
-    prisma.course.count({ where: { deletedAt: null } }),
-    prisma.enrolment.count(),
-    prisma.enrolment.count({ where: { status: 'ACTIVE' } }),
-    prisma.trainer.count({ where: { verificationStatus: 'PENDING' } }),
-    prisma.dispute.count({ where: { status: 'OPEN' } }),
-    prisma.transactionLedger.aggregate({
+    supabaseDb.user.count(),
+    supabaseDb.trainer.count(),
+    supabaseDb.course.count({ where: { deletedAt: null } }),
+    supabaseDb.enrolment.count(),
+    supabaseDb.enrolment.count({ where: { status: 'ACTIVE' } }),
+    supabaseDb.trainer.count({ where: { verificationStatus: 'PENDING' } }),
+    supabaseDb.dispute.count({ where: { status: 'OPEN' } }),
+    supabaseDb.transactionLedger.aggregate({
       where: { type: 'COMMISSION' },
       _sum: { amountKes: true },
     }),
@@ -43,7 +43,7 @@ export async function listVerifications(status?: string, page = 1, perPage = 20)
   if (status) where.verificationStatus = status;
 
   const [trainers, total] = await Promise.all([
-    prisma.trainer.findMany({
+    supabaseDb.trainer.findMany({
       where,
       include: {
         user: {
@@ -54,7 +54,7 @@ export async function listVerifications(status?: string, page = 1, perPage = 20)
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.trainer.count({ where }),
+    supabaseDb.trainer.count({ where }),
   ]);
 
   return {
@@ -64,7 +64,7 @@ export async function listVerifications(status?: string, page = 1, perPage = 20)
 }
 
 export async function approveVerification(trainerId: string, adminId: string) {
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerId },
     include: { user: true },
   });
@@ -73,7 +73,7 @@ export async function approveVerification(trainerId: string, adminId: string) {
     throw new ValidationError('Trainer is not pending verification');
   }
 
-  await prisma.trainer.update({
+  await supabaseDb.trainer.update({
     where: { id: trainerId },
     data: {
       isVerified: true,
@@ -89,13 +89,13 @@ export async function approveVerification(trainerId: string, adminId: string) {
 }
 
 export async function rejectVerification(trainerId: string, adminId: string, reason: string) {
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerId },
     include: { user: true },
   });
   if (!trainer) throw new NotFoundError('Trainer');
 
-  await prisma.trainer.update({
+  await supabaseDb.trainer.update({
     where: { id: trainerId },
     data: {
       verificationStatus: 'REJECTED',
@@ -115,7 +115,7 @@ export async function listDisputes(status?: string, page = 1, perPage = 20) {
   if (status) where.status = status;
 
   const [disputes, total] = await Promise.all([
-    prisma.dispute.findMany({
+    supabaseDb.dispute.findMany({
       where,
       include: {
         raisedBy: { select: { fullName: true, email: true } },
@@ -130,7 +130,7 @@ export async function listDisputes(status?: string, page = 1, perPage = 20) {
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.dispute.count({ where }),
+    supabaseDb.dispute.count({ where }),
   ]);
 
   return {
@@ -139,13 +139,8 @@ export async function listDisputes(status?: string, page = 1, perPage = 20) {
   };
 }
 
-export async function resolveDispute(
-  disputeId: string,
-  adminId: string,
-  resolution: string,
-  notes?: string
-) {
-  const dispute = await prisma.dispute.findUnique({
+export async function resolveDispute(disputeId: string, adminId: string, resolution: string, notes?: string) {
+  const dispute = await supabaseDb.dispute.findUnique({
     where: { id: disputeId },
     include: {
       enrolment: {
@@ -174,7 +169,7 @@ export async function resolveDispute(
       throw new ValidationError('Invalid resolution type');
   }
 
-  await prisma.dispute.update({
+  await supabaseDb.dispute.update({
     where: { id: disputeId },
     data: {
       status: resolvedStatus as any,
@@ -184,12 +179,12 @@ export async function resolveDispute(
   });
 
   if (resolution === 'refund_to_trainee' && dispute.milestone) {
-    await prisma.milestone.update({
+    await supabaseDb.milestone.update({
       where: { id: dispute.milestone.id },
       data: { status: 'PENDING' },
     });
   } else if (resolution === 'release_to_trainer' && dispute.milestone) {
-    await prisma.milestone.update({
+    await supabaseDb.milestone.update({
       where: { id: dispute.milestone.id },
       data: { status: 'TRAINEE_CONFIRMED' },
     });
@@ -215,9 +210,14 @@ export async function resolveDispute(
   });
 }
 
-export async function listTransactions(
-  filters: { type?: string; userId?: string; from?: string; to?: string; page?: number; perPage?: number }
-) {
+export async function listTransactions(filters: {
+  type?: string;
+  userId?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  perPage?: number;
+}) {
   const page = filters.page || 1;
   const perPage = filters.perPage || 50;
   const where: any = {};
@@ -231,13 +231,13 @@ export async function listTransactions(
   }
 
   const [transactions, total] = await Promise.all([
-    prisma.transactionLedger.findMany({
+    supabaseDb.transactionLedger.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.transactionLedger.count({ where }),
+    supabaseDb.transactionLedger.count({ where }),
   ]);
 
   return {
@@ -259,18 +259,25 @@ export async function listUsers(search?: string, role?: string, isActive?: strin
   if (isActive !== undefined) where.isActive = isActive === 'true';
 
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
+    supabaseDb.user.findMany({
       where,
       select: {
-        id: true, fullName: true, email: true, phone: true, role: true, isActive: true,
-        emailVerified: true, createdAt: true, lastLoginAt: true,
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        role: true,
+        isActive: true,
+        emailVerified: true,
+        createdAt: true,
+        lastLoginAt: true,
         trainer: { select: { isVerified: true, verificationStatus: true } },
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.user.count({ where }),
+    supabaseDb.user.count({ where }),
   ]);
 
   return {
@@ -280,16 +287,16 @@ export async function listUsers(search?: string, role?: string, isActive?: strin
 }
 
 export async function suspendUser(targetUserId: string) {
-  const user = await prisma.user.findUnique({ where: { id: targetUserId } });
+  const user = await supabaseDb.user.findUnique({ where: { id: targetUserId } });
   if (!user) throw new NotFoundError('User');
   if (user.role === 'ADMIN') throw new ValidationError('Cannot suspend admin');
 
-  await prisma.user.update({
+  await supabaseDb.user.update({
     where: { id: targetUserId },
     data: { isActive: false },
   });
 
-  await prisma.enrolment.updateMany({
+  await supabaseDb.enrolment.updateMany({
     where: {
       OR: [{ traineeId: targetUserId }, { trainer: { userId: targetUserId } }],
       status: { in: ['PENDING_PAYMENT', 'ACTIVE'] },
@@ -299,10 +306,10 @@ export async function suspendUser(targetUserId: string) {
 }
 
 export async function activateUser(targetUserId: string) {
-  const user = await prisma.user.findUnique({ where: { id: targetUserId } });
+  const user = await supabaseDb.user.findUnique({ where: { id: targetUserId } });
   if (!user) throw new NotFoundError('User');
 
-  await prisma.user.update({
+  await supabaseDb.user.update({
     where: { id: targetUserId },
     data: { isActive: true },
   });

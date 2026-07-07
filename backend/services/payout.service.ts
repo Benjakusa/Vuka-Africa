@@ -1,10 +1,7 @@
 import crypto from 'crypto';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { redis } from '@backend/lib/redis';
-import {
-  NotFoundError, ValidationError, InsufficientBalanceError,
-  RateLimitError,
-} from '@backend/lib/errors';
+import { NotFoundError, ValidationError, InsufficientBalanceError, RateLimitError } from '@backend/lib/errors';
 import { addPayoutJob } from '@backend/workers/payout-worker';
 import { addEmailToQueue } from '@backend/workers/email-worker';
 
@@ -51,7 +48,7 @@ export async function request2fa(userId: string, trainerId?: string) {
   let trainerIdToUse = trainerId;
 
   if (!trainerIdToUse) {
-    const trainer = await prisma.trainer.findUnique({
+    const trainer = await supabaseDb.trainer.findUnique({
       where: { userId },
       include: { user: true },
     });
@@ -59,7 +56,7 @@ export async function request2fa(userId: string, trainerId?: string) {
     trainerIdToUse = trainer.id;
   }
 
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { id: trainerIdToUse },
     include: { user: true },
   });
@@ -84,12 +81,7 @@ export async function request2fa(userId: string, trainerId?: string) {
   return { message: 'Verification code sent to your email' };
 }
 
-export async function requestPayout(input: {
-  userId: string;
-  amount: number;
-  phone: string;
-  code: string;
-}) {
+export async function requestPayout(input: { userId: string; amount: number; phone: string; code: string }) {
   await check2faRateLimit(input.userId);
 
   const codeKey = `2fa:payout:${input.userId}`;
@@ -101,7 +93,7 @@ export async function requestPayout(input: {
 
   await redis.del(codeKey);
 
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { userId: input.userId },
   });
   if (!trainer) throw new NotFoundError('Trainer');
@@ -112,7 +104,7 @@ export async function requestPayout(input: {
 
   const idempotencyKey = crypto.randomUUID();
 
-  const payout = await prisma.$transaction(async (tx) => {
+  const payout = await supabaseDb.$transaction(async (tx) => {
     const updated = await tx.trainer.updateMany({
       where: { id: trainer.id, availableBalance: { gte: input.amount } },
       data: { availableBalance: { decrement: input.amount } },
@@ -170,17 +162,17 @@ export async function requestPayout(input: {
 }
 
 export async function getPayoutHistory(userId: string, page = 1, perPage = 20) {
-  const trainer = await prisma.trainer.findUnique({ where: { userId } });
+  const trainer = await supabaseDb.trainer.findUnique({ where: { userId } });
   if (!trainer) throw new NotFoundError('Trainer');
 
   const [payouts, total] = await Promise.all([
-    prisma.payout.findMany({
+    supabaseDb.payout.findMany({
       where: { trainerId: trainer.id },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * perPage,
       take: perPage,
     }),
-    prisma.payout.count({ where: { trainerId: trainer.id } }),
+    supabaseDb.payout.count({ where: { trainerId: trainer.id } }),
   ]);
 
   return {
@@ -190,7 +182,7 @@ export async function getPayoutHistory(userId: string, page = 1, perPage = 20) {
 }
 
 export async function getEarningsSummary(userId: string) {
-  const trainer = await prisma.trainer.findUnique({
+  const trainer = await supabaseDb.trainer.findUnique({
     where: { userId },
     select: {
       id: true,
@@ -202,7 +194,7 @@ export async function getEarningsSummary(userId: string) {
   });
   if (!trainer) throw new NotFoundError('Trainer');
 
-  const pendingRelease = await prisma.milestone.aggregate({
+  const pendingRelease = await supabaseDb.milestone.aggregate({
     where: {
       enrolment: { trainer: { userId }, status: 'ACTIVE' },
       status: 'TRAINEE_CONFIRMED',
@@ -210,7 +202,7 @@ export async function getEarningsSummary(userId: string) {
     _sum: { amountKes: true },
   });
 
-  const totalEarnedAgg = await prisma.transactionLedger.aggregate({
+  const totalEarnedAgg = await supabaseDb.transactionLedger.aggregate({
     where: {
       userId,
       type: 'TRAINER_PAYOUT',

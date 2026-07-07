@@ -1,6 +1,6 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { redis } from '@backend/lib/redis';
-import { prisma } from '@backend/lib/prisma';
+import { supabaseDb } from '@backend/lib/db';
 import { addEmailToQueue } from './email-worker';
 
 const connection = redis;
@@ -18,7 +18,7 @@ async function runMpesaReconciliation() {
 
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  const payments = await prisma.transactionLedger.findMany({
+  const payments = await supabaseDb.transactionLedger.findMany({
     where: {
       createdAt: { gte: twentyFourHoursAgo },
       mpesaTransactionId: { not: null },
@@ -26,13 +26,13 @@ async function runMpesaReconciliation() {
     include: { user: { select: { email: true, fullName: true } } },
   });
 
-  const internalTransactions = await prisma.transactionLedger.findMany({
+  const internalTransactions = await supabaseDb.transactionLedger.findMany({
     where: {
       createdAt: { gte: twentyFourHoursAgo },
     },
   });
 
-  const orphaned = await prisma.enrolment.findMany({
+  const orphaned = await supabaseDb.enrolment.findMany({
     where: {
       status: 'PENDING_PAYMENT',
       createdAt: { lt: twentyFourHoursAgo },
@@ -41,7 +41,7 @@ async function runMpesaReconciliation() {
   });
 
   for (const enrolment of orphaned) {
-    await prisma.enrolment.update({
+    await supabaseDb.enrolment.update({
       where: { id: enrolment.id },
       data: { status: 'CANCELLED', cancelledAt: new Date() },
     });
@@ -59,7 +59,7 @@ async function runMpesaReconciliation() {
     console.log(`[Reconciliation] Cancelled ${orphaned.length} stale pending enrolments`);
   }
 
-  const pendingPayouts = await prisma.payout.findMany({
+  const pendingPayouts = await supabaseDb.payout.findMany({
     where: {
       status: { in: ['PENDING', 'PROCESSING'] },
       createdAt: { lt: twentyFourHoursAgo },
@@ -71,7 +71,7 @@ async function runMpesaReconciliation() {
     console.log(`[Reconciliation] Found ${pendingPayouts.length} stuck payouts`);
 
     for (const payout of pendingPayouts) {
-      await prisma.payout.update({
+      await supabaseDb.payout.update({
         where: { id: payout.id },
         data: {
           status: 'FAILED',
@@ -79,7 +79,7 @@ async function runMpesaReconciliation() {
         },
       });
 
-      await prisma.$transaction(async (tx) => {
+      await supabaseDb.$transaction(async (tx) => {
         const trainer = await tx.trainer.findUnique({ where: { id: payout.trainerId } });
         if (!trainer) return;
 
@@ -122,7 +122,7 @@ async function runMpesaReconciliation() {
   }
 
   if (discrepancyCount > 0 || orphaned.length > 0 || pendingPayouts.length > 0) {
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
     if (admin) {
       let html = `<h2>Daily Reconciliation Report</h2>`;
       html += `<p>Cancelled stale enrolments: ${orphaned.length}</p>`;
@@ -145,7 +145,7 @@ async function runCleanup() {
   console.log('[Cleanup] Running weekly cleanup...');
 
   const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-  const stale = await prisma.enrolment.findMany({
+  const stale = await supabaseDb.enrolment.findMany({
     where: {
       status: 'PENDING_PAYMENT',
       createdAt: { lt: thirtyMinutesAgo },
@@ -154,14 +154,14 @@ async function runCleanup() {
   });
 
   for (const enrolment of stale) {
-    await prisma.enrolment.update({
+    await supabaseDb.enrolment.update({
       where: { id: enrolment.id },
       data: { status: 'CANCELLED', cancelledAt: new Date() },
     });
   }
 
   const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
-  const staleConfirmations = await prisma.milestone.findMany({
+  const staleConfirmations = await supabaseDb.milestone.findMany({
     where: {
       status: 'TRAINER_CONFIRMED',
       trainerConfirmedAt: { lt: threeDaysAgo },
@@ -170,7 +170,7 @@ async function runCleanup() {
   });
 
   if (staleConfirmations.length > 0) {
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
     if (admin) {
       await addEmailToQueue({
         to: admin.email,
@@ -181,7 +181,7 @@ async function runCleanup() {
   }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const staleCheckout = await prisma.enrolment.findMany({
+  const staleCheckout = await supabaseDb.enrolment.findMany({
     where: {
       status: 'PENDING_PAYMENT',
       createdAt: { lt: sevenDaysAgo },
@@ -189,7 +189,7 @@ async function runCleanup() {
   });
 
   for (const enrolment of staleCheckout) {
-    await prisma.enrolment.update({
+    await supabaseDb.enrolment.update({
       where: { id: enrolment.id },
       data: { status: 'CANCELLED', cancelledAt: new Date() },
     });
@@ -197,29 +197,41 @@ async function runCleanup() {
 }
 
 export async function scheduleCronJobs() {
-  await cronQueue.upsertJobScheduler('mpesa-reconciliation', {
-    pattern: '0 2 * * *',
-    tz: 'Africa/Nairobi',
-  }, {
-    name: 'run-mpesa-reconciliation',
-    data: {},
-  });
+  await cronQueue.upsertJobScheduler(
+    'mpesa-reconciliation',
+    {
+      pattern: '0 2 * * *',
+      tz: 'Africa/Nairobi',
+    },
+    {
+      name: 'run-mpesa-reconciliation',
+      data: {},
+    },
+  );
 
-  await cronQueue.upsertJobScheduler('cleanup', {
-    pattern: '0 3 * * 0',
-    tz: 'Africa/Nairobi',
-  }, {
-    name: 'run-cleanup',
-    data: {},
-  });
+  await cronQueue.upsertJobScheduler(
+    'cleanup',
+    {
+      pattern: '0 3 * * 0',
+      tz: 'Africa/Nairobi',
+    },
+    {
+      name: 'run-cleanup',
+      data: {},
+    },
+  );
 
-  await cronQueue.upsertJobScheduler('session-reminders', {
-    pattern: '0 * * * *',
-    tz: 'Africa/Nairobi',
-  }, {
-    name: 'run-session-reminders',
-    data: {},
-  });
+  await cronQueue.upsertJobScheduler(
+    'session-reminders',
+    {
+      pattern: '0 * * * *',
+      tz: 'Africa/Nairobi',
+    },
+    {
+      name: 'run-session-reminders',
+      data: {},
+    },
+  );
 
   console.log('[Cron] Jobs scheduled');
 }
@@ -232,7 +244,7 @@ async function sendSessionReminders() {
   const dayAfter = new Date(tomorrow);
   dayAfter.setDate(dayAfter.getDate() + 1);
 
-  const sessions = await prisma.sessionLog.findMany({
+  const sessions = await supabaseDb.sessionLog.findMany({
     where: {
       sessionDate: {
         gte: tomorrow,
@@ -282,7 +294,7 @@ const worker = new Worker(
         console.warn(`[Cron] Unknown job: ${job.name}`);
     }
   },
-  { connection }
+  { connection },
 );
 
 worker.on('completed', (job) => {
