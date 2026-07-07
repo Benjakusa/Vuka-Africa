@@ -29,3 +29,6 @@ playwright-report/
 
 # misc
 .cache/
+
+# build artifacts
+tsconfig.tsbuildinfo

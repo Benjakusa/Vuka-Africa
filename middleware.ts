@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { createClient } from './lib/supabase/middleware';
+import { createClient } from '@/lib/supabase/middleware';
 
 const publicPaths = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
 
