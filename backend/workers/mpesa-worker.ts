@@ -219,18 +219,80 @@ async function processSuccessfulEnrolment(
   await addEmailToQueue({
     to: enrolment.trainee.email,
     subject: `Payment Successful — Enrolled in ${enrolment.course.title}`,
-    html: `<p>Hi ${enrolment.trainee.fullName},</p>
-<p>Your payment of KES ${paidAmount.toLocaleString()} for <strong>${enrolment.course.title}</strong> was successful.</p>
-<p>M-Pesa receipt: ${mpesaReceiptNumber}</p>
-<p>You can now access your course from your dashboard.</p>`,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+<tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">Payment Confirmed</p>
+</td></tr>
+<tr><td style="padding:32px">
+<h2 style="margin:0 0 6px;font-size:18px;color:#1a1a1a">Hi ${enrolment.trainee.fullName},</h2>
+<p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6">
+Your payment was successful. You are now enrolled in <strong style="color:#1a1a1a">${enrolment.course.title}</strong>.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px">
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Course</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">${enrolment.course.title}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Amount Paid</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">KES ${paidAmount.toLocaleString()}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">M-Pesa Receipt</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-family:monospace">${mpesaReceiptNumber}</td></tr>
+</table>
+<p style="margin:0 0 20px;font-size:14px;color:#4b5563;line-height:1.6">
+You can now access your course materials and start learning from your dashboard.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+<a href="https://vuka.app/trainee/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Go to Dashboard</a>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body>
+</html>`,
   });
 
   await addEmailToQueue({
     to: enrolment.trainer.user.email,
     subject: `New Enrolment — ${enrolment.trainee.fullName} joined ${enrolment.course.title}`,
-    html: `<p>Hi ${enrolment.trainer.user.fullName},</p>
-<p><strong>${enrolment.trainee.fullName}</strong> has enrolled in your course <strong>${enrolment.course.title}</strong>.</p>
-<p>Payment of KES ${paidAmount.toLocaleString()} has been received and held in escrow.</p>`,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+<tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">New Enrolment</p>
+</td></tr>
+<tr><td style="padding:32px">
+<h2 style="margin:0 0 6px;font-size:18px;color:#1a1a1a">Hi ${enrolment.trainer.user.fullName},</h2>
+<p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6">
+<strong style="color:#1a1a1a">${enrolment.trainee.fullName}</strong> has enrolled in your course <strong style="color:#1a1a1a">${enrolment.course.title}</strong>.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px">
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Trainee</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">${enrolment.trainee.fullName}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Course</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">${enrolment.course.title}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Amount Received</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">KES ${paidAmount.toLocaleString()}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">M-Pesa Receipt</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-family:monospace">${mpesaReceiptNumber}</td></tr>
+</table>
+<p style="margin:0 0 20px;font-size:14px;color:#4b5563;line-height:1.6">
+The payment has been received and is held securely in escrow. It will be released as training milestones are confirmed.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+<a href="https://vuka.app/trainer/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">View Enrolment</a>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body>
+</html>`,
   });
 }
 
@@ -284,9 +346,35 @@ async function processVerificationFee(trainerId: string, mpesaReceiptNumber: str
   await addEmailToQueue({
     to: trainer.user.email,
     subject: 'Verification Fee Received — Under Review',
-    html: `<p>Hi ${trainer.user.fullName},</p>
-<p>Your KES 5,000 verification fee has been received (M-Pesa: ${mpesaReceiptNumber}).</p>
-<p>Our team will review your documents within 2 business days.</p>`,
+    html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+<tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">Verification Fee Received</p>
+</td></tr>
+<tr><td style="padding:32px">
+<h2 style="margin:0 0 6px;font-size:18px;color:#1a1a1a">Hi ${trainer.user.fullName},</h2>
+<p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6">
+Thank you for your payment. Your trainer verification application is now under review.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px">
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Amount</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">KES 5,000</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">M-Pesa Receipt</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-family:monospace">${mpesaReceiptNumber}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Status</td><td style="padding:4px 0;font-size:13px;color:#eab308;font-weight:600">Under Review</td></tr>
+</table>
+<p style="margin:0 0 4px;font-size:14px;color:#4b5563;line-height:1.6">Our team will review your documents within <strong>2 business days</strong>. You will receive an email once your account is verified.</p>
+</td></tr>
+<tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body>
+</html>`,
   });
 
   const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
@@ -294,9 +382,38 @@ async function processVerificationFee(trainerId: string, mpesaReceiptNumber: str
     await addEmailToQueue({
       to: admin.email,
       subject: `New Verification Fee Paid — ${trainer.user.fullName}`,
-      html: `<p>Trainer <strong>${trainer.user.fullName}</strong> (${trainer.user.email}) has paid the KES 5,000 verification fee.</p>
-<p>Receipt: ${mpesaReceiptNumber}</p>
-<p>Review their application in the admin dashboard.</p>`,
+      html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+<tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">New Verification Fee</p>
+</td></tr>
+<tr><td style="padding:32px">
+<h2 style="margin:0 0 6px;font-size:18px;color:#1a1a1a">Admin Notification</h2>
+<p style="margin:0 0 16px;font-size:14px;color:#4b5563;line-height:1.6">
+Trainer <strong style="color:#1a1a1a">${trainer.user.fullName}</strong> has paid the verification fee and is ready for review.
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f9fafb;border-radius:8px;padding:16px;margin-bottom:16px">
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Name</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">${trainer.user.fullName}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">Email</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-weight:600">${trainer.user.email}</td></tr>
+<tr><td style="padding:4px 0;font-size:13px;color:#6b7280">M-Pesa Receipt</td><td style="padding:4px 0;font-size:13px;color:#1a1a1a;font-family:monospace">${mpesaReceiptNumber}</td></tr>
+</table>
+<p style="margin:0 0 20px;font-size:14px;color:#4b5563;line-height:1.6">Review their application in the admin dashboard.</p>
+<table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
+<a href="https://vuka.app/admin/trainers" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Review Application</a>
+</td></tr></table>
+</td></tr>
+<tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+</td></tr>
+</table>
+</td></tr></table>
+</body>
+</html>`,
     });
   }
 }

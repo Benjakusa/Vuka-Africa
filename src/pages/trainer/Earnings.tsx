@@ -32,8 +32,8 @@ export default function Earnings() {
   });
 
   const totalEarnings =
-    payouts?.reduce((sum: number, p: any) => {
-      if (p.status === 'PAID') return sum + (p.amount || 0);
+    transactions?.reduce((sum: number, tx: any) => {
+      if (tx.entryType === 'CREDIT') return sum + (tx.amountKes || 0);
       return sum;
     }, 0) || 0;
 

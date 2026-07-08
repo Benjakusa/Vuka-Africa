@@ -49,12 +49,12 @@ export default function AuthPage() {
       const user = await login(loginEmail, loginPassword);
       setUser(user);
       toast.success('Welcome back!');
-      const redirect =
-        searchParams.get('redirect') ||
-        (user.role === 'TRAINER' ? '/trainer' : user.role === 'ADMIN' ? '/admin' : '/trainee');
+      const redirect = searchParams.get('redirect') || '/';
       navigate(redirect, { replace: true });
     } catch (err: any) {
-      setLoginError(err.message || 'Invalid email or password');
+      setLoginError(
+        err?.message || (typeof err === 'object' ? JSON.stringify(err) : String(err)) || 'Invalid email or password',
+      );
     } finally {
       setLoginLoading(false);
     }
@@ -68,10 +68,9 @@ export default function AuthPage() {
     setRegError('');
     setRegLoading(true);
     try {
-      const user = await register(regForm);
-      setUser(user);
-      toast.success('Account created! Welcome to Vuka.');
-      navigate('/trainee', { replace: true });
+      await register(regForm);
+      toast.success('Account created! Please sign in.');
+      navigate('/auth/login', { replace: true });
     } catch (err: any) {
       setRegError(err.message || 'Registration failed');
     } finally {

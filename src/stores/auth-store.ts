@@ -14,6 +14,9 @@ export interface User {
     verificationStatus: string;
     commissionRate: number;
     availableBalance: number;
+    averageRating: number;
+    totalReviews: number;
+    totalStudents: number;
     bio: string | null;
     skills: string[];
   } | null;
@@ -58,6 +61,9 @@ async function tryCreateTrainer(
   verificationStatus: string;
   commissionRate: number;
   availableBalance: number;
+  averageRating: number;
+  totalReviews: number;
+  totalStudents: number;
   bio: string | null;
   skills: string[];
 } | null> {
@@ -65,14 +71,18 @@ async function tryCreateTrainer(
   if (email && meta) await ensureUserRecord(userId, email, meta);
   const { data: existing } = await supabaseData
     .from('Trainer')
-    .select('id, isVerified, verificationStatus, commissionRate, availableBalance, bio, skills')
+    .select(
+      'id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills',
+    )
     .eq('userId', userId)
     .maybeSingle();
   if (existing) return existing;
   const { data: created } = await supabaseData
     .from('Trainer')
     .insert({ userId, updatedAt: new Date().toISOString() })
-    .select('id, isVerified, verificationStatus, commissionRate, availableBalance, bio, skills')
+    .select(
+      'id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills',
+    )
     .maybeSingle();
   return created || null;
 }
@@ -101,10 +111,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
 
-      const { data: dbUser } = await supabaseData
+      const { data: dbUser } = await supabase
         .from('User')
         .select(
-          '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, bio, skills)',
+          '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills)',
         )
         .eq('id', authUser.id)
         .maybeSingle();
@@ -160,16 +170,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       throw new Error(authError?.message || 'Invalid email or password');
     }
 
-    const { data: dbUser } = await supabaseData
+    const { data: dbUser } = await supabase
       .from('User')
       .select(
-        '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, bio, skills)',
+        '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills)',
       )
       .eq('id', data.user.id)
       .maybeSingle();
 
     if (dbUser) {
-      await supabaseData
+      await supabase
         .from('User')
         .update({ lastLoginAt: new Date().toISOString() })
         .eq('id', data.user.id)
@@ -193,18 +203,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     const meta = data.user.user_metadata || {};
     const role = (meta.role as string) || 'TRAINEE';
+    await ensureUserRecord(data.user.id, data.user.email || '', meta);
     let trainer: User['trainer'] = null;
     if (role === 'TRAINER') {
       trainer = await tryCreateTrainer(data.user.id, role, data.user.email, meta);
     }
+    const { data: refreshed } = await supabase
+      .from('User')
+      .select(
+        '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills)',
+      )
+      .eq('id', data.user.id)
+      .maybeSingle();
     const user: User = {
       id: data.user.id,
-      email: data.user.email || '',
-      phone: (meta.phone as string) || '',
-      fullName: (meta.full_name as string) || data.user.email?.split('@')[0] || 'User',
-      role: role as User['role'],
-      avatarUrl: null,
-      trainer,
+      email: refreshed?.email || data.user.email || '',
+      phone: refreshed?.phone || (meta.phone as string) || '',
+      fullName: refreshed?.fullName || (meta.full_name as string) || data.user.email?.split('@')[0] || 'User',
+      role: refreshed?.role || (role as User['role']),
+      avatarUrl: refreshed?.avatarUrl || null,
+      trainer: refreshed?.trainer || trainer,
     };
     set({ user, isAuthenticated: true });
     return user;

@@ -10,6 +10,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// TEMP: Fallback to service role key for dev until RLS policies are applied.
+// Remove this and VITE_SUPABASE_SERVICE_ROLE_KEY from .env once you run the
+// RLS policies SQL in the Supabase dashboard (see migrate.sql or supabase-schema.sql).
 export const supabaseData =
   import.meta.env.DEV && serviceKey
     ? createClient(supabaseUrl, serviceKey, {

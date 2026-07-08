@@ -60,11 +60,6 @@ export default function CourseDetail() {
 
   const cfg = modeConfig[course.mode as string];
   const ModeIcon = cfg?.icon || MapPin;
-  const milestones = [
-    { pct: 25, label: 'Start', amount: Number(course.priceKes) * 0.25 },
-    { pct: 50, label: 'Mid-way', amount: Number(course.priceKes) * 0.5 },
-    { pct: 25, label: 'Completion', amount: Number(course.priceKes) * 0.25 },
-  ];
 
   return (
     <>
@@ -140,25 +135,6 @@ export default function CourseDetail() {
                 </ul>
               </section>
             )}
-
-            <section>
-              <h2 className="text-lg font-semibold text-dark mb-4">Payment Breakdown</h2>
-              <p className="text-xs text-muted-foreground mb-3">
-                Your payment is held securely and released as you complete each stage.
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {milestones.map((m, i) => (
-                  <div key={i} className="p-3 bg-accent rounded-card text-center">
-                    <div className="h-2 bg-primary/20 rounded-full mb-2 overflow-hidden">
-                      <div className="h-2 bg-primary rounded-full" style={{ width: '100%' }} />
-                    </div>
-                    <p className="text-xs font-medium text-dark">{m.pct}%</p>
-                    <p className="text-xs text-muted-foreground">{m.label}</p>
-                    <p className="text-xs md:text-sm font-semibold text-primary">{formatCurrency(m.amount)}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
           </div>
 
           <div className="lg:col-span-1">
@@ -180,7 +156,7 @@ export default function CourseDetail() {
                 </div>
                 <button
                   onClick={handleEnrol}
-                  disabled={!isAuthenticated || user?.role !== 'TRAINEE'}
+                  disabled={isAuthenticated && user?.role !== 'TRAINEE'}
                   className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {!isAuthenticated
@@ -200,7 +176,8 @@ export default function CourseDetail() {
           open={showPayment}
           onClose={() => setShowPayment(false)}
           type="enrolment"
-          referenceId={course.id}
+          courseId={course.id}
+          trainerId={course.trainerId}
           amount={Number(course.priceKes)}
           phone={user?.phone}
           onSuccess={() => setShowPayment(false)}

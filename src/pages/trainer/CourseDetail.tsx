@@ -8,29 +8,7 @@ import { courseKeys } from '@/lib/query-keys';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ErrorState } from '@/components/shared/error-state';
 import { supabaseData as supabase } from '@/lib/supabase';
-
-const CATEGORIES = [
-  'Baking & Cake Decoration',
-  'Photography & Videography',
-  'Programming & Web Dev',
-  'Fitness & Wellness',
-  'Music & Instruments',
-  'Languages',
-  'Art & Painting',
-  'Fashion & Design',
-  'Cooking & Culinary Arts',
-  'Beauty & Makeup',
-  'Business & Entrepreneurship',
-  'Marketing & Social Media',
-  'Writing & Content Creation',
-  'Dance & Performing Arts',
-  'Sports & Coaching',
-  'Finance & Accounting',
-  'Personal Development',
-  'Home & Garden',
-  'Technology & IT',
-  'Crafts & DIY',
-];
+import { CATEGORIES } from '@/lib/categories';
 
 export default function CourseDetail() {
   const { slug } = useParams<{ slug: string }>();

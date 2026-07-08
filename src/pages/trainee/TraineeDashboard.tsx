@@ -26,10 +26,6 @@ export default function TraineeDashboard() {
   const pendingReviews =
     enrolments?.filter((e: any) => e.status === 'COMPLETED' && (!e.reviews || e.reviews.length === 0)) || [];
 
-  const upcomingSessions = activeEnrolments
-    .flatMap((e: any) => (e.milestones || []).filter((m: any) => m.status !== 'RELEASED'))
-    .slice(0, 5);
-
   return (
     <div className="max-w-5xl mx-auto">
       <OfflineBanner />
@@ -91,28 +87,6 @@ export default function TraineeDashboard() {
               ))}
             </div>
           )}
-        </section>
-      )}
-
-      {upcomingSessions.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-lg font-bold text-dark mb-4">Upcoming Sessions</h2>
-          <div className="bg-white rounded-card shadow-card divide-y divide-border">
-            {upcomingSessions.map((milestone: any) => {
-              const enrolment = enrolments?.find((e: any) => e.milestones?.some((m: any) => m.id === milestone.id));
-              return (
-                <div key={milestone.id} className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-dark">
-                      {milestone.label || `Milestone ${milestone.sequence}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{enrolment?.course?.title}</p>
-                  </div>
-                  <span className="text-xs text-yellow-600 font-medium">Pending</span>
-                </div>
-              );
-            })}
-          </div>
         </section>
       )}
 

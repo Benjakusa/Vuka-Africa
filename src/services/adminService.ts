@@ -115,11 +115,23 @@ export async function getTransactions(filters?: Record<string, any>, page = 1, p
 export async function getPlatformConfig() {
   const { data, error } = await supabase.from('PlatformConfig').select('*').maybeSingle();
   if (error) throw error;
-  return data;
+  return (
+    data || {
+      commissionRate: 12,
+      verificationFee: 5000,
+      minPayoutAmount: 100,
+      maxPayoutAmount: 50000,
+      freeTrainerLimit: 100,
+    }
+  );
 }
 
 export async function updatePlatformConfig(updates: Record<string, any>) {
-  const { data, error } = await supabase.from('PlatformConfig').update(updates).eq('id', 1).select().single();
+  const { data, error } = await supabase
+    .from('PlatformConfig')
+    .upsert({ id: 1, ...updates })
+    .select()
+    .single();
   if (error) throw error;
   return data;
 }

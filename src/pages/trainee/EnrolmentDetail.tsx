@@ -4,11 +4,10 @@ import { useParams, Link } from 'react-router-dom';
 import { BookOpen, User, MapPin, Monitor, Globe, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
-import { getEnrolment, confirmMilestone, createDispute, createReview } from '@/services/enrolmentService';
+import { getEnrolment, createDispute, createReview } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';
 import { BackButton } from '@/components/shared/back-button';
 import { StatusBadge } from '@/components/shared/status-badge';
-import { MilestoneStepper } from '@/components/shared/milestone-stepper';
 import { DisputeModal } from '@/components/shared/dispute-modal';
 import { ReviewModal } from '@/components/shared/review-modal';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
@@ -20,7 +19,6 @@ export default function EnrolmentDetail() {
   const { user } = useAuthStore();
   const [showDispute, setShowDispute] = useState(false);
   const [showReview, setShowReview] = useState(false);
-  const [confirming, setConfirming] = useState<string | null>(null);
 
   const {
     data: enrolment,
@@ -32,19 +30,6 @@ export default function EnrolmentDetail() {
     queryFn: () => getEnrolment(id!),
     enabled: !!id,
   });
-
-  const handleConfirmMilestone = async (milestoneId: string) => {
-    setConfirming(milestoneId);
-    try {
-      await confirmMilestone(milestoneId, 'trainee');
-      toast.success('Milestone confirmed');
-      refetch();
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to confirm milestone');
-    } finally {
-      setConfirming(null);
-    }
-  };
 
   const handleDispute = async (data: { reason: string; description: string }) => {
     if (!enrolment || !user) return;
@@ -89,7 +74,6 @@ export default function EnrolmentDetail() {
 
   const course = enrolment.course || {};
   const trainer = enrolment.trainer || {};
-  const milestones = enrolment.milestones || [];
   const hasReview = enrolment.reviews && enrolment.reviews.length > 0;
   const isCompleted = enrolment.status === 'COMPLETED';
   const hasDispute = enrolment.disputeStatus === 'OPEN';
@@ -140,16 +124,6 @@ export default function EnrolmentDetail() {
             </p>
           </div>
         </div>
-      </div>
-
-      <div className="bg-white rounded-card shadow-card p-6 mb-6">
-        <h2 className="text-lg font-bold text-dark mb-4">Milestones</h2>
-        <MilestoneStepper
-          milestones={milestones}
-          role="trainee"
-          onConfirm={handleConfirmMilestone}
-          confirming={confirming}
-        />
       </div>
 
       <div className="flex flex-wrap gap-3">

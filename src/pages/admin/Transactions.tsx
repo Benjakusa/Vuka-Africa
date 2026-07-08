@@ -42,7 +42,7 @@ export default function Transactions() {
         </div>
       </div>
 
-      <div className="flex gap-1 mb-6 bg-white rounded-card p-1 shadow-card">
+      <div className="flex gap-1 mb-6 bg-white rounded-card p-1 shadow-card overflow-x-auto">
         {FILTERS.map((f) => (
           <button
             key={f.value}
@@ -52,7 +52,7 @@ export default function Transactions() {
               params.set('page', '1');
               setSearchParams(params, { replace: true });
             }}
-            className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors ${
+            className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors whitespace-nowrap ${
               type === f.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
             }`}
           >
@@ -69,7 +69,7 @@ export default function Transactions() {
         <EmptyState icon={Search} title="No transactions found" subtitle="No transactions match your filter criteria" />
       ) : (
         <div className="bg-white rounded-card shadow-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">
@@ -108,6 +108,29 @@ export default function Transactions() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="divide-y divide-border md:hidden">
+            {transactions.map((tx: any) => (
+              <div key={tx.id} className="p-4 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-dark truncate flex-1">{tx.description || 'Transaction'}</p>
+                  <span
+                    className={`text-sm font-bold ml-2 ${tx.entryType === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}
+                  >
+                    {tx.entryType === 'CREDIT' ? '+' : '-'}
+                    {formatCurrency(tx.amountKes)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    {tx.entryType === 'CREDIT' ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
+                    {tx.entryType}
+                  </span>
+                  <span>{formatDateTime(tx.createdAt)}</span>
+                </div>
+                {tx.reference && <p className="text-xs text-muted-foreground">Ref: {tx.reference}</p>}
+              </div>
+            ))}
           </div>
         </div>
       )}

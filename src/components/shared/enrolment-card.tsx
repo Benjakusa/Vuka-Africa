@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Monitor, MapPin, ChevronRight } from 'lucide-react';
-import { cn, formatCurrency, formatDate } from '@/lib/utils';
+import { BookOpen, Monitor, MapPin } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
-import { ProgressBar } from './progress-bar';
 
 interface EnrolmentCardProps {
   enrolment: any;
@@ -11,10 +10,6 @@ interface EnrolmentCardProps {
 }
 
 export function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps) {
-  const milestones = enrolment.milestones || [];
-  const completedMilestones = milestones.filter((m: any) => m.status === 'RELEASED').length;
-  const totalMilestones = milestones.length || 1;
-
   return (
     <Link
       to={`/${role}/enrolments/${enrolment.id}`}
@@ -40,13 +35,6 @@ export function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps
           )}
         </div>
         <StatusBadge status={enrolment.status} />
-      </div>
-      <div className="mt-3">
-        <ProgressBar
-          value={completedMilestones}
-          max={totalMilestones}
-          label={`${completedMilestones}/${totalMilestones} milestones`}
-        />
       </div>
     </Link>
   );

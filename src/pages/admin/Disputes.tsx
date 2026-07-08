@@ -65,7 +65,7 @@ export default function Disputes() {
         </div>
       </div>
 
-      <div className="flex gap-1 mb-6 bg-white rounded-card p-1 shadow-card">
+      <div className="flex gap-1 mb-6 bg-white rounded-card p-1 shadow-card overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.value}
@@ -75,7 +75,7 @@ export default function Disputes() {
               params.set('page', '1');
               setSearchParams(params, { replace: true });
             }}
-            className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors ${
+            className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors whitespace-nowrap ${
               status === tab.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
             }`}
           >
@@ -96,7 +96,7 @@ export default function Disputes() {
         />
       ) : (
         <div className="bg-white rounded-card shadow-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">
@@ -146,6 +146,42 @@ export default function Disputes() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="divide-y divide-border md:hidden">
+            {disputes.map((d: any) => (
+              <div key={d.id} className="p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="font-medium text-dark text-sm">{d.enrolment?.course?.title || 'Course'}</p>
+                  <StatusBadge status={d.status} />
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <span>Trainee: {d.enrolment?.trainee?.fullName || 'N/A'}</span>
+                  <span>Trainer: {d.enrolment?.trainer?.fullName || 'N/A'}</span>
+                  <span className="truncate">Reason: {d.reason}</span>
+                  <span>{formatDate(d.createdAt)}</span>
+                </div>
+                {d.status === 'OPEN' ? (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Resolution note..."
+                      value={resolution[d.id] || ''}
+                      onChange={(e) => setResolution({ ...resolution, [d.id]: e.target.value })}
+                      className="flex-1 px-2 py-1.5 border border-border rounded text-xs"
+                    />
+                    <button
+                      onClick={() => handleResolve(d.id)}
+                      disabled={resolving === d.id}
+                      className="px-3 py-1.5 bg-primary text-white text-xs rounded hover:bg-primary/90 disabled:opacity-50"
+                    >
+                      {resolving === d.id ? <Loader2 size={12} className="animate-spin" /> : 'Resolve'}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">{d.resolution}</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}

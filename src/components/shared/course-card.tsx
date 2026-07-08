@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, MapPin, Monitor, Globe } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
@@ -20,16 +21,27 @@ const modeIcons: Record<string, any> = {
 };
 
 export function CourseCard({ id, title, slug, mode, duration, sessionCount, priceKes, imageUrl }: CourseCardProps) {
+  const [imgError, setImgError] = useState(false);
   const ModeIcon = modeIcons[mode] || MapPin;
+
+  const colors = [
+    'from-blue-500/20 to-blue-600/10',
+    'from-green-500/20 to-green-600/10',
+    'from-purple-500/20 to-purple-600/10',
+    'from-orange-500/20 to-orange-600/10',
+    'from-pink-500/20 to-pink-600/10',
+    'from-teal-500/20 to-teal-600/10',
+  ];
+  const colorIndex = id ? id.charCodeAt(0) % colors.length : 0;
 
   return (
     <Link
       to={`/course/${slug}`}
       className="block bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow overflow-hidden"
     >
-      <div className="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-        {imageUrl ? (
-          <img src={imageUrl} alt={title} className="w-full h-full object-cover" />
+      <div className={`h-32 bg-gradient-to-br ${colors[colorIndex]} flex items-center justify-center`}>
+        {imageUrl && !imgError ? (
+          <img src={imageUrl} alt={title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
         ) : (
           <span className="text-3xl font-bold text-primary/30">{title[0]}</span>
         )}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { Users, Search, Loader2, Ban, CheckCircle } from 'lucide-react';
+import { Users as UsersIcon, Search, Loader2, Ban, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { getUsers, suspendUser, activateUser } from '@/services/adminService';
 import { adminKeys } from '@/lib/query-keys';
@@ -63,7 +63,7 @@ export default function AdminUsers() {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Users size={24} className="text-primary" />
+        <UsersIcon size={24} className="text-primary" />
         <div>
           <h1 className="text-2xl font-bold text-dark">User Management</h1>
           <p className="text-body text-sm">View and manage platform users</p>
@@ -77,7 +77,7 @@ export default function AdminUsers() {
           value={searchInput}
           onChange={handleSearchChange}
           placeholder="Search by name or email..."
-          className="w-full pl-9 pr-3 py-2 border border-border rounded-btn text-sm"
+          className="w-full pl-9 pr-3 py-2.5 border border-border rounded-btn text-sm"
         />
       </div>
 
@@ -93,7 +93,7 @@ export default function AdminUsers() {
         />
       ) : (
         <div className="bg-white rounded-card shadow-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">
@@ -162,6 +162,64 @@ export default function AdminUsers() {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="divide-y divide-border md:hidden">
+            {users.map((u: any) => (
+              <div key={u.id} className="p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                    {getInitials(u.fullName)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-dark text-sm truncate">{u.fullName}</p>
+                      <span
+                        className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          u.role === 'ADMIN'
+                            ? 'bg-purple-100 text-purple-700'
+                            : u.role === 'TRAINER'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {u.role}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>{u.phone || 'No phone'}</span>
+                  <span className="flex items-center gap-1">
+                    {u.isActive !== false ? (
+                      <span className="text-green-600">Active</span>
+                    ) : (
+                      <span className="text-red-600">Suspended</span>
+                    )}
+                    <span>| {formatDate(u.createdAt)}</span>
+                  </span>
+                </div>
+                {u.role !== 'ADMIN' && (
+                  <div className="flex gap-2 pt-1">
+                    {u.isActive !== false ? (
+                      <button
+                        onClick={() => setConfirmAction({ userId: u.id, action: 'suspend' })}
+                        className="flex-1 py-2 border border-red-200 text-red-600 text-xs font-medium rounded hover:bg-red-50 flex items-center justify-center gap-1"
+                      >
+                        <Ban size={12} /> Suspend
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmAction({ userId: u.id, action: 'activate' })}
+                        className="flex-1 py-2 border border-green-200 text-green-600 text-xs font-medium rounded hover:bg-green-50 flex items-center justify-center gap-1"
+                      >
+                        <CheckCircle size={12} /> Activate
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       )}

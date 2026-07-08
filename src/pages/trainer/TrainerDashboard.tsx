@@ -87,7 +87,13 @@ export default function TrainerDashboard() {
           iconBg="bg-purple-50"
           iconColor="text-purple-600"
         />
-        <StatCard icon={Star} label="Rating" value={'New'} iconBg="bg-yellow-50" iconColor="text-yellow-600" />
+        <StatCard
+          icon={Star}
+          label="Rating"
+          value={user?.trainer?.averageRating?.toFixed(1) || '0.0'}
+          iconBg="bg-yellow-50"
+          iconColor="text-yellow-600"
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

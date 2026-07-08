@@ -72,6 +72,7 @@ export function AppRoutes() {
           <Route path="/trainer" element={<TrainerDashboard />} />
           <Route path="/trainer/courses" element={<Courses />} />
           <Route path="/trainer/courses/new" element={<CourseNew />} />
+          <Route path="/trainer/courses/:id/edit" element={<CourseNew />} />
           <Route path="/trainer/courses/:id" element={<TrainerCourseDetail />} />
           <Route path="/trainer/earnings" element={<Earnings />} />
           <Route path="/trainer/enrolments" element={<TrainerEnrolments />} />

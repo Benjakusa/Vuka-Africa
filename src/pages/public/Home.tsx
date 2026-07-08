@@ -1,8 +1,39 @@
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Search, BookOpen, CheckCircle, ChefHat, Camera, Code, Dumbbell, Music, Languages } from 'lucide-react';
+import {
+  Search,
+  BookOpen,
+  CheckCircle,
+  ChefHat,
+  Camera,
+  Code,
+  Dumbbell,
+  Music,
+  Languages,
+  ArrowRight,
+} from 'lucide-react';
 import HeroCarousel from '@/components/shared/hero-carousel';
+import { CourseCard } from '@/components/shared/course-card';
+import { CardSkeleton } from '@/components/shared/loading-skeleton';
+import { getCourses } from '@/services/courseService';
+import { courseKeys } from '@/lib/query-keys';
+import { CATEGORIES } from '@/lib/categories';
+
+const categoryIcons: Record<string, any> = {
+  'Baking & Cake Decoration': ChefHat,
+  'Photography & Videography': Camera,
+  'Programming & Web Dev': Code,
+  'Fitness & Wellness': Dumbbell,
+  'Music & Instruments': Music,
+  Languages: Languages,
+};
 
 export default function Home() {
+  const { data: courses, isLoading } = useQuery({
+    queryKey: courseKeys.list({ isPublished: true }),
+    queryFn: () => getCourses({ isPublished: true, limit: 4 }),
+  });
+
   const steps = [
     { icon: Search, step: '1', title: 'Browse', desc: 'Find the perfect skill and trainer for you' },
     { icon: BookOpen, step: '2', title: 'Learn', desc: 'Attend physical or virtual sessions' },
@@ -37,27 +68,59 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">Popular Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {[
-              { icon: ChefHat, label: 'Baking & Cake Decoration', slug: 'Baking & Cake Decoration' },
-              { icon: Camera, label: 'Photography', slug: 'Photography & Videography' },
-              { icon: Code, label: 'Programming & Web Dev', slug: 'Programming & Web Dev' },
-              { icon: Dumbbell, label: 'Fitness & Wellness', slug: 'Fitness & Wellness' },
-              { icon: Music, label: 'Music & Instruments', slug: 'Music & Instruments' },
-              { icon: Languages, label: 'Languages', slug: 'Languages' },
-            ].map((cat) => (
-              <Link
-                key={cat.slug}
-                to={`/trainers?category=${encodeURIComponent(cat.slug)}`}
-                className="flex flex-col items-center p-6 bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow"
-              >
-                <cat.icon size={40} className="text-primary mb-3" />
-                <span className="text-sm font-medium text-dark text-center">{cat.label}</span>
-                <span className="text-xs text-primary mt-2">Browse &rarr;</span>
-              </Link>
-            ))}
+            {CATEGORIES.slice(0, 6).map((cat) => {
+              const Icon = categoryIcons[cat] || BookOpen;
+              return (
+                <Link
+                  key={cat}
+                  to={`/trainers?category=${encodeURIComponent(cat)}`}
+                  className="flex flex-col items-center p-6 bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow"
+                >
+                  <Icon size={40} className="text-primary mb-3" />
+                  <span className="text-sm font-medium text-dark text-center">{cat}</span>
+                  <span className="text-xs text-primary mt-2">Browse &rarr;</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
+
+      {courses && courses.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
+              <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View all <ArrowRight size={14} />
+              </Link>
+            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <CardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {courses.map((course: any) => (
+                  <CourseCard
+                    key={course.id}
+                    id={course.id}
+                    title={course.title}
+                    slug={course.slug}
+                    mode={course.mode}
+                    duration={course.duration}
+                    sessionCount={course.sessionCount}
+                    priceKes={Number(course.priceKes)}
+                    imageUrl={course.imageUrl}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="py-20 text-center bg-white">
         <div className="max-w-2xl mx-auto px-4">

@@ -1,38 +1,19 @@
-import { useState, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
-import { createCourse } from '@/services/courseService';
+import { createCourse, updateCourse, getTrainerCourses } from '@/services/courseService';
 import { supabaseData as supabase } from '@/lib/supabase';
-
-const CATEGORIES = [
-  'Baking & Cake Decoration',
-  'Photography & Videography',
-  'Programming & Web Dev',
-  'Fitness & Wellness',
-  'Music & Instruments',
-  'Languages',
-  'Art & Painting',
-  'Fashion & Design',
-  'Cooking & Culinary Arts',
-  'Beauty & Makeup',
-  'Business & Entrepreneurship',
-  'Marketing & Social Media',
-  'Writing & Content Creation',
-  'Dance & Performing Arts',
-  'Sports & Coaching',
-  'Finance & Accounting',
-  'Personal Development',
-  'Home & Garden',
-  'Technology & IT',
-  'Crafts & DIY',
-];
+import { CATEGORIES } from '@/lib/categories';
 
 export default function CourseNew() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
+  const isEdit = !!id;
   const [loading, setLoading] = useState(false);
+  const [loadingCourse, setLoadingCourse] = useState(isEdit);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -49,6 +30,38 @@ export default function CourseNew() {
     maxStudents: '',
     location: '',
   });
+
+  useEffect(() => {
+    if (!isEdit) return;
+    (async () => {
+      try {
+        const courses = await getTrainerCourses(user?.trainer?.id!);
+        const course = courses.find((c: any) => c.id === id);
+        if (!course) {
+          toast.error('Course not found');
+          navigate('/trainer/courses');
+          return;
+        }
+        setForm({
+          title: course.title || '',
+          description: course.description || '',
+          mode: course.mode || 'PHYSICAL',
+          priceKes: course.priceKes?.toString() || '',
+          category: course.category || '',
+          duration: course.duration || '',
+          sessionCount: course.sessionCount?.toString() || '',
+          maxStudents: course.maxStudents?.toString() || '',
+          location: course.location || '',
+        });
+        if (course.imageUrl) setImagePreview(course.imageUrl);
+        if (!CATEGORIES.includes(course.category)) setCategoryOther(course.category);
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to load course');
+      } finally {
+        setLoadingCourse(false);
+      }
+    })();
+  }, [id, isEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -79,47 +92,69 @@ export default function CourseNew() {
     }
     setLoading(true);
     try {
-      let imageUrl: string | null = null;
+      let imageUrl = isEdit ? imagePreview : null;
 
       if (imageFile) {
-        const ext = imageFile.name.split('.').pop();
-        const filePath = `courses/${user.trainer.id}/${Date.now()}.${ext}`;
-        const { error: uploadError } = await supabase.storage.from('courses').upload(filePath, imageFile, {
-          cacheControl: '3600',
-          upsert: false,
+        const reader = new FileReader();
+        imageUrl = await new Promise<string>((resolve) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(imageFile);
         });
-        if (uploadError) throw new Error(uploadError.message);
-        const { data: urlData } = supabase.storage.from('courses').getPublicUrl(filePath);
-        imageUrl = urlData.publicUrl;
       }
 
-      const slug = form.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-      await createCourse({
-        trainerId: user.trainer.id,
-        title: form.title,
-        slug,
-        description: form.description,
-        mode: form.mode,
-        priceKes: Number(form.priceKes),
-        category: form.category === 'OTHER' ? categoryOther : form.category,
-        duration: form.duration,
-        sessionCount: Number(form.sessionCount),
-        maxStudents: Number(form.maxStudents) || null,
-        location: form.location || null,
-        imageUrl,
-        isPublished: true,
-      });
-      toast.success('Course created successfully!');
+      if (isEdit) {
+        await updateCourse(id, {
+          title: form.title,
+          description: form.description,
+          mode: form.mode,
+          priceKes: Number(form.priceKes),
+          category: form.category === 'OTHER' ? categoryOther : form.category,
+          duration: form.duration,
+          sessionCount: Number(form.sessionCount),
+          maxStudents: Number(form.maxStudents) || null,
+          location: form.location || null,
+          imageUrl,
+        });
+        toast.success('Course updated successfully!');
+      } else {
+        const slug = form.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        await createCourse({
+          trainerId: user.trainer.id,
+          title: form.title,
+          slug,
+          description: form.description,
+          mode: form.mode,
+          priceKes: Number(form.priceKes),
+          category: form.category === 'OTHER' ? categoryOther : form.category,
+          duration: form.duration,
+          sessionCount: Number(form.sessionCount),
+          maxStudents: Number(form.maxStudents) || null,
+          location: form.location || null,
+          imageUrl,
+          isPublished: true,
+        });
+        toast.success('Course created successfully!');
+      }
       navigate('/trainer/courses');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create course');
+      toast.error(err.message || 'Failed to save course');
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingCourse) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="bg-white rounded-card shadow-card p-6 flex items-center justify-center py-20">
+          <Loader2 size={24} className="animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -130,7 +165,7 @@ export default function CourseNew() {
         <ArrowLeft size={16} /> Back to Courses
       </Link>
 
-      <h1 className="text-2xl font-bold text-dark mb-6">Create New Course</h1>
+      <h1 className="text-2xl font-bold text-dark mb-6">{isEdit ? 'Edit Course' : 'Create New Course'}</h1>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-card shadow-card p-6 space-y-4">
         <div>
@@ -206,8 +241,11 @@ export default function CourseNew() {
             <label className="text-sm font-medium text-dark mb-1 block">Category</label>
             <select
               name="category"
-              value={form.category}
-              onChange={handleChange}
+              value={CATEGORIES.includes(form.category) ? form.category : 'OTHER'}
+              onChange={(e) => {
+                handleChange(e);
+                if (e.target.value !== 'OTHER') setCategoryOther('');
+              }}
               required
               className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             >
@@ -219,6 +257,16 @@ export default function CourseNew() {
               ))}
               <option value="OTHER">Other</option>
             </select>
+            {form.category && !CATEGORIES.includes(form.category) && (
+              <input
+                type="text"
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                placeholder="Type your category"
+                required
+                className="w-full px-3 py-2.5 border border-border rounded-btn text-sm mt-2"
+              />
+            )}
             {form.category === 'OTHER' && (
               <input
                 type="text"
@@ -304,7 +352,7 @@ export default function CourseNew() {
           className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
-          {loading ? 'Creating...' : 'Create Course'}
+          {loading ? 'Saving...' : isEdit ? 'Update Course' : 'Create Course'}
         </button>
       </form>
     </div>

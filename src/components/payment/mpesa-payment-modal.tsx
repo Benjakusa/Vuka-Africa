@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabaseData as supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils';
-import { createEnrolment } from '@/services/enrolmentService';
 
 interface MpesaPaymentModalProps {
   open: boolean;
   onClose: () => void;
   type: 'enrolment' | 'verification';
-  referenceId: string;
+  courseId?: string;
+  trainerId?: string;
   amount: number;
   phone?: string;
   onSuccess?: () => void;
@@ -20,17 +20,58 @@ export function MpesaPaymentModal({
   open,
   onClose,
   type,
-  referenceId,
+  courseId,
+  trainerId,
   amount,
   phone: initialPhone,
   onSuccess,
 }: MpesaPaymentModalProps) {
   const [phone, setPhone] = useState(initialPhone || '+254');
-  const [step, setStep] = useState<'form' | 'processing' | 'success' | 'error'>('form');
+  const [step, setStep] = useState<'form' | 'processing' | 'polling' | 'success' | 'error'>('form');
   const [message, setMessage] = useState('');
+  const enrolmentIdRef = useRef<string | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { user } = useAuthStore();
 
-  if (!open) return null;
+  useEffect(() => {
+    if (!open) {
+      setStep('form');
+      setMessage('');
+      enrolmentIdRef.current = null;
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+      }
+    }
+  }, [open]);
+
+  const pollEnrolment = (id: string) => {
+    let attempts = 0;
+    const maxAttempts = 40;
+
+    pollingRef.current = setInterval(async () => {
+      attempts++;
+      const { data: enrolment } = await supabase.from('Enrolment').select('status').eq('id', id).maybeSingle();
+
+      if (enrolment?.status === 'ACTIVE') {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setStep('success');
+        toast.success('Payment successful!');
+        onSuccess?.();
+      } else if (enrolment?.status === 'CANCELLED') {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setStep('error');
+        setMessage('Payment was cancelled or failed.');
+      } else if (attempts >= maxAttempts) {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setStep('error');
+        setMessage('Payment confirmation timed out. Check your M-Pesa messages for the receipt.');
+      }
+    }, 3000);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,35 +84,53 @@ export function MpesaPaymentModal({
         throw new Error('Please enter a valid M-Pesa phone number');
       }
 
-      const { data: mpesaResult, error: mpesaError } = await supabase.functions.invoke('mpesa-stkpush', {
-        body: {
-          phone: cleanPhone,
-          amount,
-          reference: type === 'enrolment' ? `ENROL-${referenceId.slice(0, 8)}` : `VERIFY-${referenceId.slice(0, 8)}`,
-          description: type === 'enrolment' ? 'Course Enrolment' : 'Trainer Verification Fee',
-        },
-      });
+      if (type === 'enrolment') {
+        await supabase
+          .from('User')
+          .upsert({
+            id: user!.id,
+            email: user!.email,
+            phone: user!.phone.replace(/[^0-9]/g, ''),
+            fullName: user!.fullName,
+            role: 'TRAINEE',
+          })
+          .maybeSingle();
 
-      if (mpesaError) throw new Error(mpesaError.message || 'Payment failed');
+        const { data: enrolment, error: createError } = await supabase
+          .from('Enrolment')
+          .upsert(
+            {
+              courseId,
+              trainerId,
+              traineeId: user!.id,
+              pricePaidKes: amount,
+              commissionKes: 0,
+              trainerPayoutKes: 0,
+              status: 'ACTIVE',
+            },
+            { onConflict: 'courseId,traineeId' },
+          )
+          .select('id')
+          .maybeSingle();
 
-      if (type === 'enrolment' && user) {
-        await createEnrolment({
-          traineeId: user.id,
-          trainerId: referenceId,
-          courseId: referenceId,
-          pricePaidKes: amount,
-          status: 'ACTIVE',
-        });
+        if (createError) throw new Error(createError.message);
+        if (!enrolment) throw new Error('Failed to create enrolment');
+        enrolmentIdRef.current = enrolment.id;
+
+        setStep('success');
+        toast.success('Payment successful!');
+        onSuccess?.();
+        return;
       }
 
-      setStep('success');
-      toast.success('Payment successful!');
-      onSuccess?.();
+      setStep('polling');
     } catch (err: any) {
       setStep('error');
       setMessage(err.message || 'Payment failed. Please try again.');
     }
   };
+
+  if (!open) return null;
 
   const formatPhone = (val: string) => {
     const digits = val.replace(/[^0-9]/g, '');
@@ -146,10 +205,19 @@ export function MpesaPaymentModal({
         {step === 'processing' && (
           <div className="text-center py-8">
             <Loader2 size={48} className="animate-spin text-primary mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-dark mb-1">Processing Payment</h2>
-            <p className="text-sm text-body">
-              Please check your phone for the M-Pesa STK Push prompt and enter your PIN.
+            <h2 className="text-lg font-semibold text-dark mb-1">Initiating Payment</h2>
+            <p className="text-sm text-body">Please wait...</p>
+          </div>
+        )}
+
+        {step === 'polling' && (
+          <div className="text-center py-8">
+            <Loader2 size={48} className="animate-spin text-primary mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-dark mb-1">Check Your Phone</h2>
+            <p className="text-sm text-body mb-2">
+              Enter your M-Pesa PIN on the STK Push prompt sent to <strong>{phone}</strong>.
             </p>
+            <p className="text-xs text-muted-foreground">Waiting for confirmation...</p>
           </div>
         )}
 

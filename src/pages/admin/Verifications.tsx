@@ -111,7 +111,7 @@ export default function Verifications() {
         />
       ) : (
         <div className="bg-white rounded-card shadow-card overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto hidden md:block">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-surface">
@@ -189,6 +189,62 @@ export default function Verifications() {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="divide-y divide-border md:hidden">
+            {verifications.map((v: any) => {
+              const userData = v.user || {};
+              return (
+                <div key={v.id} className="p-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                      {getInitials(userData.fullName || 'T')}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-dark text-sm truncate">{userData.fullName || 'Unknown'}</p>
+                      <p className="text-xs text-muted-foreground truncate">{userData.email || 'N/A'}</p>
+                    </div>
+                    <span
+                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                        v.verificationStatus === 'APPROVED'
+                          ? 'bg-green-100 text-green-700'
+                          : v.verificationStatus === 'REJECTED'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                      }`}
+                    >
+                      {v.verificationStatus}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Phone: {userData.phone || 'N/A'}</span>
+                    <span>{formatDate(v.updatedAt || v.createdAt)}</span>
+                  </div>
+                  {v.verificationStatus === 'PENDING' && (
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => handleApprove(v.id)}
+                        disabled={actionLoading === v.id}
+                        className="flex-1 py-2 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                      >
+                        {actionLoading === v.id ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <CheckCircle size={12} />
+                        )}
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(v.id)}
+                        disabled={actionLoading === v.id}
+                        className="flex-1 py-2 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                      >
+                        <XCircle size={12} /> Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

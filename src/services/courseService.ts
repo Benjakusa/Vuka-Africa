@@ -16,6 +16,27 @@ export async function getCourseBySlug(slug: string) {
   return data;
 }
 
+export async function getCourses(filters?: Record<string, any>) {
+  let query = supabase
+    .from('Course')
+    .select('*, trainer:Trainer!trainerId(id, isVerified, averageRating, totalReviews, user:User!userId(fullName))');
+  if (filters?.isPublished) query = query.eq('isPublished', true);
+  if (filters?.limit) {
+    const from = 0;
+    query = query.range(from, filters.limit - 1);
+  }
+  query = query.order('createdAt', { ascending: false });
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).map((course: any) => {
+    if (course.trainer) {
+      (course.trainer as Record<string, unknown>).fullName = (course.trainer as any).user?.fullName;
+      delete (course.trainer as any).user;
+    }
+    return course;
+  });
+}
+
 export async function getTrainerCourses(trainerId: string) {
   const { data, error } = await supabase.from('Course').select('*').eq('trainerId', trainerId);
   if (error) throw error;
