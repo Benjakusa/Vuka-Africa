@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { Users as UsersIcon, Search, Loader2, Ban, CheckCircle } from 'lucide-react';
+import { Users as UsersIcon, Search, Ban, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { getUsers, suspendUser, activateUser } from '@/services/adminService';
 import { adminKeys } from '@/lib/query-keys';

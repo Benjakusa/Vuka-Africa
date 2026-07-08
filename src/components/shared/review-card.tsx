@@ -9,7 +9,7 @@ interface ReviewCardProps {
   createdAt: string;
 }
 
-export function ReviewCard({ traineeName, avatarUrl, rating, comment, createdAt }: ReviewCardProps) {
+export function ReviewCard({ traineeName, rating, comment, createdAt }: ReviewCardProps) {
   return (
     <div className="bg-white rounded-card shadow-card p-4">
       <div className="flex items-center gap-3 mb-2">

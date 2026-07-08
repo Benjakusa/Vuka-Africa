@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams, Link } from 'react-router-dom';
-import { BookOpen, Search } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { getEnrolments } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';

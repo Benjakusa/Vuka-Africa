@@ -3,7 +3,7 @@ import { redis } from '@backend/lib/redis';
 import { supabaseDb } from '@backend/lib/db';
 import { addEmailToQueue } from './email-worker';
 
-const connection = redis;
+const connection = redis as any;
 
 export const mpesaQueue = new Queue('mpesa-callbacks', {
   connection,
@@ -112,7 +112,7 @@ async function processSuccessfulEnrolment(
   enrolmentId: string,
   mpesaReceiptNumber: string,
   amount: number,
-  phoneNumber: string,
+  _phoneNumber: string,
   checkoutRequestId: string,
 ) {
   const enrolment = await supabaseDb.enrolment.findUnique({
@@ -145,7 +145,7 @@ async function processSuccessfulEnrolment(
   const trainerPayoutTotal = Number(enrolment.trainerPayoutKes);
   const commissionAmount = Number(enrolment.commissionKes);
 
-  await supabaseDb.$transaction(async (tx) => {
+  await supabaseDb.$transaction(async (tx: any) => {
     await tx.enrolment.update({
       where: { id: enrolmentId },
       data: {
@@ -317,7 +317,7 @@ async function processVerificationFee(trainerId: string, mpesaReceiptNumber: str
     return;
   }
 
-  await supabaseDb.$transaction(async (tx) => {
+  await supabaseDb.$transaction(async (tx: any) => {
     await tx.trainer.update({
       where: { id: trainerId },
       data: {
@@ -490,7 +490,7 @@ async function handleB2cResult(data: any) {
       },
     });
 
-    await supabaseDb.$transaction(async (tx) => {
+    await supabaseDb.$transaction(async (tx: any) => {
       const trainer = await tx.trainer.findUnique({
         where: { id: payout.trainerId },
       });

@@ -3,7 +3,7 @@ import { redis } from '@backend/lib/redis';
 import { sendEmail } from '@backend/lib/email';
 import { supabaseDb } from '@backend/lib/db';
 
-const connection = redis;
+const connection = redis as any;
 
 export const emailQueue = new Queue('emails', {
   connection,

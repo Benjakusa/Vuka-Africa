@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { BookOpen, Users, Wallet, Star, ArrowRight, AlertTriangle } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { getTrainerCourses } from '@/services/courseService';
@@ -41,7 +41,7 @@ export default function TrainerDashboard() {
   });
 
   const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
-  const completedEnrolments = enrolments?.filter((e: any) => e.status === 'COMPLETED') || [];
+
   const totalEarnings = earnings?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
   const recentReviews = reviewsData?.data || [];
   const needsVerification = user?.trainer && !user.trainer.isVerified && user.trainer.verificationStatus !== 'PENDING';

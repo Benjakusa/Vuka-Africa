@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { getMyTrainerProfile, updateTrainerProfile } from '@/services/trainerService';
 import { FileUpload } from '@/components/shared/file-upload';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
@@ -86,7 +86,12 @@ export default function Verification() {
     },
   };
 
-  const config = statusConfig[status] || statusConfig.NONE;
+  const config = statusConfig[status] ?? {
+    icon: ShieldCheck,
+    color: 'text-muted-foreground',
+    title: 'Not Verified',
+    desc: 'Verify your identity to build trust with students and unlock higher earnings.',
+  };
   const StatusIcon = config.icon;
 
   return (

@@ -7,7 +7,7 @@ import { getCourseBySlug, updateCourse } from '@/services/courseService';
 import { courseKeys } from '@/lib/query-keys';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ErrorState } from '@/components/shared/error-state';
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/lib/categories';
 
 export default function CourseDetail() {

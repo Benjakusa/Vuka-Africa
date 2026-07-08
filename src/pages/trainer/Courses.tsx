@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Plus, MoreVertical, Eye, EyeOff, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { BookOpen, Plus, MoreVertical, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { getTrainerCourses, updateCourse } from '@/services/courseService';
 import { courseKeys } from '@/lib/query-keys';
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { CourseCard } from '@/components/shared/course-card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';

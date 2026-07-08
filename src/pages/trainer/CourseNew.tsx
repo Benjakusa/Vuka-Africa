@@ -4,7 +4,7 @@ import { Loader2, ArrowLeft, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { createCourse, updateCourse, getTrainerCourses } from '@/services/courseService';
-import { supabaseData as supabase } from '@/lib/supabase';
+
 import { CATEGORIES } from '@/lib/categories';
 
 export default function CourseNew() {

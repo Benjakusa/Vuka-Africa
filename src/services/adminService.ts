@@ -1,4 +1,4 @@
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export async function getAdminStats() {
   const [users, trainers, courses, enrolments, disputes] = await Promise.all([
@@ -104,7 +104,7 @@ export async function rejectVerification(trainerId: string) {
 
 export async function getTransactions(filters?: Record<string, any>, page = 1, perPage = 20) {
   let query = supabase.from('TransactionLedger').select('*', { count: 'exact' });
-  if (filters?.type) query = query.eq('entryType', filters.type);
+  if (filters?.['type']) query = query.eq('entryType', filters['type'] as string);
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
   const { data, error, count } = await query.range(from, to).order('createdAt', { ascending: false });

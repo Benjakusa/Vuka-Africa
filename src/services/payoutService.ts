@@ -1,4 +1,4 @@
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export async function requestPayout(data: { trainerId: string; amount: number; phone: string }) {
   const { data: payout, error } = await supabase

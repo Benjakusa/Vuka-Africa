@@ -6,7 +6,7 @@ import { addEmailToQueue } from './email-worker';
 import { createManagedWorker, setupGracefulShutdown } from './base';
 import { WORKER } from '@backend/lib/config';
 
-const connection = redis;
+const connection = redis as any;
 
 export const payoutQueue = new Queue('payouts', {
   connection,
@@ -75,7 +75,7 @@ async function processB2CInitiation(
         `[Payout Worker] B2C failed after ${WORKER.PAYOUT_MAX_RETRIES} retries for payout ${payoutId}: ${error.message}`,
       );
 
-      await supabaseDb.$transaction(async (tx) => {
+      await supabaseDb.$transaction(async (tx: any) => {
         await tx.payout.update({
           where: { id: payoutId },
           data: { status: 'FAILED', failureReason: error.message || 'B2C failed after retries', retryCount },

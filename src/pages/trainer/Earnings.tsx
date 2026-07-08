@@ -3,12 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Wallet, Download, RefreshCw, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
-import { getTrainerEarnings } from '@/services/trainerService';
+
 import { getTransactionHistory } from '@/services/paymentService';
 import { getPayoutHistory, requestPayout } from '@/services/payoutService';
 import { WithdrawModal } from '@/components/payment/withdraw-modal';
-import { CardSkeleton } from '@/components/shared/loading-skeleton';
-import { ErrorState } from '@/components/shared/error-state';
+
 import { EmptyState } from '@/components/shared/empty-state';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { StatCard } from '@/components/shared/stat-card';

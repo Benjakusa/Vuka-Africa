@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams, Link } from 'react-router-dom';
-import { BookOpen, User, MapPin, Monitor, Globe, Calendar } from 'lucide-react';
-import { toast } from 'sonner';
+import { useParams } from 'react-router-dom';
+import { BookOpen, MapPin, Calendar } from 'lucide-react';
+
 import { useAuthStore } from '@/stores/auth-store';
 import { getEnrolment, createDispute, createReview } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';
@@ -78,7 +78,7 @@ export default function EnrolmentDetail() {
   const isCompleted = enrolment.status === 'COMPLETED';
   const hasDispute = enrolment.disputeStatus === 'OPEN';
 
-  const modeIcon = course.mode === 'PHYSICAL' ? MapPin : course.mode === 'VIRTUAL' ? Monitor : Globe;
+
 
   return (
     <div className="max-w-4xl mx-auto">

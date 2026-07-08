@@ -12,13 +12,13 @@ import { ReviewCard } from '@/components/shared/review-card';
 import { CourseCard } from '@/components/shared/course-card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
-import { ProfileSkeleton, CardSkeleton } from '@/components/shared/loading-skeleton';
+import { ProfileSkeleton } from '@/components/shared/loading-skeleton';
 import { Pagination } from '@/components/shared/pagination';
 import { toast } from 'sonner';
 
 export default function TrainerProfile() {
   const { slug: trainerId } = useParams<{ slug: string }>();
-  const [reviewPage, setReviewPage] = useState(1);
+  const [reviewPage] = useState(1);
 
   const {
     data: trainerRes,

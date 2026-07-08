@@ -4,7 +4,7 @@ import { Loader2, Upload, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { getMyTrainerProfile, updateTrainerProfile } from '@/services/trainerService';
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 
 export default function ProfileEdit() {

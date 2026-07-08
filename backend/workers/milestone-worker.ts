@@ -6,7 +6,7 @@ import { supabaseDb } from '@backend/lib/db';
 import { createManagedWorker, setupGracefulShutdown } from './base';
 import { WORKER, MILESTONE } from '@backend/lib/config';
 
-const connection = redis;
+const connection = redis as any;
 
 export const milestoneQueue = new Queue('milestone-release', {
   connection,

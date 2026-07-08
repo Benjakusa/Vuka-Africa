@@ -8,15 +8,14 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@backend': path.resolve(__dirname, './backend'),
-      '@frontend': path.resolve(__dirname, './src'),
     },
   },
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: Number(process.env.PORT) || 3000,
     proxy: {
       '/supabase': {
-        target: 'https://yghndmkuogaepegibxhd.supabase.co',
+        target: process.env.VITE_SUPABASE_URL || 'http://localhost:54321',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/supabase/, ''),
       },
@@ -28,7 +27,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['lucide-react', 'sonner', '@tanstack/react-query'],
+          data: ['@tanstack/react-query', 'zustand'],
+          ui: ['lucide-react', 'sonner'],
           supabase: ['@supabase/supabase-js'],
         },
       },

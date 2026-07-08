@@ -21,7 +21,7 @@ export default function Transactions() {
   const page = Number(searchParams.get('page')) || 1;
 
   const filters: Record<string, unknown> = {};
-  if (type) filters.type = type;
+  if (type) filters['type'] = type;
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: adminKeys.transactions(filters),

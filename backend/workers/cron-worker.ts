@@ -3,7 +3,7 @@ import { redis } from '@backend/lib/redis';
 import { supabaseDb } from '@backend/lib/db';
 import { addEmailToQueue } from './email-worker';
 
-const connection = redis;
+const connection = redis as any;
 
 export const cronQueue = new Queue('cron-jobs', {
   connection,
@@ -18,7 +18,7 @@ async function runMpesaReconciliation() {
 
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  const payments = await supabaseDb.transactionLedger.findMany({
+  const _payments = await supabaseDb.transactionLedger.findMany({
     where: {
       createdAt: { gte: twentyFourHoursAgo },
       mpesaTransactionId: { not: null },
@@ -79,7 +79,7 @@ async function runMpesaReconciliation() {
         },
       });
 
-      await supabaseDb.$transaction(async (tx) => {
+      await supabaseDb.$transaction(async (tx: any) => {
         const trainer = await tx.trainer.findUnique({ where: { id: payout.trainerId } });
         if (!trainer) return;
 

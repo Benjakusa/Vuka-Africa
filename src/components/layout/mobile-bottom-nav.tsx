@@ -9,7 +9,6 @@ import {
   AlertTriangle,
   List,
   Star,
-  Receipt,
   Search,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';

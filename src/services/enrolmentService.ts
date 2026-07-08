@@ -1,4 +1,4 @@
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export async function getEnrolments(filters?: Record<string, any>) {
   let query = supabase
@@ -7,9 +7,9 @@ export async function getEnrolments(filters?: Record<string, any>) {
       '*, trainee:User!traineeId(id, fullName, email, phone), trainer:User!trainerId(id, fullName), course:Course(id, title, slug, mode, duration, sessionCount), milestones:Milestone(*), reviews:Review(*)',
     );
 
-  if (filters?.status) query = query.eq('status', filters.status);
-  if (filters?.traineeId) query = query.eq('traineeId', filters.traineeId);
-  if (filters?.trainerId) query = query.eq('trainerId', filters.trainerId);
+  if (filters?.['status']) query = query.eq('status', filters['status'] as string);
+  if (filters?.['traineeId']) query = query.eq('traineeId', filters['traineeId'] as string);
+  if (filters?.['trainerId']) query = query.eq('trainerId', filters['trainerId'] as string);
 
   query = query.order('createdAt', { ascending: false });
 
@@ -38,8 +38,8 @@ export async function createEnrolment(data: Record<string, any>) {
 
 export async function confirmMilestone(milestoneId: string, by: 'trainee' | 'trainer') {
   const updates: Record<string, any> = {};
-  if (by === 'trainee') updates.traineeConfirmedAt = new Date().toISOString();
-  else updates.trainerConfirmedAt = new Date().toISOString();
+  if (by === 'trainee') updates['traineeConfirmedAt'] = new Date().toISOString();
+  else updates['trainerConfirmedAt'] = new Date().toISOString();
 
   const { data, error } = await supabase.from('Milestone').update(updates).eq('id', milestoneId).select().single();
   if (error) throw error;

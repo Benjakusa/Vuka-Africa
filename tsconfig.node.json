@@ -11,7 +11,26 @@
     "composite": true,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@backend/*": ["./backend/*"]
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "backend/**/*.ts"
+  ],
+  "exclude": [
+    "backend/**/*.test.ts",
+    "backend/**/*.spec.ts"
+  ]
 }

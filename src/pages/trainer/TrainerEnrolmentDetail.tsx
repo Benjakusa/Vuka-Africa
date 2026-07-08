@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { BookOpen, MapPin, Monitor, Globe, Calendar } from 'lucide-react';
+import { BookOpen, MapPin, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuthStore } from '@/stores/auth-store';
+
 import { getEnrolment, confirmMilestone } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';
 import { BackButton } from '@/components/shared/back-button';
@@ -60,7 +60,7 @@ export default function TrainerEnrolmentDetail() {
   const trainee = enrolment.trainee || {};
   const milestones = enrolment.milestones || [];
 
-  const modeIcon = course.mode === 'PHYSICAL' ? MapPin : course.mode === 'VIRTUAL' ? Monitor : Globe;
+
 
   return (
     <div className="max-w-4xl mx-auto">

@@ -23,7 +23,6 @@ export function TrainerCard({
   totalReviews,
   bio,
   skills,
-  user,
   courses,
 }: TrainerCardProps) {
   const minPrice = courses?.length ? Math.min(...courses.map((c: any) => Number(c.priceKes))) : null;

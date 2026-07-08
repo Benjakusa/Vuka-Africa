@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Loader2, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils';
 
@@ -45,33 +45,7 @@ export function MpesaPaymentModal({
     }
   }, [open]);
 
-  const pollEnrolment = (id: string) => {
-    let attempts = 0;
-    const maxAttempts = 40;
 
-    pollingRef.current = setInterval(async () => {
-      attempts++;
-      const { data: enrolment } = await supabase.from('Enrolment').select('status').eq('id', id).maybeSingle();
-
-      if (enrolment?.status === 'ACTIVE') {
-        if (pollingRef.current) clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        setStep('success');
-        toast.success('Payment successful!');
-        onSuccess?.();
-      } else if (enrolment?.status === 'CANCELLED') {
-        if (pollingRef.current) clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        setStep('error');
-        setMessage('Payment was cancelled or failed.');
-      } else if (attempts >= maxAttempts) {
-        if (pollingRef.current) clearInterval(pollingRef.current);
-        pollingRef.current = null;
-        setStep('error');
-        setMessage('Payment confirmation timed out. Check your M-Pesa messages for the receipt.');
-      }
-    }, 3000);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

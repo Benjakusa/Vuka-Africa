@@ -1,15 +1,15 @@
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export async function getTrainers(filters?: Record<string, any>) {
   let query = supabase.from('Trainer').select('*, user:User!userId(id, fullName, email, avatarUrl), courses:Course(*)');
 
-  if (filters?.verifiedOnly) query = query.eq('isVerified', true);
-  if (filters?.category) query = query.contains('skills', [filters.category]);
-  if (filters?.search) {
-    query = query.or(`user.fullName.ilike.%${filters.search}%,bio.ilike.%${filters.search}%`);
+  if (filters?.['verifiedOnly']) query = query.eq('isVerified', true);
+  if (filters?.['category']) query = query.contains('skills', [filters['category'] as string]);
+  if (filters?.['search']) {
+    query = query.or(`user.fullName.ilike.%${filters['search']}%,bio.ilike.%${filters['search']}%`);
   }
 
-  const sortBy = filters?.sortBy || 'averageRating';
+  const sortBy = (filters?.['sortBy'] as string) || 'averageRating';
   query = query.order(sortBy, { ascending: false });
 
   const { data, error } = await query;

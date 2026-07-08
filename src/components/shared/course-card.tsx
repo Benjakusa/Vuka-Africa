@@ -20,7 +20,7 @@ const modeIcons: Record<string, any> = {
   HYBRID: Globe,
 };
 
-export function CourseCard({ id, title, slug, mode, duration, sessionCount, priceKes, imageUrl }: CourseCardProps) {
+export function CourseCard({ id, title, slug, mode, duration, priceKes, imageUrl }: CourseCardProps) {
   const [imgError, setImgError] = useState(false);
   const ModeIcon = modeIcons[mode] || MapPin;
 

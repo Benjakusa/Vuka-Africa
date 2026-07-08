@@ -1,4 +1,4 @@
-import { supabaseData as supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 export async function getCourseBySlug(slug: string) {
   const { data, error } = await supabase
@@ -8,10 +8,10 @@ export async function getCourseBySlug(slug: string) {
     .maybeSingle();
   if (error) throw error;
   if (data?.trainer) {
-    (data.trainer as Record<string, unknown>).fullName =
-      (data.trainer as Record<string, unknown>).user &&
-      ((data.trainer as Record<string, unknown>).user as Record<string, unknown>).fullName;
-    delete (data.trainer as Record<string, unknown>).user;
+    (data.trainer as Record<string, unknown>)['fullName'] =
+      (data.trainer as Record<string, unknown>)['user'] &&
+      ((data.trainer as Record<string, unknown>)['user'] as Record<string, unknown>)['fullName'];
+    delete (data.trainer as Record<string, unknown>)['user'];
   }
   return data;
 }
@@ -20,17 +20,17 @@ export async function getCourses(filters?: Record<string, any>) {
   let query = supabase
     .from('Course')
     .select('*, trainer:Trainer!trainerId(id, isVerified, averageRating, totalReviews, user:User!userId(fullName))');
-  if (filters?.isPublished) query = query.eq('isPublished', true);
-  if (filters?.limit) {
+  if (filters?.['isPublished']) query = query.eq('isPublished', true);
+  if (filters?.['limit']) {
     const from = 0;
-    query = query.range(from, filters.limit - 1);
+    query = query.range(from, (filters['limit'] as number) - 1);
   }
   query = query.order('createdAt', { ascending: false });
   const { data, error } = await query;
   if (error) throw error;
   return (data || []).map((course: any) => {
     if (course.trainer) {
-      (course.trainer as Record<string, unknown>).fullName = (course.trainer as any).user?.fullName;
+      (course.trainer as Record<string, unknown>)['fullName'] = (course.trainer as any).user?.fullName;
       delete (course.trainer as any).user;
     }
     return course;

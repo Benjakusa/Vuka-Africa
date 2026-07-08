@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User, LayoutDashboard, Users, LogIn } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, Users, LogIn } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useUIStore } from '@/stores/ui-store';
-import { cn } from '@/lib/utils';
+
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();
