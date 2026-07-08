@@ -32,6 +32,7 @@ import TrainerEnrolments from '@/pages/trainer/TrainerEnrolments';
 import TrainerEnrolmentDetail from '@/pages/trainer/TrainerEnrolmentDetail';
 import TrainerReviews from '@/pages/trainer/TrainerReviews';
 import Verification from '@/pages/trainer/Verification';
+import ProfileEdit from '@/pages/trainer/ProfileEdit';
 
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminConfig from '@/pages/admin/Config';
@@ -78,6 +79,7 @@ export function AppRoutes() {
           <Route path="/trainer/enrolments" element={<TrainerEnrolments />} />
           <Route path="/trainer/enrolments/:id" element={<TrainerEnrolmentDetail />} />
           <Route path="/trainer/reviews" element={<TrainerReviews />} />
+          <Route path="/trainer/profile" element={<ProfileEdit />} />
           <Route path="/trainer/verification" element={<Verification />} />
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>

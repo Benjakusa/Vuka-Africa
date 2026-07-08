@@ -43,6 +43,7 @@ CREATE TABLE "Trainer" (
     "verificationFeePaid" BOOLEAN NOT NULL DEFAULT false,
     "verificationFeeAmount" DECIMAL(12,2) NOT NULL DEFAULT 5000.00,
     "commissionRate" DECIMAL(5,2) NOT NULL DEFAULT 20.00,
+    "coverPhoto" TEXT,
     "averageRating" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "totalReviews" INTEGER NOT NULL DEFAULT 0,
     "totalStudents" INTEGER NOT NULL DEFAULT 0,

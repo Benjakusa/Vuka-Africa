@@ -102,12 +102,12 @@ export default function Courses() {
                 priceKes={course.priceKes}
                 imageUrl={course.imageUrl}
               />
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <div className="absolute top-2 right-2 z-10">
                 <button
                   onClick={() => setOpenMenu(openMenu === course.id ? null : course.id)}
                   className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
                 >
-                  <EyeOff size={14} className="text-muted-foreground" />
+                  <MoreVertical size={14} className="text-muted-foreground" />
                 </button>
               </div>
 

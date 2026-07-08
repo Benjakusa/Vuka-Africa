@@ -49,3 +49,6 @@ ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "commissionRate" DECIMAL(5
 ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "verificationFee" DECIMAL(12,2) NOT NULL DEFAULT 5000.00;
 ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "minPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 100.00;
 ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "maxPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 50000.00;
+
+-- Trainer profile: add cover photo column
+ALTER TABLE "Trainer" ADD COLUMN IF NOT EXISTS "coverPhoto" TEXT;

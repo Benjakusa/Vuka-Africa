@@ -7,6 +7,7 @@ interface ConfirmationDialogProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  loading?: boolean;
   variant?: 'primary' | 'destructive';
 }
 
@@ -17,6 +18,7 @@ export function ConfirmationDialog({
   title,
   message,
   confirmLabel = 'Confirm',
+  loading = false,
   variant = 'primary',
 }: ConfirmationDialogProps) {
   if (!open) return null;
@@ -49,10 +51,14 @@ export function ConfirmationDialog({
           </button>
           <button
             onClick={handleConfirm}
-            className={`flex-1 py-2.5 text-white text-sm font-medium rounded-btn transition-colors ${
-              variant === 'destructive' ? 'bg-destructive hover:bg-destructive/90' : 'bg-primary hover:bg-primary/90'
+            disabled={loading}
+            className={`flex-1 py-2.5 text-white text-sm font-medium rounded-btn transition-colors flex items-center justify-center gap-2 ${
+              variant === 'destructive'
+                ? 'bg-destructive hover:bg-destructive/90 disabled:opacity-50'
+                : 'bg-primary hover:bg-primary/90 disabled:opacity-50'
             }`}
           >
+            {loading && <Loader2 size={14} className="animate-spin" />}
             {confirmLabel}
           </button>
         </div>

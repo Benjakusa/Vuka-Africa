@@ -13,6 +13,7 @@ import {
   LogOut,
   Search,
   Settings,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
@@ -30,6 +31,7 @@ const trainerLinks = [
   { href: '/trainer/courses', label: 'My Courses', icon: Book },
   { href: '/trainer/enrolments', label: 'Enrolments', icon: Users },
   { href: '/trainer/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/trainer/profile', label: 'Profile', icon: UserCircle },
   { href: '/trainer/verification', label: 'Verification', icon: ShieldCheck },
   { href: '/trainer/reviews', label: 'Reviews', icon: Star },
 ];
