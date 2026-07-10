@@ -44,6 +44,42 @@ export default function Home() {
     <div>
       <HeroCarousel />
 
+      {courses && courses.length > 0 && (
+        <section id="courses" className="py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
+              <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View all <ArrowRight size={14} />
+              </Link>
+            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <CardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {courses.map((course: any) => (
+                  <CourseCard
+                    key={course.id}
+                    id={course.id}
+                    title={course.title}
+                    slug={course.slug}
+                    mode={course.mode}
+                    duration={course.duration}
+                    sessionCount={course.sessionCount}
+                    priceKes={Number(course.priceKes)}
+                    imageUrl={course.imageUrl}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">How It Works</h2>
@@ -85,42 +121,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {courses && courses.length > 0 && (
-        <section id="courses" className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
-              <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
-                View all <ArrowRight size={14} />
-              </Link>
-            </div>
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <CardSkeleton key={i} />
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {courses.map((course: any) => (
-                  <CourseCard
-                    key={course.id}
-                    id={course.id}
-                    title={course.title}
-                    slug={course.slug}
-                    mode={course.mode}
-                    duration={course.duration}
-                    sessionCount={course.sessionCount}
-                    priceKes={Number(course.priceKes)}
-                    imageUrl={course.imageUrl}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
 
       <section className="py-20 text-center bg-white">
         <div className="max-w-2xl mx-auto px-4">

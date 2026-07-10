@@ -49,7 +49,7 @@ export default function HeroCarousel() {
   return (
     <section
       className="relative w-full overflow-hidden bg-dark"
-      style={{ aspectRatio: '16 / 9' }}
+      style={{ aspectRatio: '16 / 9', minHeight: '280px' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -66,12 +66,13 @@ export default function HeroCarousel() {
               loading={i === 0 ? 'eager' : 'lazy'}
             />
             <div className="absolute inset-0 bg-black/50" />
-            <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center max-w-2xl mx-auto">
+            {/* Content sits in the upper/center area, leaving room for dots at the bottom */}
+            <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center max-w-2xl mx-auto pb-10 sm:pb-12">
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">{slide.headline}</h1>
               <p className="mt-4 text-base sm:text-lg text-white/80 max-w-lg">{slide.subtitle}</p>
               <Link
                 to={slide.cta.href}
-                className="mt-8 px-8 py-3 bg-[#FF5349] text-white font-semibold rounded-lg hover:bg-[#E0483F] transition-colors text-sm sm:text-base"
+                className="mt-6 sm:mt-8 px-8 py-3 bg-[#ff3f34] text-white font-semibold rounded-lg hover:bg-[#e03029] transition-colors text-sm sm:text-base"
               >
                 {slide.cta.label}
               </Link>
@@ -80,12 +81,13 @@ export default function HeroCarousel() {
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+      {/* Dots sit at the bottom, outside the content area — never overlap the button */}
+      <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${i === current ? 'bg-white w-6' : 'bg-white/50'}`}
+            className={`h-2.5 rounded-full transition-all duration-300 ${i === current ? 'bg-white w-6' : 'bg-white/50 w-2.5'}`}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
