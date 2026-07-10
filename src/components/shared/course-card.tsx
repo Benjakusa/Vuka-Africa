@@ -24,7 +24,6 @@ const modeIcons: Record<string, any> = {
 };
 
 export const CourseCard = React.memo(function CourseCard({
-  id,
   title,
   slug,
   mode,

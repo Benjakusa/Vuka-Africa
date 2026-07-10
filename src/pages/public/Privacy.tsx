@@ -73,8 +73,8 @@ const sections = [
 
 export default function Privacy() {
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div className="min-h-screen bg-gray-100">
+      <div className="bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <Link
             to="/"
@@ -83,8 +83,8 @@ export default function Privacy() {
             <ArrowLeft size={16} /> Back to Home
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center">
-              <Shield size={24} className="text-primary" />
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center">
+              <Shield size={24} className="text-white" />
             </div>
             <div>
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Privacy Policy</h1>
@@ -99,9 +99,9 @@ export default function Privacy() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-16">
         <div className="space-y-6">
           {sections.map((section, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-8 hover:">
+            <div key={i} className="bg-white rounded-2xl border border-gray-200 p-8">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
                   <section.icon size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -109,7 +109,7 @@ export default function Privacy() {
                   <ul className="space-y-2">
                     {section.items.map((item, j) => (
                       <li key={j} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-surface mt-2" />
+                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-gray-300 mt-2" />
                         {item}
                       </li>
                     ))}

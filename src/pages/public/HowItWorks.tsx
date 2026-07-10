@@ -77,14 +77,14 @@ const trainerSteps = [
 
 function StepCard({ icon: Icon, title, desc, index }: { icon: any; title: string; desc: string; index: number }) {
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 p-6 transition-all duration-300 hover: hover:border-primary/20 hover:-translate-y-1">
+    <div className="group relative bg-white rounded-2xl border border-gray-200 p-6 transition-all duration-300 hover:border-primary-200 hover:-translate-y-1">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white group-hover:scale-110 transition-transform">
           <Icon size={22} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="text-xs font-semibold text-primary/60 uppercase tracking-wider">Step {index + 1}</span>
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Step {index + 1}</span>
           </div>
           <h3 className="font-semibold text-gray-900">{title}</h3>
           <p className="mt-1 text-sm text-gray-500 leading-relaxed">{desc}</p>
@@ -96,8 +96,8 @@ function StepCard({ icon: Icon, title, desc, index }: { icon: any; title: string
 
 export default function HowItWorks() {
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+    <div className="min-h-screen bg-gray-100">
+      <div className="bg-gray-900 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
           <Link
             to="/"
@@ -114,9 +114,9 @@ export default function HowItWorks() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 sm:p-10 mb-12">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 sm:p-10 mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
               <Search size={20} />
             </div>
             <div>
@@ -131,9 +131,9 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 sm:p-10 mb-16">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 sm:p-10 mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-foreground">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
               <UserPlus size={20} />
             </div>
             <div>
