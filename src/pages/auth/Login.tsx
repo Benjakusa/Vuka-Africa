@@ -92,33 +92,33 @@ export default function AuthPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; }
         .ap-root { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; padding: 1rem; font-family: 'Inter', system-ui, sans-serif; }
-        .ap-card { position: relative; width: 100%; max-width: 860px; height: 600px; border-radius: 1.5rem; box-shadow: 0 24px 64px -12px rgba(255,75,51,.18), 0 8px 24px -4px rgba(0,0,0,.10); overflow: hidden; background: #fff; }
+        .ap-card { position: relative; width: 100%; max-width: 860px; height: 600px; border-radius: 1.5rem; box-shadow: 0 24px 64px -12px rgba(255,63,52,.18), 0 8px 24px -4px rgba(0,0,0,.10); overflow: hidden; background: #fff; }
         .ap-panel { position: absolute; top: 0; width: 50%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 2.5rem 2.25rem; background: #fff; z-index: 1; }
         .ap-panel--login  { left: 0; }
         .ap-panel--register { right: 0; }
-        .ap-overlay { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: #ff4b33; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; text-align: center; z-index: 5; transition: transform .65s cubic-bezier(.77,0,.175,1); }
+        .ap-overlay { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: #ff3f34; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; text-align: center; z-index: 5; transition: transform .65s cubic-bezier(.77,0,.175,1); }
         .ap-overlay__logo { font-size: 2.8rem; font-weight: 900; color: #fff; letter-spacing: -.05em; margin-bottom: .4rem; }
         .ap-overlay__tagline { font-size: .875rem; color: rgba(255,255,255,.88); line-height: 1.65; margin-bottom: 1.75rem; white-space: pre-line; }
         .ap-overlay__btn { padding: .6rem 2rem; border: 2px solid rgba(255,255,255,.75); border-radius: .5rem; color: #fff; font-weight: 700; font-size: .875rem; background: transparent; cursor: pointer; transition: background .2s; }
         .ap-overlay__btn:hover { background: rgba(255,255,255,.15); }
         .ap-panel h1 { font-size: 1.6rem; font-weight: 800; color: #1A1A1A; margin: 0 0 .2rem; }
         .ap-sub { font-size: .875rem; color: #4B5563; margin: 0 0 1.4rem; }
-        .ap-back { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; color: #ff4b33; text-decoration: none; font-weight: 500; margin-bottom: 1rem; }
+        .ap-back { display: inline-flex; align-items: center; gap: .3rem; font-size: .78rem; color: #ff3f34; text-decoration: none; font-weight: 500; margin-bottom: 1rem; }
         .ap-back:hover { text-decoration: underline; }
         .ap-field { margin-bottom: .8rem; }
         .ap-label { display: block; font-size: .78rem; font-weight: 600; color: #1A1A1A; margin-bottom: .3rem; }
         .ap-input { width: 100%; padding: .58rem .85rem; border: 1.5px solid #E5E7EB; border-radius: .5rem; font-size: .875rem; color: #1A1A1A; background: #FAFAFA; outline: none; transition: border-color .18s, box-shadow .18s, background .18s; font-family: inherit; }
-        .ap-input:focus { border-color: #ff4b33; box-shadow: 0 0 0 3px rgba(255,75,51,.15); background: #fff; }
+        .ap-input:focus { border-color: #ff3f34; box-shadow: 0 0 0 3px rgba(255,63,52,.15); background: #fff; }
         .ap-input-wrap { position: relative; }
         .ap-input-wrap .ap-input { padding-right: 2.4rem; }
         .ap-eye { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9AA3AF; display: flex; align-items: center; padding: 0; line-height: 1; }
-        .ap-eye:hover { color: #ff4b33; }
+        .ap-eye:hover { color: #ff3f34; }
         .ap-forgot { text-align: right; margin-top: .2rem; }
-        .ap-forgot a { font-size: .75rem; color: #ff4b33; text-decoration: none; font-weight: 600; }
+        .ap-forgot a { font-size: .75rem; color: #ff3f34; text-decoration: none; font-weight: 600; }
         .ap-forgot a:hover { text-decoration: underline; }
         .ap-error { font-size: .8rem; color: #EF4444; background: #FEF2F2; border-radius: .4rem; padding: .45rem .75rem; margin-bottom: .5rem; }
-        .ap-submit { width: 100%; padding: .72rem; background: #ff4b33; color: #fff; font-weight: 700; font-size: .9rem; border: none; border-radius: .5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; margin-top: .4rem; transition: background .2s, transform .15s; font-family: inherit; }
-        .ap-submit:hover:not(:disabled) { background: #e03a22; transform: translateY(-1px); }
+        .ap-submit { width: 100%; padding: .72rem; background: #ff3f34; color: #fff; font-weight: 700; font-size: .9rem; border: none; border-radius: .5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .5rem; margin-top: .4rem; transition: background .2s, transform .15s; font-family: inherit; }
+        .ap-submit:hover:not(:disabled) { background: #e03029; transform: translateY(-1px); }
         .ap-submit:active:not(:disabled) { transform: translateY(0); }
         .ap-submit:disabled { opacity: .55; cursor: not-allowed; }
         @keyframes ap-spin { to { transform: rotate(360deg); } }
@@ -133,7 +133,7 @@ export default function AuthPage() {
           .ap-panel--login, .ap-panel--register { left: auto; right: auto; display: none; }
           .ap-panel--login.ap-active, .ap-panel--register.ap-active { display: flex; }
           .ap-back { display: none; }
-          .ap-mobile-header { display: flex !important; flex-direction: column; align-items: center; justify-content: center; background: #ff4b33; padding: 3rem 1.5rem 2.5rem; text-align: center; position: relative; }
+          .ap-mobile-header { display: flex !important; flex-direction: column; align-items: center; justify-content: center; background: #ff3f34; padding: 3rem 1.5rem 2.5rem; text-align: center; position: relative; }
           .ap-mobile-header__logo { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -.04em; }
           .ap-mobile-header__sub { font-size: .8rem; color: rgba(255,255,255,.85); margin-top: .25rem; }
           .ap-mobile-card { background: #fff; padding: 1.75rem 1.5rem 2rem; }

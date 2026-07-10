@@ -8,17 +8,17 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#ff4b33',
-          50: '#FFF3F1',
-          100: '#FFE2DE',
-          200: '#FFC5BC',
-          300: '#FFA89A',
-          400: '#FF8A78',
-          500: '#ff4b33',
-          600: '#E63D27',
-          700: '#CC341F',
-          800: '#B32B17',
-          900: '#99220F',
+          DEFAULT: '#ff3f34',
+          50: '#FFF2F1',
+          100: '#FFE0DE',
+          200: '#FFC2BC',
+          300: '#FFA49A',
+          400: '#FF8678',
+          500: '#ff3f34',
+          600: '#E63129',
+          700: '#CC2921',
+          800: '#B32018',
+          900: '#991710',
         },
         dark: '#000000',
         body: '#4B5563', // Grey
@@ -52,7 +52,7 @@ module.exports = {
         },
         border: '#E5E7EB', // Grey
         input: '#E5E7EB', // Grey
-        ring: '#ff4b33', // Brand Orange
+        ring: '#ff3f34', // Brand Orange
         background: '#FFFFFF', // White
         foreground: '#000000', // Black
         card: '#FFFFFF', // White
