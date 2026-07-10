@@ -126,26 +126,115 @@ export default function AuthPage() {
         .ap-mobile-header { display: none; }
         .ap-mobile-toggle { display: none; }
         @media (max-width: 640px) {
-          .ap-root { padding: 0; background: #FAFAFA; justify-content: flex-start; }
-          .ap-card { height: auto; max-width: 100%; border-radius: 0; overflow: visible; box-shadow: none; background: transparent; }
+          /* Page background */
+          .ap-root {
+            padding: 1.25rem;
+            background: #F1F1F1;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+          }
+          /* The card: floating, rounded, elevated, never touches screen edges */
+          .ap-card {
+            height: auto;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 20px 60px -10px rgba(0,0,0,.18), 0 6px 20px -4px rgba(0,0,0,.10);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+          }
+          /* Hide desktop overlay panel */
           .ap-overlay { display: none; }
-          .ap-panel { position: relative; width: 100%; height: auto; padding: 0; }
+          /* Panels become full-width blocks inside the card */
+          .ap-panel {
+            position: relative;
+            width: 100%;
+            height: auto;
+            padding: 0;
+            background: #fff;
+          }
           .ap-panel--login, .ap-panel--register { left: auto; right: auto; display: none; }
-          .ap-panel--login.ap-active, .ap-panel--register.ap-active { display: flex; }
+          .ap-panel--login.ap-active, .ap-panel--register.ap-active { display: flex; flex-direction: column; }
+          /* Hide desktop back link */
           .ap-back { display: none; }
-          .ap-mobile-header { display: flex !important; flex-direction: column; align-items: center; justify-content: center; background: #ff3f34; padding: 3rem 1.5rem 2.5rem; text-align: center; position: relative; }
-          .ap-mobile-header__logo { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -.04em; }
-          .ap-mobile-header__sub { font-size: .8rem; color: rgba(255,255,255,.85); margin-top: .25rem; }
-          .ap-mobile-card { background: #fff; padding: 1.75rem 1.5rem 2rem; }
-          .ap-panel h1 { text-align: center; margin-top: 0; }
-          .ap-sub { text-align: center; }
-          .ap-mobile-toggle { display: flex !important; }
+          /* Mobile header: full-width brand strip at top of card */
+          .ap-mobile-header {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #ff3f34;
+            padding: 2rem 1.5rem 1.75rem;
+            text-align: center;
+            position: relative;
+            width: 100%;
+          }
+          .ap-mobile-header__logo {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -.05em;
+            line-height: 1;
+          }
+          .ap-mobile-header__sub {
+            font-size: .8rem;
+            color: rgba(255,255,255,.88);
+            margin-top: .4rem;
+            font-weight: 500;
+            letter-spacing: .01em;
+          }
+          /* Back link in header */
+          .ap-mobile-header .ap-mobile-back {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            color: rgba(255,255,255,.75);
+            font-size: .78rem;
+            text-decoration: none;
+            font-weight: 500;
+          }
+          .ap-mobile-header .ap-mobile-back:hover { color: #fff; }
+          /* Form area inside card */
+          .ap-mobile-card {
+            background: #fff;
+            padding: 1.75rem 1.5rem 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+          }
+          /* Center form headings */
+          .ap-panel h1 { text-align: center; margin-top: 0; font-size: 1.4rem; }
+          .ap-sub { text-align: center; margin-bottom: 1.25rem; }
+          /* Switch panel toggle */
+          .ap-mobile-toggle {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            gap: .35rem;
+            margin-top: 1.25rem;
+            font-size: .82rem;
+            color: #6B7280;
+          }
+          .ap-mobile-toggle button {
+            background: none;
+            border: none;
+            color: #ff3f34;
+            font-weight: 700;
+            font-size: .82rem;
+            cursor: pointer;
+            padding: 0;
+            font-family: inherit;
+          }
+          .ap-mobile-toggle button:hover { text-decoration: underline; }
         }
       `}</style>
 
       <div className="ap-root">
         <div className="ap-mobile-header">
-          <Link to="/" className="absolute left-4 top-4 text-white/70 hover:text-white text-sm no-underline">
+          <Link to="/" className="ap-mobile-back">
             ← Back
           </Link>
           <div className="ap-mobile-header__logo">Vuka</div>
