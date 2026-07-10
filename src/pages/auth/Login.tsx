@@ -160,7 +160,7 @@ export default function AuthPage() {
           .ap-panel--login.ap-active, .ap-panel--register.ap-active { display: flex; flex-direction: column; }
           /* Hide desktop back link */
           .ap-back { display: none; }
-          /* Mobile header: full-width brand strip at top of card */
+          /* Mobile header: full-width brand strip at top of card, flush with all edges */
           .ap-mobile-header {
             display: flex !important;
             flex-direction: column;
@@ -171,6 +171,10 @@ export default function AuthPage() {
             text-align: center;
             position: relative;
             width: 100%;
+            /* Ensure zero gap from card edges */
+            margin: 0;
+            flex-shrink: 0;
+            border-radius: 0;
           }
           .ap-mobile-header__logo {
             font-size: 2.2rem;
@@ -197,6 +201,8 @@ export default function AuthPage() {
             font-weight: 500;
           }
           .ap-mobile-header .ap-mobile-back:hover { color: #fff; }
+          /* Hide the form-panel h1 and subtitle on mobile — card header handles this */
+          .ap-mobile-card h1, .ap-mobile-card .ap-sub { display: none; }
           /* Form area inside card */
           .ap-mobile-card {
             background: #fff;
@@ -233,15 +239,14 @@ export default function AuthPage() {
       `}</style>
 
       <div className="ap-root">
-        <div className="ap-mobile-header">
-          <Link to="/" className="ap-mobile-back">
-            ← Back
-          </Link>
-          <div className="ap-mobile-header__logo">Vuka</div>
-          <div className="ap-mobile-header__sub">{isRegister ? 'Create your account' : 'Sign into your account'}</div>
-        </div>
-
         <div className="ap-card">
+          <div className="ap-mobile-header">
+            <Link to="/" className="ap-mobile-back">
+              ← Back
+            </Link>
+            <div className="ap-mobile-header__logo">Vuka</div>
+            <div className="ap-mobile-header__sub">{isRegister ? 'Create your account' : 'Sign into your account'}</div>
+          </div>
           <div className={`ap-panel ap-panel--login${!isRegister ? ' ap-active' : ''}`}>
             <div className="ap-mobile-card">
               <Link to="/" className="ap-back">
