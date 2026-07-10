@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <span className="text-2xl font-bold text-white">Vuka</span>
+            <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-10" />
             <p className="mt-2 text-sm text-gray-400">Africa&apos;s trusted skill marketplace.</p>
           </div>
           <div>

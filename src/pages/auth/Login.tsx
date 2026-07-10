@@ -97,7 +97,7 @@ export default function AuthPage() {
         .ap-panel--login  { left: 0; }
         .ap-panel--register { right: 0; }
         .ap-overlay { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; background: #ff3f34; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 2rem; text-align: center; z-index: 5; transition: transform .65s cubic-bezier(.77,0,.175,1); }
-        .ap-overlay__logo { font-size: 2.8rem; font-weight: 900; color: #fff; letter-spacing: -.05em; margin-bottom: .4rem; }
+          .ap-overlay__logo { margin-bottom: .4rem; display: flex; align-items: center; justify-content: center; }
         .ap-overlay__tagline { font-size: .875rem; color: rgba(255,255,255,.88); line-height: 1.65; margin-bottom: 1.75rem; white-space: pre-line; }
         .ap-overlay__btn { padding: .6rem 2rem; border: 2px solid rgba(255,255,255,.75); border-radius: .5rem; color: #fff; font-weight: 700; font-size: .875rem; background: transparent; cursor: pointer; transition: background .2s; }
         .ap-overlay__btn:hover { background: rgba(255,255,255,.15); }
@@ -177,10 +177,9 @@ export default function AuthPage() {
             border-radius: 0;
           }
           .ap-mobile-header__logo {
-            font-size: 2.2rem;
-            font-weight: 900;
-            color: #fff;
-            letter-spacing: -.05em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             line-height: 1;
           }
           .ap-mobile-header__sub {
@@ -244,7 +243,9 @@ export default function AuthPage() {
             <Link to="/" className="ap-mobile-back">
               ← Back
             </Link>
-            <div className="ap-mobile-header__logo">Vuka</div>
+            <div className="ap-mobile-header__logo">
+              <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-11" />
+            </div>
             <div className="ap-mobile-header__sub">{isRegister ? 'Create your account' : 'Sign into your account'}</div>
           </div>
           <div className={`ap-panel ap-panel--login${!isRegister ? ' ap-active' : ''}`}>
@@ -253,7 +254,7 @@ export default function AuthPage() {
                 ← Home
               </Link>
               <h1>Welcome back</h1>
-              <p className="ap-sub">Sign in to your Vuka account</p>
+              <p className="ap-sub">Sign in to your account</p>
 
               <form onSubmit={handleLogin}>
                 <div className="ap-field">
@@ -316,7 +317,7 @@ export default function AuthPage() {
                 ← Home
               </Link>
               <h1>Create Account</h1>
-              <p className="ap-sub">Join Vuka and start learning today</p>
+              <p className="ap-sub">Create your account and start learning today</p>
 
               <form onSubmit={handleRegister}>
                 <div className="ap-field">
@@ -420,11 +421,13 @@ export default function AuthPage() {
           </div>
 
           <div className="ap-overlay" style={{ transform: isRegister ? 'translateX(-100%)' : 'translateX(0)' }}>
-            <div className="ap-overlay__logo">Vuka</div>
+            <div className="ap-overlay__logo">
+              <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-14" />
+            </div>
             <p className="ap-overlay__tagline">
               {isRegister
                 ? 'Already have an account?\nSign in and continue your journey.'
-                : "New to Vuka?\nJoin thousands mastering\nAfrica's best skills."}
+                : "Join thousands mastering\nAfrica's best skills."}
             </p>
             <button className="ap-overlay__btn" onClick={() => setPanel(isRegister ? 'login' : 'register')}>
               {isRegister ? 'Sign In →' : 'Sign Up →'}

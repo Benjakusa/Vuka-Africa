@@ -34,26 +34,8 @@ export function Navbar() {
     <header className="sticky top-0 z-50 bg-white border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-[72px] gap-4">
-          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 512 512" fill="none">
-                <path
-                  d="M120 380L256 120L392 380"
-                  stroke="white"
-                  strokeWidth="48"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M180 300L256 200L332 300"
-                  stroke="white"
-                  strokeWidth="40"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-            <span className="text-xl lg:text-2xl font-bold text-dark tracking-tight">Vuka</span>
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <img src="/brand/VUKA AFRICA MAIN WHITE BACKGROUND.png" alt="" className="h-10 lg:h-11" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 bg-dark text-white px-1.5 py-1.5 rounded-full">
