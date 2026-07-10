@@ -44,25 +44,25 @@ export default function Payments() {
             <div key={tx.id} className="flex items-center gap-4 p-4">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  tx.entryType === 'DEBIT' ? 'bg-red-50' : 'bg-green-50'
+                  tx.entryType === 'DEBIT' ? 'bg-primary' : 'bg-surface'
                 }`}
               >
                 {tx.entryType === 'DEBIT' ? (
-                  <ArrowUpRight size={18} className="text-red-500" />
+                  <ArrowUpRight size={18} className="text-primary" />
                 ) : (
-                  <ArrowDownLeft size={18} className="text-green-500" />
+                  <ArrowDownLeft size={18} className="text-foreground" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-dark">{tx.description || tx.entryType}</p>
-                <p className="text-xs text-muted-foreground">{formatDateTime(tx.createdAt)}</p>
+                <p className="text-xs text-body-foreground">{formatDateTime(tx.createdAt)}</p>
               </div>
               <div className="text-right">
-                <p className={`text-sm font-bold ${tx.entryType === 'DEBIT' ? 'text-red-500' : 'text-green-500'}`}>
+                <p className={`text-sm font-bold ${tx.entryType === 'DEBIT' ? 'text-primary' : 'text-foreground'}`}>
                   {tx.entryType === 'DEBIT' ? '-' : '+'}
                   {formatCurrency(tx.amountKes)}
                 </p>
-                <p className="text-xs text-muted-foreground">{timeAgo(tx.createdAt)}</p>
+                <p className="text-xs text-body-foreground">{timeAgo(tx.createdAt)}</p>
               </div>
             </div>
           ))}

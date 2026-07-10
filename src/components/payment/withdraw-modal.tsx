@@ -46,8 +46,8 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-dark">
+      <div className="bg-white rounded-2xl -modal max-w-md w-full p-6 relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-body-foreground hover:text-dark">
           <X size={20} />
         </button>
 
@@ -60,7 +60,9 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="withdraw-amount" className="text-sm font-medium text-dark mb-1 block">Amount (KES)</label>
+                <label htmlFor="withdraw-amount" className="text-sm font-medium text-dark mb-1 block">
+                  Amount (KES)
+                </label>
                 <input
                   id="withdraw-amount"
                   type="number"
@@ -74,7 +76,9 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
                 />
               </div>
               <div>
-                <label htmlFor="withdraw-phone" className="text-sm font-medium text-dark mb-1 block">M-Pesa Phone Number</label>
+                <label htmlFor="withdraw-phone" className="text-sm font-medium text-dark mb-1 block">
+                  M-Pesa Phone Number
+                </label>
                 <input
                   id="withdraw-phone"
                   type="tel"
@@ -89,16 +93,17 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
                   placeholder="+254 712 345 678"
                 />
               </div>
-              <div className="p-3 bg-yellow-50 rounded-card flex items-start gap-2">
-                <Clock size={16} className="text-yellow-600 mt-0.5 shrink-0" />
-                <p className="text-xs text-yellow-700">
-                  Your withdrawal request will be submitted for admin review. An admin will process your payment within 24 hours. You will receive an M-Pesa notification when payment is sent.
+              <div className="p-3 bg-surface rounded-card flex items-start gap-2">
+                <Clock size={16} className="text-body mt-0.5 shrink-0" />
+                <p className="text-xs text-body">
+                  Your withdrawal request will be submitted for admin review. An admin will process your payment within
+                  24 hours. You will receive an M-Pesa notification when payment is sent.
                 </p>
               </div>
               <button
                 type="submit"
                 disabled={!amount || Number(amount) < 100}
-                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50"
+                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50"
               >
                 Submit Withdrawal Request
               </button>
@@ -116,14 +121,15 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
 
         {step === 'success' && (
           <div className="text-center py-8">
-            <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
+            <CheckCircle size={48} className="text-foreground mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-dark mb-1">Request Submitted!</h2>
             <p className="text-sm text-body mb-4">
-              Your withdrawal request has been submitted for admin review. You will receive your payment within 24 hours.
+              Your withdrawal request has been submitted for admin review. You will receive your payment within 24
+              hours.
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90"
+              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Done
             </button>
@@ -132,12 +138,12 @@ export function WithdrawModal({ open, onClose, balance, onWithdraw }: WithdrawMo
 
         {step === 'error' && (
           <div className="text-center py-8">
-            <AlertCircle size={48} className="text-destructive mx-auto mb-4" />
+            <AlertCircle size={48} className="text-primary mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-dark mb-1">Request Failed</h2>
             <p className="text-sm text-body mb-4">{message}</p>
             <button
               onClick={() => setStep('form')}
-              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90"
+              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Try Again
             </button>

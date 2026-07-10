@@ -52,7 +52,7 @@ export default function TrainerEnrolments() {
               setSearchParams(params, { replace: true });
             }}
             className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors ${
-              status === tab.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
+              status === tab.value ? 'bg-primary text-white' : 'text-body-foreground hover:text-dark'
             }`}
           >
             {tab.label}

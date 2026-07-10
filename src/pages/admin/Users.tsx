@@ -71,13 +71,13 @@ export default function AdminUsers() {
       </div>
 
       <div className="relative mb-6">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-body-foreground" />
         <input
           type="text"
           value={searchInput}
           onChange={handleSearchChange}
           placeholder="Search by name or email..."
-          className="w-full pl-9 pr-3 py-2.5 border border-border rounded-btn text-sm"
+          className="w-full pl-9 pr-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
         />
       </div>
 
@@ -111,31 +111,31 @@ export default function AdminUsers() {
                   <tr key={u.id}>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                        <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary font-bold text-xs">
                           {getInitials(u.fullName)}
                         </div>
                         <span className="font-medium text-dark">{u.fullName}</span>
                       </div>
                     </td>
-                    <td className="p-3 text-muted-foreground">{u.email}</td>
+                    <td className="p-3 text-body-foreground">{u.email}</td>
                     <td className="p-3">
                       <span
                         className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                           u.role === 'ADMIN'
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-surface text-foreground'
                             : u.role === 'TRAINER'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-green-100 text-green-700'
+                              ? 'bg-surface text-foreground'
+                              : 'bg-surface text-foreground'
                         }`}
                       >
                         {u.role}
                       </span>
                     </td>
-                    <td className="p-3 text-muted-foreground">{u.phone || 'N/A'}</td>
-                    <td className="p-3 text-muted-foreground whitespace-nowrap">{formatDate(u.createdAt)}</td>
+                    <td className="p-3 text-body-foreground">{u.phone || 'N/A'}</td>
+                    <td className="p-3 text-body-foreground whitespace-nowrap">{formatDate(u.createdAt)}</td>
                     <td className="p-3">
                       <span
-                        className={`text-xs font-medium ${u.isActive !== false ? 'text-green-600' : 'text-red-600'}`}
+                        className={`text-xs font-medium ${u.isActive !== false ? 'text-foreground' : 'text-primary'}`}
                       >
                         {u.isActive !== false ? 'Active' : 'Suspended'}
                       </span>
@@ -145,14 +145,14 @@ export default function AdminUsers() {
                         (u.isActive !== false ? (
                           <button
                             onClick={() => setConfirmAction({ userId: u.id, action: 'suspend' })}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-primary hover:bg-primary hover:text-white transition-colors rounded"
                           >
                             <Ban size={12} /> Suspend
                           </button>
                         ) : (
                           <button
                             onClick={() => setConfirmAction({ userId: u.id, action: 'activate' })}
-                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-green-600 hover:bg-green-50 rounded"
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs text-foreground hover:bg-surface transition-colors rounded"
                           >
                             <CheckCircle size={12} /> Activate
                           </button>
@@ -167,7 +167,7 @@ export default function AdminUsers() {
             {users.map((u: any) => (
               <div key={u.id} className="p-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                  <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center text-primary font-bold text-xs">
                     {getInitials(u.fullName)}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -176,25 +176,25 @@ export default function AdminUsers() {
                       <span
                         className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                           u.role === 'ADMIN'
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-surface text-foreground'
                             : u.role === 'TRAINER'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-green-100 text-green-700'
+                              ? 'bg-surface text-foreground'
+                              : 'bg-surface text-foreground'
                         }`}
                       >
                         {u.role}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                    <p className="text-xs text-body-foreground truncate">{u.email}</p>
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center justify-between text-xs text-body-foreground">
                   <span>{u.phone || 'No phone'}</span>
                   <span className="flex items-center gap-1">
                     {u.isActive !== false ? (
-                      <span className="text-green-600">Active</span>
+                      <span className="text-foreground">Active</span>
                     ) : (
-                      <span className="text-red-600">Suspended</span>
+                      <span className="text-primary">Suspended</span>
                     )}
                     <span>| {formatDate(u.createdAt)}</span>
                   </span>
@@ -204,14 +204,14 @@ export default function AdminUsers() {
                     {u.isActive !== false ? (
                       <button
                         onClick={() => setConfirmAction({ userId: u.id, action: 'suspend' })}
-                        className="flex-1 py-2 border border-red-200 text-red-600 text-xs font-medium rounded hover:bg-red-50 flex items-center justify-center gap-1"
+                        className="flex-1 py-2 border border-primary text-primary text-xs font-medium rounded hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-1"
                       >
                         <Ban size={12} /> Suspend
                       </button>
                     ) : (
                       <button
                         onClick={() => setConfirmAction({ userId: u.id, action: 'activate' })}
-                        className="flex-1 py-2 border border-green-200 text-green-600 text-xs font-medium rounded hover:bg-green-50 flex items-center justify-center gap-1"
+                        className="flex-1 py-2 border border-border text-foreground text-xs font-medium rounded hover:bg-surface flex items-center justify-center gap-1"
                       >
                         <CheckCircle size={12} /> Activate
                       </button>

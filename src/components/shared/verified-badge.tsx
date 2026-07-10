@@ -12,7 +12,7 @@ export function VerifiedBadge({ isVerified, size = 'sm' }: VerifiedBadgeProps) {
   const s = sizeMap[size];
 
   return (
-    <span className="inline-flex items-center gap-1 text-blue-500" title="Verified Trainer">
+    <span className="inline-flex items-center gap-1 text-foreground" title="Verified Trainer">
       <ShieldCheck size={s} className="fill-blue-500 text-white" />
     </span>
   );

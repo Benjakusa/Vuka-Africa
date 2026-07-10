@@ -21,7 +21,13 @@ interface MilestoneManagerProps {
   onRefresh: () => void;
 }
 
-export function MilestoneManager({ enrolmentId, role, courseSessionCount, milestones, onRefresh }: MilestoneManagerProps) {
+export function MilestoneManager({
+  enrolmentId,
+  role,
+  courseSessionCount,
+  milestones,
+  onRefresh,
+}: MilestoneManagerProps) {
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
   const [showCreate, setShowCreate] = useState(false);
@@ -106,9 +112,9 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
       case 'NOT_STARTED':
         return 'border-gray-200 bg-gray-50';
       case 'IN_PROGRESS':
-        return 'border-primary/30 bg-primary/5';
+        return 'border-primary/30 bg-surface';
       case 'COMPLETED':
-        return 'border-green-200 bg-green-50';
+        return 'border-border bg-surface';
       default:
         return 'border-gray-200';
     }
@@ -119,9 +125,9 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
       case 'NOT_STARTED':
         return { text: 'Not Started', class: 'bg-gray-100 text-gray-600' };
       case 'IN_PROGRESS':
-        return { text: 'In Progress', class: 'bg-blue-100 text-blue-700' };
+        return { text: 'In Progress', class: 'bg-surface text-foreground' };
       case 'COMPLETED':
-        return { text: 'Completed', class: 'bg-green-100 text-green-700' };
+        return { text: 'Completed', class: 'bg-surface text-foreground' };
       default:
         return { text: status, class: 'bg-gray-100 text-gray-600' };
     }
@@ -152,7 +158,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
         {canAdd && !showCreate && (
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface"
           >
             <Plus size={14} />
             Add Session
@@ -160,12 +166,10 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
         )}
       </div>
 
-      {milestones.length > 0 && (
-        <MilestoneProgress completed={completedCount} total={courseSessionCount} size="sm" />
-      )}
+      {milestones.length > 0 && <MilestoneProgress completed={completedCount} total={courseSessionCount} size="sm" />}
 
       {isTrainer && !canAdd && milestones.length > 0 && (
-        <p className="text-xs text-muted-foreground">Maximum {courseSessionCount} sessions reached</p>
+        <p className="text-xs text-body-foreground">Maximum {courseSessionCount} sessions reached</p>
       )}
 
       {showCreate && (
@@ -174,13 +178,13 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
             <span className="text-sm font-medium text-dark">
               Session {milestones.length + 1} of {courseSessionCount}
             </span>
-            <button type="button" onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-dark">
+            <button type="button" onClick={() => setShowCreate(false)} className="text-body-foreground hover:text-dark">
               <X size={16} />
             </button>
           </div>
           <div>
             <label htmlFor="milestone-label" className="block text-sm font-medium text-dark mb-1">
-              Session Title <span className="text-destructive">*</span>
+              Session Title <span className="text-primary">*</span>
             </label>
             <input
               id="milestone-label"
@@ -189,12 +193,12 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
               onChange={(e) => setNewLabel(e.target.value)}
               placeholder={`Session ${milestones.length + 1}: Topic name`}
               required
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
             />
           </div>
           <div>
             <label htmlFor="milestone-notes" className="block text-sm font-medium text-dark mb-1">
-              Notes <span className="text-muted-foreground">(optional)</span>
+              Notes <span className="text-body-foreground">(optional)</span>
             </label>
             <textarea
               id="milestone-notes"
@@ -202,13 +206,13 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
               onChange={(e) => setNewNotes(e.target.value)}
               placeholder="What this session covers..."
               rows={2}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
             />
           </div>
           <button
             onClick={() => createMutation.mutate({ label: newLabel.trim(), notes: newNotes.trim() || undefined })}
             disabled={!newLabel.trim() || createMutation.isPending}
-            className="w-full py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 text-sm"
+            className="w-full py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 text-sm"
           >
             {createMutation.isPending ? (
               <span className="flex items-center justify-center gap-2">
@@ -225,13 +229,13 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
         <div className="text-center py-8 bg-gray-50 rounded-card border border-dashed border-gray-200">
           {isTrainer ? (
             <>
-              <Play size={24} className="mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No sessions created yet. Add the first training session.</p>
+              <Play size={24} className="mx-auto text-body-foreground mb-2" />
+              <p className="text-sm text-body-foreground">No sessions created yet. Add the first training session.</p>
             </>
           ) : (
             <>
-              <Clock size={24} className="mx-auto text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">No sessions have been added yet.</p>
+              <Clock size={24} className="mx-auto text-body-foreground mb-2" />
+              <p className="text-sm text-body-foreground">No sessions have been added yet.</p>
             </>
           )}
         </div>
@@ -251,19 +255,24 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                       type="text"
                       value={editLabel}
                       onChange={(e) => setEditLabel(e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
                     />
                     <textarea
                       value={editNotes}
                       onChange={(e) => setEditNotes(e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
                     />
                     <div className="flex gap-2">
                       <button
-                        onClick={() => updateMutation.mutate({ id: m.id, updates: { label: editLabel.trim(), notes: editNotes.trim() || undefined } })}
+                        onClick={() =>
+                          updateMutation.mutate({
+                            id: m.id,
+                            updates: { label: editLabel.trim(), notes: editNotes.trim() || undefined },
+                          })
+                        }
                         disabled={!editLabel.trim() || updateMutation.isPending}
-                        className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50"
+                        className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface disabled:opacity-50"
                       >
                         {updateMutation.isPending ? 'Saving...' : 'Save'}
                       </button>
@@ -280,19 +289,19 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className={cn(
-                            'text-sm font-medium',
-                            m.status === 'COMPLETED' ? 'text-green-800' : 'text-dark'
-                          )}>
+                          <span
+                            className={cn(
+                              'text-sm font-medium',
+                              m.status === 'COMPLETED' ? 'text-foreground' : 'text-dark',
+                            )}
+                          >
                             Session {m.sequence}: {m.label}
                           </span>
                           <span className={cn('px-2 py-0.5 text-xs font-medium rounded-full', badge.class)}>
                             {badge.text}
                           </span>
                         </div>
-                        {m.notes && (
-                          <p className="text-xs text-muted-foreground mt-0.5">{m.notes}</p>
-                        )}
+                        {m.notes && <p className="text-xs text-body-foreground mt-0.5">{m.notes}</p>}
                       </div>
 
                       {isTrainer && (
@@ -302,7 +311,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                               <button
                                 onClick={() => startMutation.mutate(m.id)}
                                 disabled={startMutation.isPending}
-                                className="flex items-center gap-1 px-2.5 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50"
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface disabled:opacity-50"
                                 aria-label="Start session"
                               >
                                 {startMutation.isPending ? (
@@ -318,7 +327,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                                   setEditLabel(m.label);
                                   setEditNotes(m.notes || '');
                                 }}
-                                className="p-1.5 text-muted-foreground hover:text-dark hover:bg-gray-100 rounded-btn"
+                                className="p-1.5 text-body-foreground hover:text-dark hover:bg-gray-100 rounded-btn"
                                 aria-label="Edit milestone"
                               >
                                 <Pencil size={14} />
@@ -326,7 +335,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                               <button
                                 onClick={() => deleteMutation.mutate(m.id)}
                                 disabled={deleteMutation.isPending}
-                                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-red-50 rounded-btn"
+                                className="p-1.5 text-body-foreground hover:text-primary hover:bg-primary rounded-btn"
                                 aria-label="Delete milestone"
                               >
                                 {deleteMutation.isPending ? (
@@ -344,7 +353,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                                   setCompleteId(m.id);
                                   setCompleteNotes('');
                                 }}
-                                className="flex items-center gap-1 px-2.5 py-1.5 bg-green-600 text-white text-xs font-medium rounded-btn hover:bg-green-700"
+                                className="flex items-center gap-1 px-2.5 py-1.5 bg-surface text-white text-xs font-medium rounded-btn hover:bg-surface"
                                 aria-label="Complete session"
                               >
                                 <CheckCircle size={12} />
@@ -356,7 +365,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                       )}
                     </div>
 
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-xs text-body-foreground">
                       {m.startedAt && (
                         <span className="flex items-center gap-1">
                           <Play size={10} />
@@ -370,7 +379,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                         </span>
                       )}
                       {m.completedAt && (
-                        <span className="flex items-center gap-1 text-green-600">
+                        <span className="flex items-center gap-1 text-foreground">
                           <CheckCircle size={10} />
                           Completed {formatDateTime(m.completedAt)}
                           {m.startedAt && ` (${calcDuration(m.startedAt, m.completedAt)})`}
@@ -387,7 +396,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
 
       {completeId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6">
+          <div className="bg-white rounded-2xl -modal max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-dark mb-2">Complete Session</h3>
             <p className="text-sm text-body mb-4">Add any notes about this completed session.</p>
             <textarea
@@ -395,7 +404,7 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
               onChange={(e) => setCompleteNotes(e.target.value)}
               placeholder="Session summary, what was covered..."
               rows={3}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none mb-4"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none mb-4"
             />
             <div className="flex gap-3">
               <button
@@ -405,9 +414,11 @@ export function MilestoneManager({ enrolmentId, role, courseSessionCount, milest
                 Cancel
               </button>
               <button
-                onClick={() => completeMutation.mutate({ milestoneId: completeId, notes: completeNotes.trim() || undefined })}
+                onClick={() =>
+                  completeMutation.mutate({ milestoneId: completeId, notes: completeNotes.trim() || undefined })
+                }
                 disabled={completeMutation.isPending}
-                className="flex-1 py-2.5 bg-green-600 text-white font-medium rounded-btn hover:bg-green-700 disabled:opacity-50 text-sm"
+                className="flex-1 py-2.5 bg-surface text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 text-sm"
               >
                 {completeMutation.isPending ? (
                   <span className="flex items-center justify-center gap-2">

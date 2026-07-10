@@ -26,12 +26,12 @@ export function Pagination({ page, totalPages, total }: PaginationProps) {
         disabled={page <= 1}
         className={cn(
           'p-2 rounded-btn border border-border text-sm',
-          page <= 1 ? 'text-muted-foreground cursor-not-allowed' : 'text-dark hover:bg-accent',
+          page <= 1 ? 'text-body-foreground cursor-not-allowed' : 'text-dark hover:bg-accent',
         )}
       >
         <ChevronLeft size={16} />
       </button>
-      <span className="text-sm text-muted-foreground">
+      <span className="text-sm text-body-foreground">
         Page {page} of {totalPages} ({total} total)
       </span>
       <button
@@ -39,7 +39,7 @@ export function Pagination({ page, totalPages, total }: PaginationProps) {
         disabled={page >= totalPages}
         className={cn(
           'p-2 rounded-btn border border-border text-sm',
-          page >= totalPages ? 'text-muted-foreground cursor-not-allowed' : 'text-dark hover:bg-accent',
+          page >= totalPages ? 'text-body-foreground cursor-not-allowed' : 'text-dark hover:bg-accent',
         )}
       >
         <ChevronRight size={16} />

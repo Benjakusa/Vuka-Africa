@@ -69,22 +69,28 @@ export function FileUpload({
                 setPreview(null);
                 setFile(null);
               }}
-              className="absolute -top-2 -right-2 p-0.5 bg-destructive text-white rounded-full"
+              className="absolute -top-2 -right-2 p-0.5 bg-primary text-white text-white rounded-full"
             >
               <X size={14} />
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <Upload size={24} className="text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{label}</p>
+            <Upload size={24} className="text-body-foreground" />
+            <p className="text-sm text-body-foreground">{label}</p>
           </div>
         )}
-        <input ref={inputRef} type="file" accept={accept} onChange={handleSelect} className="hidden" />
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          onChange={handleSelect}
+          className="hidden focus:border-primary"
+        />
       </div>
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p className="text-xs text-primary">{error}</p>}
       {file && !preview && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-body-foreground">
           <File size={14} />
           <span className="flex-1 truncate">{file.name}</span>
         </div>
@@ -93,7 +99,7 @@ export function FileUpload({
         <button
           onClick={handleUpload}
           disabled={uploading}
-          className="w-full py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {uploading && <Loader2 size={14} className="animate-spin" />}
           {uploading ? 'Uploading...' : 'Upload'}

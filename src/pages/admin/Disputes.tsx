@@ -58,7 +58,7 @@ export default function Disputes() {
   return (
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <AlertTriangle size={24} className="text-destructive" />
+        <AlertTriangle size={24} className="text-primary" />
         <div>
           <h1 className="text-2xl font-bold text-dark">Disputes</h1>
           <p className="text-body text-sm">Manage and resolve disputes</p>
@@ -76,7 +76,7 @@ export default function Disputes() {
               setSearchParams(params, { replace: true });
             }}
             className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors whitespace-nowrap ${
-              status === tab.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
+              status === tab.value ? 'bg-primary text-white' : 'text-body-foreground hover:text-dark'
             }`}
           >
             {tab.label}
@@ -115,8 +115,8 @@ export default function Disputes() {
                     <td className="p-3 text-dark">{d.enrolment?.course?.title || 'N/A'}</td>
                     <td className="p-3 text-dark">{d.enrolment?.trainee?.fullName || 'N/A'}</td>
                     <td className="p-3 text-dark">{d.enrolment?.trainer?.fullName || 'N/A'}</td>
-                    <td className="p-3 text-muted-foreground max-w-[150px] truncate">{d.reason}</td>
-                    <td className="p-3 text-muted-foreground whitespace-nowrap">{formatDate(d.createdAt)}</td>
+                    <td className="p-3 text-body-foreground max-w-[150px] truncate">{d.reason}</td>
+                    <td className="p-3 text-body-foreground whitespace-nowrap">{formatDate(d.createdAt)}</td>
                     <td className="p-3">
                       <StatusBadge status={d.status} />
                     </td>
@@ -133,13 +133,13 @@ export default function Disputes() {
                           <button
                             onClick={() => handleResolve(d.id)}
                             disabled={resolving === d.id}
-                            className="px-2 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90 disabled:opacity-50"
+                            className="px-2 py-1 bg-primary text-white text-xs rounded hover:bg-surface disabled:opacity-50"
                           >
                             {resolving === d.id ? <Loader2 size={12} className="animate-spin" /> : 'Resolve'}
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foreground">{d.resolution}</span>
+                        <span className="text-xs text-body-foreground">{d.resolution}</span>
                       )}
                     </td>
                   </tr>
@@ -154,7 +154,7 @@ export default function Disputes() {
                   <p className="font-medium text-dark text-sm">{d.enrolment?.course?.title || 'Course'}</p>
                   <StatusBadge status={d.status} />
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                <div className="grid grid-cols-2 gap-2 text-xs text-body-foreground">
                   <span>Trainee: {d.enrolment?.trainee?.fullName || 'N/A'}</span>
                   <span>Trainer: {d.enrolment?.trainer?.fullName || 'N/A'}</span>
                   <span className="truncate">Reason: {d.reason}</span>
@@ -172,13 +172,13 @@ export default function Disputes() {
                     <button
                       onClick={() => handleResolve(d.id)}
                       disabled={resolving === d.id}
-                      className="px-3 py-1.5 bg-primary text-white text-xs rounded hover:bg-primary/90 disabled:opacity-50"
+                      className="px-3 py-1.5 bg-primary text-white text-xs rounded hover:bg-surface disabled:opacity-50"
                     >
                       {resolving === d.id ? <Loader2 size={12} className="animate-spin" /> : 'Resolve'}
                     </button>
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground">{d.resolution}</p>
+                  <p className="text-xs text-body-foreground">{d.resolution}</p>
                 )}
               </div>
             ))}

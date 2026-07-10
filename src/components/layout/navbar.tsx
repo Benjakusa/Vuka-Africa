@@ -37,8 +37,20 @@ export function Navbar() {
           <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
             <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
               <svg width="20" height="20" viewBox="0 0 512 512" fill="none">
-                <path d="M120 380L256 120L392 380" stroke="white" strokeWidth="48" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M180 300L256 200L332 300" stroke="white" strokeWidth="40" strokeLinecap="round" strokeLinejoin="round"/>
+                <path
+                  d="M120 380L256 120L392 380"
+                  stroke="white"
+                  strokeWidth="48"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M180 300L256 200L332 300"
+                  stroke="white"
+                  strokeWidth="40"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             <span className="text-xl lg:text-2xl font-bold text-dark tracking-tight">Vuka</span>
@@ -71,20 +83,29 @@ export function Navbar() {
             </Link>
             {isAuthenticated ? (
               <div className="relative group ml-2">
-                <button className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+                <button className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-full bg-primary text-white hover:bg-surface transition-colors">
                   <LayoutDashboard size={14} />
                   <span>{user?.fullName?.split(' ')[0] || 'Dashboard'}</span>
                   <ChevronDown size={12} />
                 </button>
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-modal border border-border py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <Link to={dashboardLink} className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors">
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl -modal border border-border py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <Link
+                    to={dashboardLink}
+                    className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors"
+                  >
                     Dashboard
                   </Link>
-                  <Link to="/trainer/profile" className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors">
+                  <Link
+                    to="/trainer/profile"
+                    className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors"
+                  >
                     My Profile
                   </Link>
                   <hr className="my-1 border-border/50" />
-                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-surface/80 transition-colors flex items-center gap-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-primary hover:bg-surface/80 transition-colors flex items-center gap-2"
+                  >
                     <LogOut size={14} /> Logout
                   </button>
                 </div>
@@ -92,14 +113,14 @@ export function Navbar() {
             ) : (
               <Link
                 to="/auth/register"
-                className="ml-2 px-5 py-1.5 text-sm font-semibold rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
+                className="ml-2 px-5 py-1.5 text-sm font-semibold rounded-full bg-primary text-white hover:bg-surface transition-colors"
               >
                 Get Started
               </Link>
             )}
           </nav>
 
-          <div className="hidden lg:flex items-center gap-4 text-xs text-muted-foreground flex-shrink-0">
+          <div className="hidden lg:flex items-center gap-4 text-xs text-body-foreground flex-shrink-0">
             <span className="flex items-center gap-1.5">
               <Phone size={12} className="text-primary" />
               +254 712 345 678
@@ -129,7 +150,7 @@ export function Navbar() {
       {mobileOpen && (
         <div className="lg:hidden border-t border-border bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-4">
-            <div className="space-y-2 text-sm text-muted-foreground pb-3 border-b border-border/50">
+            <div className="space-y-2 text-sm text-body-foreground pb-3 border-b border-border/50">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-primary" />
                 +254 712 345 678
@@ -150,7 +171,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
-                  isActive('/') ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-surface/80',
+                  isActive('/') ? 'bg-surface text-primary' : 'text-dark hover:bg-surface/80',
                 )}
               >
                 Home
@@ -166,7 +187,7 @@ export function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
-                  isActive('/trainers') ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-surface/80',
+                  isActive('/trainers') ? 'bg-surface text-primary' : 'text-dark hover:bg-surface/80',
                 )}
               >
                 Browse Trainers
@@ -185,7 +206,7 @@ export function Navbar() {
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-destructive rounded-lg hover:bg-surface/80 transition-colors w-full text-left"
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary rounded-lg hover:bg-surface/80 transition-colors w-full text-left"
                   >
                     <LogOut size={16} /> Logout
                   </button>
@@ -195,14 +216,14 @@ export function Navbar() {
                   <Link
                     to="/auth/login"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:bg-primary/90 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:bg-surface transition-colors"
                   >
                     <LogIn size={16} /> Sign In
                   </Link>
                   <Link
                     to="/auth/register"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-primary text-primary text-sm font-semibold rounded-full hover:bg-primary/5 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-primary text-primary text-sm font-semibold rounded-full hover:bg-surface transition-colors"
                   >
                     Get Started
                   </Link>

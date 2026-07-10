@@ -57,7 +57,8 @@ export default function AuthPage() {
       setUser(user);
       toast.success('Welcome back!');
       const role = user?.role;
-      const redirect = searchParams.get('redirect') || (role === 'ADMIN' ? '/admin' : role === 'TRAINER' ? '/trainer' : '/trainee');
+      const redirect =
+        searchParams.get('redirect') || (role === 'ADMIN' ? '/admin' : role === 'TRAINER' ? '/trainer' : '/trainee');
       navigate(redirect, { replace: true });
     } catch (err: any) {
       setLoginError(
@@ -91,7 +92,7 @@ export default function AuthPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; }
         .ap-root { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; padding: 1rem; font-family: 'Inter', system-ui, sans-serif; }
-        .ap-card { position: relative; width: 100%; max-width: 860px; height: 600px; border-radius: 1.5rem; box-shadow: 0 24px 64px -12px rgba(255,83,73,.18), 0 8px 24px -4px rgba(0,0,0,.10); overflow: hidden; background: #fff; }
+        .ap-card { position: relative; width: 100%; max-width: 860px; height: 600px; border-radius: 1.5rem; box-: 0 24px 64px -12px rgba(255,83,73,.18), 0 8px 24px -4px rgba(0,0,0,.10); overflow: hidden; background: #fff; }
         .ap-panel { position: absolute; top: 0; width: 50%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 2.5rem 2.25rem; background: #fff; z-index: 1; }
         .ap-panel--login  { left: 0; }
         .ap-panel--register { right: 0; }
@@ -106,8 +107,8 @@ export default function AuthPage() {
         .ap-back:hover { text-decoration: underline; }
         .ap-field { margin-bottom: .8rem; }
         .ap-label { display: block; font-size: .78rem; font-weight: 600; color: #1A1A1A; margin-bottom: .3rem; }
-        .ap-input { width: 100%; padding: .58rem .85rem; border: 1.5px solid #E5E7EB; border-radius: .5rem; font-size: .875rem; color: #1A1A1A; background: #FAFAFA; outline: none; transition: border-color .18s, box-shadow .18s, background .18s; font-family: inherit; }
-        .ap-input:focus { border-color: #FF5349; box-shadow: 0 0 0 3px rgba(255,83,73,.15); background: #fff; }
+        .ap-input { width: 100%; padding: .58rem .85rem; border: 1.5px solid #E5E7EB; border-radius: .5rem; font-size: .875rem; color: #1A1A1A; background: #FAFAFA; outline: none; transition: border-color .18s, box- .18s, background .18s; font-family: inherit; }
+        .ap-input:focus { border-color: #FF5349; box-: 0 0 0 3px rgba(255,83,73,.15); background: #fff; }
         .ap-input-wrap { position: relative; }
         .ap-input-wrap .ap-input { padding-right: 2.4rem; }
         .ap-eye { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9AA3AF; display: flex; align-items: center; padding: 0; line-height: 1; }
@@ -124,14 +125,14 @@ export default function AuthPage() {
         .ap-spin { animation: ap-spin .7s linear infinite; }
         @media (max-width: 640px) {
           .ap-root { padding: 0; }
-          .ap-card { height: auto; border-radius: 0; overflow: visible; box-shadow: none; background: transparent; }
+          .ap-card { height: auto; border-radius: 0; overflow: visible; box-: none; background: transparent; }
           .ap-overlay { display: none; }
           .ap-panel { position: relative; width: 100%; height: auto; padding: 0; }
           .ap-panel--login, .ap-panel--register { left: auto; right: auto; }
           .ap-mobile-header { display: flex !important; flex-direction: column; align-items: center; justify-content: center; background: #FF5349; border-radius: 0; padding: 3rem 1.5rem 2.5rem; text-align: center; margin-bottom: 0; min-height: 200px; }
           .ap-mobile-header__logo { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -.04em; }
           .ap-mobile-header__sub { font-size: .8rem; color: rgba(255,255,255,.85); margin-top: .25rem; }
-          .ap-mobile-card { background: #fff; border-radius: 0; box-shadow: 0 12px 40px -8px rgba(255,83,73,.16), 0 4px 12px rgba(0,0,0,.08); padding: 1.75rem 1.5rem 2rem; }
+          .ap-mobile-card { background: #fff; border-radius: 0; box-: 0 12px 40px -8px rgba(255,83,73,.16), 0 4px 12px rgba(0,0,0,.08); padding: 1.75rem 1.5rem 2rem; }
           .ap-panel--login  { display: none; }
           .ap-panel--register { display: none; }
           .ap-panel--login.ap-active  { display: flex; }
@@ -164,7 +165,7 @@ export default function AuthPage() {
                 <input
                   id="login-email"
                   type="email"
-                  className="ap-input"
+                  className="ap-input focus:border-primary"
                   placeholder="you@example.com"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
@@ -177,7 +178,7 @@ export default function AuthPage() {
                   <input
                     id="login-password"
                     type={showLoginPw ? 'text' : 'password'}
-                    className="ap-input"
+                    className="ap-input focus:border-primary"
                     placeholder="Enter your password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
@@ -217,7 +218,7 @@ export default function AuthPage() {
                   id="reg-fullname"
                   name="fullName"
                   type="text"
-                  className="ap-input"
+                  className="ap-input focus:border-primary"
                   placeholder="John Doe"
                   value={regForm.fullName}
                   onChange={handleRegChange}
@@ -230,7 +231,7 @@ export default function AuthPage() {
                   id="reg-email"
                   name="email"
                   type="email"
-                  className="ap-input"
+                  className="ap-input focus:border-primary"
                   placeholder="you@example.com"
                   value={regForm.email}
                   onChange={handleRegChange}
@@ -243,7 +244,7 @@ export default function AuthPage() {
                   id="reg-phone"
                   name="phone"
                   type="tel"
-                  className="ap-input"
+                  className="ap-input focus:border-primary"
                   placeholder="+254 712 345 678"
                   value={regForm.phone}
                   onChange={handleRegChange}
@@ -257,7 +258,7 @@ export default function AuthPage() {
                     id="reg-password"
                     name="password"
                     type={showRegPw ? 'text' : 'password'}
-                    className="ap-input"
+                    className="ap-input focus:border-primary"
                     placeholder="At least 8 characters"
                     value={regForm.password}
                     onChange={handleRegChange}
@@ -274,7 +275,7 @@ export default function AuthPage() {
                 <select
                   id="reg-role"
                   name="role"
-                  className="ap-input"
+                  className="ap-input focus:border-primary"
                   style={{ cursor: 'pointer' }}
                   value={regForm.role}
                   onChange={handleRegChange}

@@ -45,10 +45,10 @@ export const TrainerCard = React.memo(function TrainerCard({
     <Link
       to={`/trainer/${id}`}
       onMouseEnter={prefetch}
-      className="block bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow p-4"
+      className="block bg-white rounded-card shadow-card card-hover p-4"
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden">
+        <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center text-primary font-bold overflow-hidden">
           {user?.avatarUrl ? (
             <img src={user.avatarUrl} alt={fullName} className="w-full h-full object-cover" />
           ) : (
@@ -60,8 +60,8 @@ export const TrainerCard = React.memo(function TrainerCard({
             <h3 className="font-semibold text-dark text-sm truncate">{fullName}</h3>
             <VerifiedBadge isVerified={isVerified} size="sm" />
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star size={12} className="text-warning fill-warning" />
+          <div className="flex items-center gap-1 text-xs text-body-foreground">
+            <Star size={12} className="text-body fill-warning" />
             <span>{averageRating?.toFixed(1) || '0.0'}</span>
             <span>({totalReviews || 0})</span>
           </div>
@@ -71,13 +71,13 @@ export const TrainerCard = React.memo(function TrainerCard({
       {skills && skills.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
           {skills.slice(0, 3).map((s) => (
-            <span key={s} className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+            <span key={s} className="px-2 py-0.5 bg-surface text-primary text-xs rounded-full">
               {s}
             </span>
           ))}
         </div>
       )}
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-xs text-body-foreground">
         <span className="flex items-center gap-1">
           <Users size={12} /> {courses?.length || 0} courses
         </span>

@@ -83,7 +83,7 @@ export default function CourseDetail() {
     <>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <BackButton href="/trainers" label="Back to Trainers" />
-        <nav className="text-sm text-muted-foreground mb-6">
+        <nav className="text-sm text-body-foreground mb-6">
           <Link to="/" className="hover:text-dark">
             Home
           </Link>
@@ -102,12 +102,12 @@ export default function CourseDetail() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <span
-                  className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${course.mode === 'PHYSICAL' ? 'bg-surface text-body' : course.mode === 'VIRTUAL' ? 'bg-primary/10 text-primary' : 'bg-accent text-body'}`}
+                  className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${course.mode === 'PHYSICAL' ? 'bg-surface text-body' : course.mode === 'VIRTUAL' ? 'bg-surface text-primary' : 'bg-accent text-body'}`}
                 >
                   <ModeIcon size={12} className="inline mr-1" />
                   {cfg?.label}
                 </span>
-                <span className="px-2.5 py-0.5 bg-accent text-muted-foreground text-xs rounded-full">
+                <span className="px-2.5 py-0.5 bg-accent text-body-foreground text-xs rounded-full">
                   {course.category}
                 </span>
               </div>
@@ -119,7 +119,7 @@ export default function CourseDetail() {
                 to={`/trainer/${course.trainer.id}`}
                 className="flex items-center gap-3 p-3 bg-accent rounded-card hover:bg-accent/80 transition-colors"
               >
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary font-bold">
                   {course.trainer.fullName?.[0]}
                 </div>
                 <div>
@@ -127,7 +127,7 @@ export default function CourseDetail() {
                     <span className="font-medium text-sm text-dark">{course.trainer.fullName}</span>
                     <VerifiedBadge isVerified={course.trainer.isVerified} size="sm" />
                   </div>
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-body-foreground">
                     <RatingStars rating={course.trainer.averageRating || 0} size={12} />(
                     {course.trainer.totalReviews || 0})
                   </div>
@@ -146,7 +146,7 @@ export default function CourseDetail() {
                 <ul className="space-y-2">
                   {course.learningOutcomes.map((o: string, i: number) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-body">
-                      <CheckCircle size={16} className="text-green-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle size={16} className="text-foreground mt-0.5 flex-shrink-0" />
                       {o}
                     </li>
                   ))}
@@ -175,7 +175,7 @@ export default function CourseDetail() {
                 <button
                   onClick={handleEnrol}
                   disabled={isAuthenticated && (user?.role !== 'TRAINEE' || isEnrolled)}
-                  className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {!isAuthenticated
                     ? 'Login to Enrol'

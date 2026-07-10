@@ -31,7 +31,7 @@ export default function ForgotPassword() {
 
         {sent ? (
           <div className="text-center">
-            <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
+            <CheckCircle size={48} className="text-foreground mx-auto mb-4" />
             <h1 className="text-xl font-bold text-dark mb-2">Check your email</h1>
             <p className="text-sm text-body">
               If an account with that email exists, we&apos;ve sent a password reset link.
@@ -52,14 +52,14 @@ export default function ForgotPassword() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus: focus:/20"
                   placeholder="you@example.com"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
                 Send Reset Link

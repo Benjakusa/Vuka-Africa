@@ -31,11 +31,11 @@ export function MilestoneStepper({ milestones, role, onConfirm, confirming }: Mi
                 className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center',
                   status === 'completed'
-                    ? 'bg-green-100 text-green-600'
+                    ? 'bg-surface text-foreground'
                     : status === 'releasing'
-                      ? 'bg-blue-100 text-blue-600'
+                      ? 'bg-surface text-foreground'
                       : status === 'partial'
-                        ? 'bg-yellow-100 text-yellow-600'
+                        ? 'bg-surface text-body'
                         : 'bg-gray-100 text-gray-400',
                 )}
               >
@@ -55,25 +55,25 @@ export function MilestoneStepper({ milestones, role, onConfirm, confirming }: Mi
                   <p className="text-sm font-medium text-dark">
                     Milestone {m.sequence}: {m.label || `Stage ${m.sequence}`}
                   </p>
-                  <p className="text-xs text-muted-foreground">{formatCurrency(m.amountKes)}</p>
+                  <p className="text-xs text-body-foreground">{formatCurrency(m.amountKes)}</p>
                 </div>
                 {canConfirm && status === 'partial' && otherConfirmed && (
                   <button
                     onClick={() => onConfirm?.(m.id)}
                     disabled={confirming === m.id}
-                    className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50"
+                    className="px-3 py-1 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface disabled:opacity-50"
                   >
                     {confirming === m.id ? 'Confirming...' : 'Confirm'}
                   </button>
                 )}
               </div>
               {m.traineeConfirmedAt && (
-                <p className="text-xs text-green-600 mt-1">Trainee confirmed {formatDate(m.traineeConfirmedAt)}</p>
+                <p className="text-xs text-foreground mt-1">Trainee confirmed {formatDate(m.traineeConfirmedAt)}</p>
               )}
               {m.trainerConfirmedAt && (
-                <p className="text-xs text-blue-600 mt-1">Trainer confirmed {formatDate(m.trainerConfirmedAt)}</p>
+                <p className="text-xs text-foreground mt-1">Trainer confirmed {formatDate(m.trainerConfirmedAt)}</p>
               )}
-              {m.releasedAt && <p className="text-xs text-green-600 mt-1">Released {formatDate(m.releasedAt)}</p>}
+              {m.releasedAt && <p className="text-xs text-foreground mt-1">Released {formatDate(m.releasedAt)}</p>}
             </div>
           </div>
         );

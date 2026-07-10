@@ -24,7 +24,12 @@ export default function AdminEarnings() {
   const [selectedPayout, setSelectedPayout] = useState<any>(null);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
-  const { data: earnings, isLoading: earningsLoading, isError: earningsError, refetch: refetchEarnings } = useQuery({
+  const {
+    data: earnings,
+    isLoading: earningsLoading,
+    isError: earningsError,
+    refetch: refetchEarnings,
+  } = useQuery({
     queryKey: adminKeys.earnings,
     queryFn: getAdminEarnings,
   });
@@ -34,9 +39,14 @@ export default function AdminEarnings() {
     queryFn: getPlatformConfig,
   });
 
-  const { data: payouts, isLoading: payoutsLoading, refetch: refetchPayouts } = useQuery({
+  const {
+    data: payouts,
+    isLoading: payoutsLoading,
+    refetch: refetchPayouts,
+  } = useQuery({
     queryKey: adminKeys.payouts(payoutStatusFilter, payoutPage),
-    queryFn: () => getAdminPayouts({ status: payoutStatusFilter || undefined, search: payoutSearch || undefined, page: payoutPage }),
+    queryFn: () =>
+      getAdminPayouts({ status: payoutStatusFilter || undefined, search: payoutSearch || undefined, page: payoutPage }),
   });
 
   const { data: stats } = useQuery({
@@ -56,7 +66,9 @@ export default function AdminEarnings() {
     return (
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {Array.from({ length: 4 }).map((_, i) => <CardSkeleton key={i} />)}
+          {Array.from({ length: 4 }).map((_, i) => (
+            <CardSkeleton key={i} />
+          ))}
         </div>
       </div>
     );
@@ -78,29 +90,29 @@ export default function AdminEarnings() {
           icon={TrendingUp}
           label="Total Commissions"
           value={formatCurrency(earnings?.totalCommissions || 0)}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={ArrowDownLeft}
           label="Total Disbursed"
           value={formatCurrency(earnings?.totalDisbursed || 0)}
-          iconBg="bg-red-50"
-          iconColor="text-red-600"
+          iconBg="bg-primary"
+          iconColor="text-primary"
         />
         <StatCard
           icon={Clock}
           label="Pending Payouts"
           value={formatCurrency(earnings?.pendingPayouts || 0)}
-          iconBg="bg-yellow-50"
-          iconColor="text-yellow-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
         <StatCard
           icon={DollarSign}
           label="Commission Rate"
           value={`${config?.commissionRate || 12}%`}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
       </div>
 
@@ -114,7 +126,7 @@ export default function AdminEarnings() {
                 className={`px-6 py-3 text-sm font-medium transition-colors relative ${
                   activeTab === tab.key
                     ? 'text-primary border-b-2 border-primary'
-                    : 'text-muted-foreground hover:text-dark'
+                    : 'text-body-foreground hover:text-dark'
                 }`}
               >
                 {tab.label}
@@ -128,19 +140,19 @@ export default function AdminEarnings() {
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 <div className="bg-surface rounded-card p-4">
-                  <p className="text-xs text-muted-foreground mb-1">This Month Commissions</p>
+                  <p className="text-xs text-body-foreground mb-1">This Month Commissions</p>
                   <p className="text-xl font-bold text-dark">
                     {formatCurrency(earnings?.monthlyEarnings?.slice(-1)?.[0]?.commissions || 0)}
                   </p>
                 </div>
                 <div className="bg-surface rounded-card p-4">
-                  <p className="text-xs text-muted-foreground mb-1">This Month Disbursements</p>
+                  <p className="text-xs text-body-foreground mb-1">This Month Disbursements</p>
                   <p className="text-xl font-bold text-dark">
                     {formatCurrency(earnings?.monthlyEarnings?.slice(-1)?.[0]?.disbursements || 0)}
                   </p>
                 </div>
                 <div className="bg-surface rounded-card p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Total Trainees</p>
+                  <p className="text-xs text-body-foreground mb-1">Total Trainees</p>
                   <p className="text-xl font-bold text-dark">
                     {formatNumber((stats?.totalUsers || 0) - (stats?.totalTrainers || 0))}
                   </p>
@@ -154,20 +166,23 @@ export default function AdminEarnings() {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-border">
-                          <th className="text-left py-2 px-3 text-muted-foreground font-medium">Month</th>
-                          <th className="text-right py-2 px-3 text-muted-foreground font-medium">Commissions</th>
-                          <th className="text-right py-2 px-3 text-muted-foreground font-medium">Disbursements</th>
-                          <th className="text-right py-2 px-3 text-muted-foreground font-medium">Net</th>
+                          <th className="text-left py-2 px-3 text-body-foreground font-medium">Month</th>
+                          <th className="text-right py-2 px-3 text-body-foreground font-medium">Commissions</th>
+                          <th className="text-right py-2 px-3 text-body-foreground font-medium">Disbursements</th>
+                          <th className="text-right py-2 px-3 text-body-foreground font-medium">Net</th>
                         </tr>
                       </thead>
                       <tbody>
                         {earnings.monthlyEarnings.map((m: any) => (
                           <tr key={m.month} className="border-b border-border/50">
                             <td className="py-2 px-3 text-dark font-medium">
-                              {new Date(m.month + '-01').toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}
+                              {new Date(m.month + '-01').toLocaleDateString('en-KE', {
+                                month: 'long',
+                                year: 'numeric',
+                              })}
                             </td>
-                            <td className="py-2 px-3 text-right text-green-600">{formatCurrency(m.commissions)}</td>
-                            <td className="py-2 px-3 text-right text-red-600">{formatCurrency(m.disbursements)}</td>
+                            <td className="py-2 px-3 text-right text-foreground">{formatCurrency(m.commissions)}</td>
+                            <td className="py-2 px-3 text-right text-primary">{formatCurrency(m.disbursements)}</td>
                             <td className="py-2 px-3 text-right font-medium text-dark">
                               {formatCurrency(m.commissions - m.disbursements)}
                             </td>
@@ -178,7 +193,11 @@ export default function AdminEarnings() {
                   </div>
                 </div>
               ) : (
-                <EmptyState icon={TrendingUp} title="No earnings data yet" subtitle="Earnings will appear once enrolments are made" />
+                <EmptyState
+                  icon={TrendingUp}
+                  title="No earnings data yet"
+                  subtitle="Earnings will appear once enrolments are made"
+                />
               )}
             </div>
           )}
@@ -187,19 +206,25 @@ export default function AdminEarnings() {
             <div>
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 <div className="relative flex-1 min-w-[200px]">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-body-foreground" />
                   <input
                     type="text"
                     placeholder="Search by trainer..."
                     value={payoutSearch}
-                    onChange={(e) => { setPayoutSearch(e.target.value); setPayoutPage(1); }}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring"
+                    onChange={(e) => {
+                      setPayoutSearch(e.target.value);
+                      setPayoutPage(1);
+                    }}
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
                   />
                 </div>
                 <select
                   value={payoutStatusFilter}
-                  onChange={(e) => { setPayoutStatusFilter(e.target.value); setPayoutPage(1); }}
-                  className="px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring bg-white"
+                  onChange={(e) => {
+                    setPayoutStatusFilter(e.target.value);
+                    setPayoutPage(1);
+                  }}
+                  className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
                   aria-label="Filter by status"
                 >
                   <option value="">All Statuses</option>
@@ -210,18 +235,22 @@ export default function AdminEarnings() {
               </div>
 
               {payoutsLoading ? (
-                <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)}</div>
+                <div className="space-y-3">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <CardSkeleton key={i} />
+                  ))}
+                </div>
               ) : payouts?.data?.length ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border">
-                        <th className="text-left py-2 px-3 text-muted-foreground font-medium">Trainer</th>
-                        <th className="text-right py-2 px-3 text-muted-foreground font-medium">Amount</th>
-                        <th className="text-right py-2 px-3 text-muted-foreground font-medium">Phone</th>
-                        <th className="text-right py-2 px-3 text-muted-foreground font-medium">Date</th>
-                        <th className="text-center py-2 px-3 text-muted-foreground font-medium">Status</th>
-                        <th className="text-right py-2 px-3 text-muted-foreground font-medium">Actions</th>
+                        <th className="text-left py-2 px-3 text-body-foreground font-medium">Trainer</th>
+                        <th className="text-right py-2 px-3 text-body-foreground font-medium">Amount</th>
+                        <th className="text-right py-2 px-3 text-body-foreground font-medium">Phone</th>
+                        <th className="text-right py-2 px-3 text-body-foreground font-medium">Date</th>
+                        <th className="text-center py-2 px-3 text-body-foreground font-medium">Status</th>
+                        <th className="text-right py-2 px-3 text-body-foreground font-medium">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -229,12 +258,14 @@ export default function AdminEarnings() {
                         <tr key={p.id} className="border-b border-border/50 hover:bg-surface/50 transition-colors">
                           <td className="py-2 px-3">
                             <p className="text-dark font-medium">{p.trainerName}</p>
-                            <p className="text-xs text-muted-foreground">{p.trainerEmail}</p>
+                            <p className="text-xs text-body-foreground">{p.trainerEmail}</p>
                           </td>
                           <td className="py-2 px-3 text-right text-dark font-medium">{formatCurrency(p.amount)}</td>
                           <td className="py-2 px-3 text-right text-body">{p.phone || '-'}</td>
                           <td className="py-2 px-3 text-right text-body text-xs">{formatDate(p.createdAt)}</td>
-                          <td className="py-2 px-3 text-center"><StatusBadge status={p.status} /></td>
+                          <td className="py-2 px-3 text-center">
+                            <StatusBadge status={p.status} />
+                          </td>
                           <td className="py-2 px-3 text-right">
                             {p.status === 'PENDING' && (
                               <button
@@ -242,7 +273,7 @@ export default function AdminEarnings() {
                                   setSelectedPayout(p);
                                   setPaymentModalOpen(true);
                                 }}
-                                className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-btn hover:bg-primary/90 transition-colors"
+                                className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-btn hover:bg-surface transition-colors"
                               >
                                 Process
                               </button>
@@ -254,25 +285,28 @@ export default function AdminEarnings() {
                   </table>
                 </div>
               ) : (
-                <EmptyState icon={Wallet} title="No payout requests" subtitle="Payout requests from trainers will appear here" />
+                <EmptyState
+                  icon={Wallet}
+                  title="No payout requests"
+                  subtitle="Payout requests from trainers will appear here"
+                />
               )}
 
-              {totalPages > 1 && (
-                <Pagination page={payoutPage} totalPages={totalPages} total={payouts?.total || 0} />
-              )}
+              {totalPages > 1 && <Pagination page={payoutPage} totalPages={totalPages} total={payouts?.total || 0} />}
             </div>
           )}
 
-          {activeTab === 'commissions' && (
-            <CommissionsTab />
-          )}
+          {activeTab === 'commissions' && <CommissionsTab />}
         </div>
       </div>
 
       {selectedPayout && (
         <ProcessPaymentModal
           open={paymentModalOpen}
-          onClose={() => { setPaymentModalOpen(false); setSelectedPayout(null); }}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setSelectedPayout(null);
+          }}
           payout={{
             id: selectedPayout.id,
             trainerId: selectedPayout.trainerId,
@@ -283,7 +317,12 @@ export default function AdminEarnings() {
             availableBalance: Number(selectedPayout.amount),
             requestDate: selectedPayout.createdAt,
           }}
-          onProcessed={() => { refetchPayouts(); refetchEarnings(); setPaymentModalOpen(false); setSelectedPayout(null); }}
+          onProcessed={() => {
+            refetchPayouts();
+            refetchEarnings();
+            setPaymentModalOpen(false);
+            setSelectedPayout(null);
+          }}
         />
       )}
     </div>
@@ -305,11 +344,23 @@ function CommissionsTab() {
   });
 
   if (isLoading) {
-    return <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)}</div>;
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <CardSkeleton key={i} />
+        ))}
+      </div>
+    );
   }
 
   if (!commissions?.length) {
-    return <EmptyState icon={TrendingUp} title="No commissions yet" subtitle="Commissions will appear once enrolments are completed" />;
+    return (
+      <EmptyState
+        icon={TrendingUp}
+        title="No commissions yet"
+        subtitle="Commissions will appear once enrolments are completed"
+      />
+    );
   }
 
   const totalCommissions = commissions.reduce((sum: number, tx: any) => sum + (Number(tx.amountKes) || 0), 0);
@@ -320,11 +371,11 @@ function CommissionsTab() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="text-left py-2 px-3 text-muted-foreground font-medium">Date</th>
-              <th className="text-left py-2 px-3 text-muted-foreground font-medium">User</th>
-              <th className="text-left py-2 px-3 text-muted-foreground font-medium">Description</th>
-              <th className="text-right py-2 px-3 text-muted-foreground font-medium">Amount</th>
-              <th className="text-center py-2 px-3 text-muted-foreground font-medium">Type</th>
+              <th className="text-left py-2 px-3 text-body-foreground font-medium">Date</th>
+              <th className="text-left py-2 px-3 text-body-foreground font-medium">User</th>
+              <th className="text-left py-2 px-3 text-body-foreground font-medium">Description</th>
+              <th className="text-right py-2 px-3 text-body-foreground font-medium">Amount</th>
+              <th className="text-center py-2 px-3 text-body-foreground font-medium">Type</th>
             </tr>
           </thead>
           <tbody>
@@ -340,7 +391,9 @@ function CommissionsTab() {
           </tbody>
           <tfoot>
             <tr className="border-t border-border">
-              <td colSpan={3} className="py-3 px-3 text-right font-bold text-dark">Total Commissions</td>
+              <td colSpan={3} className="py-3 px-3 text-right font-bold text-dark">
+                Total Commissions
+              </td>
               <td className="py-3 px-3 text-right font-bold text-dark">{formatCurrency(totalCommissions)}</td>
               <td />
             </tr>

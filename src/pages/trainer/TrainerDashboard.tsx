@@ -42,16 +42,18 @@ export default function TrainerDashboard() {
 
   const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
   const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
-  const activeSessions = enrolments?.reduce((count: number, e: any) => {
-    return count + (e.milestones?.filter((m: any) => m.status === 'IN_PROGRESS').length || 0);
-  }, 0) || 0;
+  const activeSessions =
+    enrolments?.reduce((count: number, e: any) => {
+      return count + (e.milestones?.filter((m: any) => m.status === 'IN_PROGRESS').length || 0);
+    }, 0) || 0;
 
   const settledEarnings = earnings?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
   const pendingEarnings = activeEnrolments.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
   const totalEarnings = settledEarnings + pendingEarnings;
 
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const newEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE' && e.createdAt >= oneDayAgo) || [];
+  const newEnrolments =
+    enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE' && e.createdAt >= oneDayAgo) || [];
   const recentReviews = reviewsData?.data || [];
   const needsVerification = user?.trainer && !user.trainer.isVerified && user.trainer.verificationStatus !== 'PENDING';
 
@@ -60,9 +62,9 @@ export default function TrainerDashboard() {
       <OfflineBanner />
 
       {needsVerification && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-card mb-4">
-          <AlertTriangle size={18} className="text-yellow-600" />
-          <p className="text-sm text-yellow-700 flex-1">Complete your verification to get more students.</p>
+        <div className="flex items-center gap-3 px-4 py-3 bg-surface border border-border rounded-card mb-4">
+          <AlertTriangle size={18} className="text-body" />
+          <p className="text-sm text-body flex-1">Complete your verification to get more students.</p>
           <Link to="/trainer/verification" className="text-sm font-medium text-primary hover:underline">
             Verify Now
           </Link>
@@ -79,15 +81,15 @@ export default function TrainerDashboard() {
           icon={BookOpen}
           label="Courses"
           value={courses?.length || 0}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Users}
           label="Active Students"
           value={activeEnrolments.length}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Wallet}
@@ -100,15 +102,15 @@ export default function TrainerDashboard() {
           icon={Star}
           label="Rating"
           value={user?.trainer?.averageRating?.toFixed(1) || '0.0'}
-          iconBg="bg-yellow-50"
-          iconColor="text-yellow-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
         <StatCard
           icon={Play}
           label="Active Sessions"
           value={activeSessions}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
       </div>
 
@@ -117,7 +119,9 @@ export default function TrainerDashboard() {
           <div className="flex items-center gap-2 mb-3">
             <Bell size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-dark">Pending Review</h2>
-            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">{pendingEnrolments.length} pending</span>
+            <span className="px-2 py-0.5 bg-surface text-body text-xs font-semibold rounded-full">
+              {pendingEnrolments.length} pending
+            </span>
           </div>
           <div className="bg-white rounded-card shadow-card divide-y divide-border">
             {pendingEnrolments.slice(0, 10).map((enrolment: any) => (
@@ -126,16 +130,17 @@ export default function TrainerDashboard() {
                 to={`/trainer/enrolments/${enrolment.id}`}
                 className="flex items-center gap-3 p-3 hover:bg-accent transition-colors"
               >
-                <div className="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
-                  <UserPlus size={16} className="text-yellow-600" />
+                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center flex-shrink-0">
+                  <UserPlus size={16} className="text-body" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-dark">
-                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> wants to join <span className="font-semibold">{enrolment.course?.title}</span>
+                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> wants to join{' '}
+                    <span className="font-semibold">{enrolment.course?.title}</span>
                   </p>
-                  <p className="text-xs text-muted-foreground">{formatDate(enrolment.createdAt)}</p>
+                  <p className="text-xs text-body-foreground">{formatDate(enrolment.createdAt)}</p>
                 </div>
-                <span className="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">REVIEW</span>
+                <span className="px-2.5 py-0.5 bg-surface text-body text-xs font-medium rounded-full">REVIEW</span>
               </Link>
             ))}
           </div>
@@ -147,7 +152,9 @@ export default function TrainerDashboard() {
           <div className="flex items-center gap-2 mb-3">
             <Bell size={16} className="text-primary" />
             <h2 className="text-lg font-bold text-dark">New Enrolments</h2>
-            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full">{newEnrolments.length} new</span>
+            <span className="px-2 py-0.5 bg-surface text-primary text-xs font-semibold rounded-full">
+              {newEnrolments.length} new
+            </span>
           </div>
           <div className="bg-white rounded-card shadow-card divide-y divide-border">
             {newEnrolments.slice(0, 5).map((enrolment: any) => (
@@ -156,16 +163,17 @@ export default function TrainerDashboard() {
                 to={`/trainer/enrolments/${enrolment.id}`}
                 className="flex items-center gap-3 p-3 hover:bg-accent transition-colors"
               >
-                <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
-                  <UserPlus size={16} className="text-green-600" />
+                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center flex-shrink-0">
+                  <UserPlus size={16} className="text-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-dark">
-                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> enrolled in <span className="font-semibold">{enrolment.course?.title}</span>
+                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> enrolled in{' '}
+                    <span className="font-semibold">{enrolment.course?.title}</span>
                   </p>
-                  <p className="text-xs text-muted-foreground">{formatDate(enrolment.createdAt)}</p>
+                  <p className="text-xs text-body-foreground">{formatDate(enrolment.createdAt)}</p>
                 </div>
-                <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs font-medium rounded-full">NEW</span>
+                <span className="px-2 py-0.5 bg-surface text-foreground text-xs font-medium rounded-full">NEW</span>
               </Link>
             ))}
           </div>
@@ -187,7 +195,7 @@ export default function TrainerDashboard() {
               ))}
             </div>
           ) : activeEnrolments.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">No active enrolments yet</p>
+            <p className="text-sm text-body-foreground py-8 text-center">No active enrolments yet</p>
           ) : (
             <div className="bg-white rounded-card shadow-card divide-y divide-border">
               {activeEnrolments.slice(0, 5).map((enrolment: any) => (
@@ -198,9 +206,9 @@ export default function TrainerDashboard() {
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-dark truncate">{enrolment.course?.title}</p>
-                    <p className="text-xs text-muted-foreground">{enrolment.trainee?.fullName}</p>
+                    <p className="text-xs text-body-foreground">{enrolment.trainee?.fullName}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground">{formatDate(enrolment.createdAt)}</span>
+                  <span className="text-xs text-body-foreground">{formatDate(enrolment.createdAt)}</span>
                 </Link>
               ))}
             </div>
@@ -221,7 +229,7 @@ export default function TrainerDashboard() {
               ))}
             </div>
           ) : recentReviews.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-8 text-center">No reviews yet</p>
+            <p className="text-sm text-body-foreground py-8 text-center">No reviews yet</p>
           ) : (
             <div className="space-y-3">
               {recentReviews.map((review: any) => (

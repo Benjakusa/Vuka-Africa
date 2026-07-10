@@ -99,7 +99,7 @@ export default function Privacy() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-16">
         <div className="space-y-6">
           {sections.map((section, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 hover:shadow-xl">
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-8 hover:">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary">
                   <section.icon size={20} />
@@ -109,7 +109,7 @@ export default function Privacy() {
                   <ul className="space-y-2">
                     {section.items.map((item, j) => (
                       <li key={j} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/40 mt-2" />
+                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-surface mt-2" />
                         {item}
                       </li>
                     ))}

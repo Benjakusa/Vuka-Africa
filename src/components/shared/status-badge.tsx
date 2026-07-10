@@ -6,18 +6,18 @@ interface StatusBadgeProps {
 }
 
 const statusStyles: Record<string, string> = {
-  ACTIVE: 'bg-green-100 text-green-700',
-  COMPLETED: 'bg-blue-100 text-blue-700',
+  ACTIVE: 'bg-surface text-foreground',
+  COMPLETED: 'bg-surface text-foreground',
   CANCELLED: 'bg-gray-100 text-gray-500',
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  PENDING_ACCEPTANCE: 'bg-yellow-100 text-yellow-700',
-  APPROVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  OPEN: 'bg-yellow-100 text-yellow-700',
-  RESOLVED: 'bg-green-100 text-green-700',
-  PAID: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-  IN_REVIEW: 'bg-blue-100 text-blue-700',
+  PENDING: 'bg-surface text-body',
+  PENDING_ACCEPTANCE: 'bg-surface text-body',
+  APPROVED: 'bg-surface text-foreground',
+  REJECTED: 'bg-surface text-primary',
+  OPEN: 'bg-surface text-body',
+  RESOLVED: 'bg-surface text-foreground',
+  PAID: 'bg-surface text-foreground',
+  FAILED: 'bg-surface text-primary',
+  IN_REVIEW: 'bg-surface text-foreground',
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {

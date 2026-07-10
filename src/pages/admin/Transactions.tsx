@@ -53,7 +53,7 @@ export default function Transactions() {
               setSearchParams(params, { replace: true });
             }}
             className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors whitespace-nowrap ${
-              type === f.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
+              type === f.value ? 'bg-primary text-white' : 'text-body-foreground hover:text-dark'
             }`}
           >
             {f.label}
@@ -83,13 +83,13 @@ export default function Transactions() {
               <tbody className="divide-y divide-border">
                 {transactions.map((tx: any) => (
                   <tr key={tx.id}>
-                    <td className="p-3 text-muted-foreground whitespace-nowrap">{formatDateTime(tx.createdAt)}</td>
+                    <td className="p-3 text-body-foreground whitespace-nowrap">{formatDateTime(tx.createdAt)}</td>
                     <td className="p-3 text-dark">{tx.description || 'N/A'}</td>
-                    <td className="p-3 text-muted-foreground">{tx.reference || 'N/A'}</td>
+                    <td className="p-3 text-body-foreground">{tx.reference || 'N/A'}</td>
                     <td className="p-3">
                       <span
                         className={`inline-flex items-center gap-1 text-xs font-medium ${
-                          tx.entryType === 'CREDIT' ? 'text-green-600' : 'text-red-600'
+                          tx.entryType === 'CREDIT' ? 'text-foreground' : 'text-primary'
                         }`}
                       >
                         {tx.entryType === 'CREDIT' ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
@@ -98,7 +98,7 @@ export default function Transactions() {
                     </td>
                     <td
                       className={`p-3 text-right font-medium ${
-                        tx.entryType === 'CREDIT' ? 'text-green-600' : 'text-red-600'
+                        tx.entryType === 'CREDIT' ? 'text-foreground' : 'text-primary'
                       }`}
                     >
                       {tx.entryType === 'CREDIT' ? '+' : '-'}
@@ -115,20 +115,20 @@ export default function Transactions() {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-dark truncate flex-1">{tx.description || 'Transaction'}</p>
                   <span
-                    className={`text-sm font-bold ml-2 ${tx.entryType === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}
+                    className={`text-sm font-bold ml-2 ${tx.entryType === 'CREDIT' ? 'text-foreground' : 'text-primary'}`}
                   >
                     {tx.entryType === 'CREDIT' ? '+' : '-'}
                     {formatCurrency(tx.amountKes)}
                   </span>
                 </div>
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex items-center justify-between text-xs text-body-foreground">
                   <span className="flex items-center gap-1">
                     {tx.entryType === 'CREDIT' ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
                     {tx.entryType}
                   </span>
                   <span>{formatDateTime(tx.createdAt)}</span>
                 </div>
-                {tx.reference && <p className="text-xs text-muted-foreground">Ref: {tx.reference}</p>}
+                {tx.reference && <p className="text-xs text-body-foreground">Ref: {tx.reference}</p>}
               </div>
             ))}
           </div>

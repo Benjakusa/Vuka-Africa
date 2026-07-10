@@ -5,8 +5,8 @@ export function Footer() {
   return (
     <footer className="bg-dark text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
+          <div className="flex flex-col items-center md:items-start">
             <span className="text-2xl font-bold text-white">Vuka</span>
             <p className="mt-2 text-sm text-gray-400">Africa&apos;s trusted skill marketplace.</p>
           </div>
@@ -38,7 +38,10 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Support</h4>
             <div className="space-y-2 text-sm text-gray-400">
-              <a href="mailto:hello@vuka.africa" className="flex items-center gap-2 hover:text-white">
+              <a
+                href="mailto:hello@vuka.africa"
+                className="flex items-center justify-center md:justify-start gap-2 hover:text-white"
+              >
                 <Mail size={14} /> hello@vuka.africa
               </a>
             </div>

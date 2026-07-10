@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BookOpen, Search, Users, DollarSign, Trash2, Eye, EyeOff, ChevronRight, GraduationCap } from 'lucide-react';
-import { getAllCourses, getAdminCourseDetail, unpublishCourse, publishCourse, softDeleteCourse } from '@/services/adminService';
+import {
+  getAllCourses,
+  getAdminCourseDetail,
+  unpublishCourse,
+  publishCourse,
+  softDeleteCourse,
+} from '@/services/adminService';
 import { adminKeys } from '@/lib/query-keys';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ErrorState } from '@/components/shared/error-state';
@@ -77,19 +83,25 @@ export default function AdminCourses() {
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-body-foreground" />
           <input
             type="text"
             placeholder="Search by title or trainer..."
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
           />
         </div>
         <select
           value={categoryFilter}
-          onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring bg-white"
+          onChange={(e) => {
+            setCategoryFilter(e.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
           aria-label="Filter by category"
         >
           <option value="">All Categories</option>
@@ -102,8 +114,11 @@ export default function AdminCourses() {
         </select>
         <select
           value={modeFilter}
-          onChange={(e) => { setModeFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring bg-white"
+          onChange={(e) => {
+            setModeFilter(e.target.value);
+            setPage(1);
+          }}
+          className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
           aria-label="Filter by mode"
         >
           <option value="">All Modes</option>
@@ -116,14 +131,18 @@ export default function AdminCourses() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {isLoading ? (
-            <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <CardSkeleton key={i} />)}</div>
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
+            </div>
           ) : data?.data?.length ? (
             <div className="bg-white rounded-card shadow-card divide-y divide-border">
               {data.data.map((course: any) => (
                 <div
                   key={course.id}
                   className={`p-4 hover:bg-surface/50 transition-colors cursor-pointer ${
-                    selectedCourseId === course.id ? 'bg-primary/5' : ''
+                    selectedCourseId === course.id ? 'bg-surface' : ''
                   }`}
                   onClick={() => setSelectedCourseId(course.id)}
                 >
@@ -133,7 +152,7 @@ export default function AdminCourses() {
                         <h3 className="text-sm font-semibold text-dark truncate">{course.title}</h3>
                         <StatusBadge status={course.isPublished ? 'PUBLISHED' : 'UNPUBLISHED'} />
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">
+                      <p className="text-xs text-body-foreground mb-2">
                         by {course.trainerName} &middot; {course.category} &middot; {course.mode}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-body">
@@ -150,20 +169,30 @@ export default function AdminCourses() {
                     </div>
                     <div className="flex items-center gap-2 ml-4 shrink-0">
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleTogglePublish(course.id, course.isPublished); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTogglePublish(course.id, course.isPublished);
+                        }}
                         className="p-1.5 hover:bg-accent rounded-btn transition-colors"
                         aria-label={course.isPublished ? 'Unpublish course' : 'Publish course'}
                       >
-                        {course.isPublished ? <EyeOff size={16} className="text-muted-foreground" /> : <Eye size={16} className="text-muted-foreground" />}
+                        {course.isPublished ? (
+                          <EyeOff size={16} className="text-body-foreground" />
+                        ) : (
+                          <Eye size={16} className="text-body-foreground" />
+                        )}
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleDelete(course.id); }}
-                        className="p-1.5 hover:bg-red-50 rounded-btn transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(course.id);
+                        }}
+                        className="p-1.5 hover:bg-primary rounded-btn transition-colors"
                         aria-label="Delete course"
                       >
-                        <Trash2 size={16} className="text-red-500" />
+                        <Trash2 size={16} className="text-primary" />
                       </button>
-                      <ChevronRight size={16} className="text-muted-foreground" />
+                      <ChevronRight size={16} className="text-body-foreground" />
                     </div>
                   </div>
                 </div>
@@ -207,7 +236,7 @@ export default function AdminCourses() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-body">Total Revenue</span>
-                      <span className="text-green-600 font-semibold">{formatCurrency(courseDetail.totalRevenue)}</span>
+                      <span className="text-foreground font-semibold">{formatCurrency(courseDetail.totalRevenue)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-body">Enrolments</span>
@@ -230,7 +259,9 @@ export default function AdminCourses() {
                           return (
                             <div key={enr.id} className="p-2.5 bg-surface rounded-card">
                               <div className="flex items-center justify-between mb-1">
-                                <p className="text-xs font-medium text-dark truncate">{enr.trainee?.fullName || 'Trainee'}</p>
+                                <p className="text-xs font-medium text-dark truncate">
+                                  {enr.trainee?.fullName || 'Trainee'}
+                                </p>
                                 <StatusBadge status={enr.status} />
                               </div>
                               {totalCount > 0 && (
@@ -241,12 +272,12 @@ export default function AdminCourses() {
                                       style={{ width: `${progress}%` }}
                                     />
                                   </div>
-                                  <span className="text-xs text-muted-foreground shrink-0">
+                                  <span className="text-xs text-body-foreground shrink-0">
                                     {completedCount}/{totalCount}
                                   </span>
                                 </div>
                               )}
-                              <p className="text-xs text-muted-foreground mt-1">{formatDate(enr.createdAt)}</p>
+                              <p className="text-xs text-body-foreground mt-1">{formatDate(enr.createdAt)}</p>
                             </div>
                           );
                         })}
@@ -258,7 +289,7 @@ export default function AdminCourses() {
             </div>
           ) : (
             <div className="bg-white rounded-card shadow-card p-6 text-center">
-              <BookOpen size={32} className="mx-auto text-muted-foreground mb-2" />
+              <BookOpen size={32} className="mx-auto text-body-foreground mb-2" />
               <p className="text-sm text-body">Select a course to view details</p>
             </div>
           )}

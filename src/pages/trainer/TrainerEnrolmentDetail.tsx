@@ -90,29 +90,29 @@ export default function TrainerEnrolmentDetail() {
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold text-dark mb-1">{course.title || 'Course'}</h1>
-            <p className="text-xs text-muted-foreground">Enrolled {formatDate(enrolment.createdAt)}</p>
+            <p className="text-xs text-body-foreground">Enrolled {formatDate(enrolment.createdAt)}</p>
           </div>
           <StatusBadge status={enrolment.status} />
         </div>
 
         {isRejected && enrolment.rejectionReason && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-card">
-            <p className="text-sm font-medium text-red-700">Rejection Reason</p>
-            <p className="text-sm text-red-600 mt-1">{enrolment.rejectionReason}</p>
+          <div className="mb-4 p-3 bg-primary border border-primary rounded-card">
+            <p className="text-sm font-medium text-primary">Rejection Reason</p>
+            <p className="text-sm text-primary mt-1">{enrolment.rejectionReason}</p>
           </div>
         )}
 
         <div className="flex flex-wrap gap-4 text-sm text-body mb-4">
           <span className="flex items-center gap-1">
-            <MapPin size={14} className="text-muted-foreground" />
+            <MapPin size={14} className="text-body-foreground" />
             {course.mode || 'N/A'}
           </span>
           <span className="flex items-center gap-1">
-            <Calendar size={14} className="text-muted-foreground" />
+            <Calendar size={14} className="text-body-foreground" />
             {course.duration || 'Flexible'}
           </span>
           <span className="flex items-center gap-1">
-            <BookOpen size={14} className="text-muted-foreground" />
+            <BookOpen size={14} className="text-body-foreground" />
             {course.sessionCount || 0} sessions
           </span>
         </div>
@@ -129,7 +129,7 @@ export default function TrainerEnrolmentDetail() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-body">Platform Fee</span>
-              <span className="font-medium text-destructive">-{formatCurrency(enrolment.commissionKes || 0)}</span>
+              <span className="font-medium text-primary">-{formatCurrency(enrolment.commissionKes || 0)}</span>
             </div>
             <hr className="border-border/50" />
             <div className="flex justify-between text-sm font-semibold">
@@ -143,14 +143,14 @@ export default function TrainerEnrolmentDetail() {
           <div className="flex gap-3 mt-4">
             <button
               onClick={() => setActionModal('accept')}
-              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-btn hover:bg-green-700 transition-colors text-sm"
+              className="flex items-center gap-2 px-5 py-2.5 bg-surface text-white font-medium rounded-btn hover:bg-surface transition-colors text-sm"
             >
               <CheckCircle size={16} />
               Accept Enrolment
             </button>
             <button
               onClick={() => setActionModal('reject')}
-              className="flex items-center gap-2 px-5 py-2.5 border border-destructive text-destructive font-medium rounded-btn hover:bg-red-50 transition-colors text-sm"
+              className="flex items-center gap-2 px-5 py-2.5 border border-destructive text-primary font-medium rounded-btn hover:bg-primary transition-colors text-sm"
             >
               <XCircle size={16} />
               Reject
@@ -162,12 +162,12 @@ export default function TrainerEnrolmentDetail() {
       <div className="bg-white rounded-card shadow-card p-6 mb-6">
         <h2 className="text-lg font-bold text-dark mb-4">Trainee</h2>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+          <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary font-bold">
             {getInitials(trainee.fullName || 'T')}
           </div>
           <div>
             <p className="font-medium text-dark">{trainee.fullName || 'Unknown'}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-body-foreground">
               {trainee.email} • {trainee.phone}
             </p>
           </div>
@@ -195,10 +195,10 @@ export default function TrainerEnrolmentDetail() {
       {(isActive || enrolment.status === 'COMPLETED') && milestones.length > 0 && (
         <div className="bg-white rounded-card shadow-card p-6 mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <DollarSign size={16} className="text-muted-foreground" />
+            <DollarSign size={16} className="text-body-foreground" />
             <h2 className="text-lg font-bold text-dark">Escrow Confirmation</h2>
           </div>
-          <p className="text-xs text-muted-foreground mb-4">
+          <p className="text-xs text-body-foreground mb-4">
             Both parties must confirm milestones to release funds. This is separate from session tracking.
           </p>
           <MilestoneStepper

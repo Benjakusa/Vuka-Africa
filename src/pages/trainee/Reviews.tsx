@@ -67,7 +67,7 @@ export default function Reviews() {
             <div key={enrolment.id} className="p-4 flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-dark">{enrolment.course?.title || 'Course'}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-body-foreground">
                   Trainer: {enrolment.trainer?.fullName} • Completed {formatDate(enrolment.updatedAt)}
                 </p>
               </div>
@@ -79,7 +79,7 @@ export default function Reviews() {
                     title: enrolment.course?.title,
                   })
                 }
-                className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90"
+                className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface"
               >
                 Write Review
               </button>

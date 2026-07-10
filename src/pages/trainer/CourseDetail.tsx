@@ -174,18 +174,24 @@ export default function CourseDetail() {
                     e.stopPropagation();
                     removeImage();
                   }}
-                  className="absolute -top-2 -right-2 p-0.5 bg-destructive text-white rounded-full"
+                  className="absolute -top-2 -right-2 p-0.5 bg-primary text-white text-white rounded-full"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 py-4">
-                <Upload size={24} className="text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Click to upload course image</p>
+                <Upload size={24} className="text-body-foreground" />
+                <p className="text-sm text-body-foreground">Click to upload course image</p>
               </div>
             )}
-            <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden focus:border-primary"
+            />
           </div>
         </div>
 
@@ -196,7 +202,7 @@ export default function CourseDetail() {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
           />
         </div>
 
@@ -208,7 +214,7 @@ export default function CourseDetail() {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none focus:border-primary"
           />
         </div>
 
@@ -219,7 +225,7 @@ export default function CourseDetail() {
               name="mode"
               value={form.mode}
               onChange={handleChange}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             >
               <option value="PHYSICAL">Physical</option>
               <option value="VIRTUAL">Virtual</option>
@@ -233,7 +239,7 @@ export default function CourseDetail() {
               value={currentCategory}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             >
               <option value="">Select category</option>
               {CATEGORIES.map((cat) => (
@@ -266,7 +272,7 @@ export default function CourseDetail() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
           <div>
@@ -276,7 +282,7 @@ export default function CourseDetail() {
               value={form.duration}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
         </div>
@@ -291,7 +297,7 @@ export default function CourseDetail() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
           <div>
@@ -302,7 +308,7 @@ export default function CourseDetail() {
               value={form.maxStudents}
               onChange={handleChange}
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
         </div>
@@ -313,14 +319,14 @@ export default function CourseDetail() {
             name="location"
             value={form.location}
             onChange={handleChange}
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
           />
         </div>
 
         <button
           type="submit"
           disabled={updateMutation.isPending}
-          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {updateMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {updateMutation.isPending ? 'Saving...' : 'Save Changes'}

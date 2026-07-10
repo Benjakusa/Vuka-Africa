@@ -50,7 +50,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((item) => (
               <div key={item.step} className="text-center p-6">
-                <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
                   <item.icon size={28} className="text-primary" />
                 </div>
                 <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-bold">
@@ -74,7 +74,7 @@ export default function Home() {
                 <Link
                   key={cat}
                   to={`/trainers?category=${encodeURIComponent(cat)}`}
-                  className="flex flex-col items-center p-6 bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow"
+                  className="flex flex-col items-center p-6 bg-white rounded-card shadow-card card-hover"
                 >
                   <Icon size={40} className="text-primary mb-3" />
                   <span className="text-sm font-medium text-dark text-center">{cat}</span>
@@ -128,7 +128,7 @@ export default function Home() {
           <p className="text-body mb-8">Join thousands of learners mastering new skills with trusted trainers.</p>
           <Link
             to="/auth/register"
-            className="px-8 py-3 bg-primary text-white font-medium rounded-btn inline-block hover:bg-primary/90 transition-colors"
+            className="px-8 py-3 bg-primary text-white font-medium rounded-btn inline-block hover:bg-surface transition-colors"
           >
             Get Started
           </Link>

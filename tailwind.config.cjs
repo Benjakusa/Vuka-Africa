@@ -8,59 +8,64 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#FF5349',
-          50: '#FFF3F2',
-          100: '#FFE0DE',
-          200: '#FFC2BC',
-          300: '#FF9C93',
-          400: '#FF766B',
-          500: '#FF5349',
-          600: '#E0483F',
-          700: '#C43D35',
-          800: '#A8322B',
-          900: '#8C2722',
+          DEFAULT: '#FF5F00',
+          50: '#FFF5F0',
+          100: '#FFE8D9',
+          200: '#FFD1B3',
+          300: '#FFBA8C',
+          400: '#FFA366',
+          500: '#FF8C40',
+          600: '#FF751A',
+          700: '#FF5F00',
+          800: '#E65600',
+          900: '#CC4C00',
         },
-        dark: '#1A1A1A',
-        body: '#4B5563',
-        surface: '#F5F5F5',
+        dark: '#000000',
+        body: '#4B5563', // Grey
+        surface: '#F3F4F6', // Grey
+        // Map old semantic colors to approved ones to prevent missing styles before script cleanup
         warning: {
-          DEFAULT: '#F59E0B',
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE68A',
-          500: '#F59E0B',
+          DEFAULT: '#4B5563', // Grey fallback
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
+          500: '#4B5563',
         },
         destructive: {
-          DEFAULT: '#EF4444',
-          50: '#FEF2F2',
-          100: '#FEE2E2',
+          DEFAULT: '#000000', // Black fallback
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+        },
+        success: {
+          DEFAULT: '#000000', // Black fallback
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          500: '#000000',
         },
         accent: {
-          DEFAULT: '#F3F4F6',
-          foreground: '#1A1A1A',
+          DEFAULT: '#F3F4F6', // Grey
+          foreground: '#000000', // Black
         },
         muted: {
-          DEFAULT: '#9AA3AF',
-          foreground: '#6B7280',
+          DEFAULT: '#9CA3AF', // Grey
+          foreground: '#4B5563', // Grey
         },
-        border: '#E5E7EB',
-        input: '#E5E7EB',
-        ring: '#FF5349',
-        background: '#FAFAFA',
-        foreground: '#1A1A1A',
-        card: '#FFFFFF',
-        'card-foreground': '#1A1A1A',
-        popover: '#FFFFFF',
-        'popover-foreground': '#1A1A1A',
+        border: '#E5E7EB', // Grey
+        input: '#E5E7EB', // Grey
+        ring: '#FF5F00', // Neon Orange
+        background: '#FFFFFF', // White
+        foreground: '#000000', // Black
+        card: '#FFFFFF', // White
+        'card-foreground': '#000000', // Black
+        popover: '#FFFFFF', // White
+        'popover-foreground': '#000000', // Black
       },
       borderRadius: {
         btn: '0.5rem',
         card: '0.75rem',
       },
       boxShadow: {
-        card: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06)',
-        cardHover: '0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08)',
-        modal: '0 20px 25px -5px rgb(0 0 0 / 0.15), 0 8px 10px -6px rgb(0 0 0 / 0.15)',
+        card: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],

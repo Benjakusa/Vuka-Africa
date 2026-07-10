@@ -77,7 +77,7 @@ const trainerSteps = [
 
 function StepCard({ icon: Icon, title, desc, index }: { icon: any; title: string; desc: string; index: number }) {
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:border-primary/20 hover:-translate-y-1">
+    <div className="group relative bg-white rounded-2xl border border-gray-100 p-6 transition-all duration-300 hover: hover:border-primary/20 hover:-translate-y-1">
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
           <Icon size={22} />
@@ -114,7 +114,7 @@ export default function HowItWorks() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sm:p-10 mb-12">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 sm:p-10 mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary">
               <Search size={20} />
@@ -131,9 +131,9 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 sm:p-10 mb-16">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8 sm:p-10 mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-emerald-600">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 flex items-center justify-center text-foreground">
               <UserPlus size={20} />
             </div>
             <div>

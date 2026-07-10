@@ -41,24 +41,22 @@ export function AcceptEnrolmentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-dark">
+      <div className="bg-white rounded-2xl -modal max-w-md w-full p-6 relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-body-foreground hover:text-dark">
           <X size={20} />
         </button>
 
         <div className="text-center mb-6">
           <div
-            className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 ${mode === 'accept' ? 'bg-green-50' : 'bg-red-50'}`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3 ${mode === 'accept' ? 'bg-surface' : 'bg-primary'}`}
           >
             {mode === 'accept' ? (
-              <CheckCircle size={28} className="text-green-600" />
+              <CheckCircle size={28} className="text-foreground" />
             ) : (
-              <AlertCircle size={28} className="text-red-600" />
+              <AlertCircle size={28} className="text-primary" />
             )}
           </div>
-          <h2 className="text-xl font-bold text-dark">
-            {mode === 'accept' ? 'Accept Enrolment' : 'Reject Enrolment'}
-          </h2>
+          <h2 className="text-xl font-bold text-dark">{mode === 'accept' ? 'Accept Enrolment' : 'Reject Enrolment'}</h2>
           <p className="text-sm text-body mt-1">
             {mode === 'accept'
               ? `Accept ${traineeName || 'the trainee'} into ${courseTitle || 'this course'}?`
@@ -70,7 +68,7 @@ export function AcceptEnrolmentModal({
           {mode === 'reject' && (
             <div>
               <label htmlFor="rejection-reason" className="block text-sm font-medium text-dark mb-1">
-                Reason for rejection <span className="text-destructive">*</span>
+                Reason for rejection <span className="text-primary">*</span>
               </label>
               <textarea
                 id="rejection-reason"
@@ -79,12 +77,12 @@ export function AcceptEnrolmentModal({
                 placeholder="Explain why this enrolment is being rejected..."
                 rows={3}
                 required
-                className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
               />
             </div>
           )}
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm text-primary">{error}</p>}
 
           <div className="flex gap-3">
             <button
@@ -97,7 +95,7 @@ export function AcceptEnrolmentModal({
             <button
               type="submit"
               disabled={submitting || (mode === 'reject' && !reason.trim())}
-              className={`flex-1 py-2.5 text-white font-medium rounded-btn hover:opacity-90 transition-colors text-sm disabled:opacity-50 ${mode === 'accept' ? 'bg-green-600' : 'bg-destructive'}`}
+              className={`flex-1 py-2.5 text-white font-medium rounded-btn hover:opacity-90 transition-colors text-sm disabled:opacity-50 ${mode === 'accept' ? 'bg-surface' : 'bg-primary text-white'}`}
             >
               {submitting ? (
                 <span className="flex items-center justify-center gap-2">

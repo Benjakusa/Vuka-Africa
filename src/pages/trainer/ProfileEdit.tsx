@@ -119,7 +119,7 @@ export default function ProfileEdit() {
             {coverPreview ? (
               <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              <div className="w-full h-full flex items-center justify-center text-body-foreground">
                 <Upload size={24} />
               </div>
             )}
@@ -140,7 +140,7 @@ export default function ProfileEdit() {
           <div className="px-6 pb-6 -mt-12 flex items-end gap-4">
             <div
               onClick={() => avatarInputRef.current?.click()}
-              className="w-24 h-24 rounded-full border-4 border-white bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 cursor-pointer relative group overflow-hidden"
+              className="w-24 h-24 rounded-full border-4 border-white bg-surface flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 cursor-pointer relative group overflow-hidden"
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
@@ -160,7 +160,7 @@ export default function ProfileEdit() {
             </div>
             <div className="pb-1">
               <h2 className="text-lg font-bold text-dark">{user?.fullName}</h2>
-              <p className="text-sm text-muted-foreground">Trainer</p>
+              <p className="text-sm text-body-foreground">Trainer</p>
             </div>
           </div>
         </div>
@@ -183,10 +183,10 @@ export default function ProfileEdit() {
               {skills.map((s) => (
                 <span
                   key={s}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
+                  className="inline-flex items-center gap-1 px-3 py-1 bg-surface text-primary text-sm rounded-full"
                 >
                   {s}
-                  <button type="button" onClick={() => removeSkill(s)} className="hover:text-destructive">
+                  <button type="button" onClick={() => removeSkill(s)} className="hover:text-primary">
                     <X size={12} />
                   </button>
                 </span>
@@ -208,7 +208,7 @@ export default function ProfileEdit() {
               <button
                 type="button"
                 onClick={addSkill}
-                className="px-3 py-2 bg-primary text-white rounded-btn text-sm hover:bg-primary/90"
+                className="px-3 py-2 bg-primary text-white rounded-btn text-sm hover:bg-surface"
               >
                 <Plus size={16} />
               </button>
@@ -219,7 +219,7 @@ export default function ProfileEdit() {
         <button
           type="submit"
           disabled={saveMutation.isPending}
-          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {saveMutation.isPending && <Loader2 size={16} className="animate-spin" />}
           {saveMutation.isPending ? 'Saving...' : 'Save Profile'}

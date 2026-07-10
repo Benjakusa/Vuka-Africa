@@ -63,9 +63,12 @@ export default function CourseNew() {
     })();
   }, [id, isEdit, navigate, user?.trainer?.id]);
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }, []);
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    },
+    [],
+  );
 
   const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -183,18 +186,24 @@ export default function CourseNew() {
                     e.stopPropagation();
                     removeImage();
                   }}
-                  className="absolute -top-2 -right-2 p-0.5 bg-destructive text-white rounded-full"
+                  className="absolute -top-2 -right-2 p-0.5 bg-primary text-white text-white rounded-full"
                 >
                   <X size={14} />
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2 py-4">
-                <Upload size={24} className="text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Click to upload course image</p>
+                <Upload size={24} className="text-body-foreground" />
+                <p className="text-sm text-body-foreground">Click to upload course image</p>
               </div>
             )}
-            <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden focus:border-primary"
+            />
           </div>
         </div>
 
@@ -205,7 +214,7 @@ export default function CourseNew() {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             placeholder="e.g. Professional Cake Baking"
           />
         </div>
@@ -218,7 +227,7 @@ export default function CourseNew() {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none focus:border-primary"
             placeholder="Describe what students will learn..."
           />
         </div>
@@ -230,7 +239,7 @@ export default function CourseNew() {
               name="mode"
               value={form.mode}
               onChange={handleChange}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             >
               <option value="PHYSICAL">Physical</option>
               <option value="VIRTUAL">Virtual</option>
@@ -290,7 +299,7 @@ export default function CourseNew() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
               placeholder="e.g. 5000"
             />
           </div>
@@ -301,7 +310,7 @@ export default function CourseNew() {
               value={form.duration}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
               placeholder="e.g. 8 weeks"
             />
           </div>
@@ -317,7 +326,7 @@ export default function CourseNew() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
               placeholder="e.g. 8"
             />
           </div>
@@ -329,7 +338,7 @@ export default function CourseNew() {
               value={form.maxStudents}
               onChange={handleChange}
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
               placeholder="Optional"
             />
           </div>
@@ -341,7 +350,7 @@ export default function CourseNew() {
             name="location"
             value={form.location}
             onChange={handleChange}
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             placeholder="e.g. Nairobi, Kenya (optional)"
           />
         </div>
@@ -349,7 +358,7 @@ export default function CourseNew() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading && <Loader2 size={16} className="animate-spin" />}
           {loading ? 'Saving...' : isEdit ? 'Update Course' : 'Create Course'}

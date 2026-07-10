@@ -11,21 +11,21 @@ interface EmptyStateProps {
 export function EmptyState({ icon: Icon, title, subtitle, action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <Icon size={48} className="text-muted-foreground mb-4" strokeWidth={1} />
+      <Icon size={48} className="text-body-foreground mb-4" strokeWidth={1} />
       <h3 className="text-lg font-semibold text-dark mb-1">{title}</h3>
-      {subtitle && <p className="text-sm text-muted-foreground mb-4 max-w-sm">{subtitle}</p>}
+      {subtitle && <p className="text-sm text-body-foreground mb-4 max-w-sm">{subtitle}</p>}
       {action &&
         (action.href ? (
           <Link
             to={action.href}
-            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
+            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface transition-colors"
           >
             {action.label}
           </Link>
         ) : (
           <button
             onClick={action.onClick}
-            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
+            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface transition-colors"
           >
             {action.label}
           </button>

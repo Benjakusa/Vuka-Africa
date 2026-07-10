@@ -95,7 +95,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
         {canAdd && !showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface"
           >
             <Plus size={14} />
             Add Material
@@ -107,14 +107,14 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
         <form onSubmit={handleAdd} className="mb-6 p-4 bg-surface rounded-card space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-dark">New Material</span>
-            <button type="button" onClick={() => setShowForm(false)} className="text-muted-foreground hover:text-dark">
+            <button type="button" onClick={() => setShowForm(false)} className="text-body-foreground hover:text-dark">
               <X size={16} />
             </button>
           </div>
 
           <div>
             <label htmlFor="material-title" className="block text-sm font-medium text-dark mb-1">
-              Title <span className="text-destructive">*</span>
+              Title <span className="text-primary">*</span>
             </label>
             <input
               id="material-title"
@@ -123,13 +123,13 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Chapter 1 Notes"
               required
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
             />
           </div>
 
           <div>
             <label htmlFor="material-description" className="block text-sm font-medium text-dark mb-1">
-              Description <span className="text-muted-foreground">(optional)</span>
+              Description <span className="text-body-foreground">(optional)</span>
             </label>
             <textarea
               id="material-description"
@@ -137,7 +137,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the material..."
               rows={2}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
             />
           </div>
 
@@ -166,7 +166,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
                 <button
                   type="button"
                   onClick={() => setFile(null)}
-                  className="px-2 py-2 text-destructive hover:bg-red-50 rounded-btn"
+                  className="px-2 py-2 text-primary hover:bg-primary rounded-btn"
                   aria-label="Remove file"
                 >
                   <X size={14} />
@@ -182,7 +182,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
                   setFile(null);
                 }}
                 placeholder="Or paste a URL (YouTube, Google Doc, etc.)"
-                className="w-full mt-2 px-3 py-2 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full mt-2 px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
               />
             )}
           </div>
@@ -190,7 +190,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
           <button
             type="submit"
             disabled={uploading || !title.trim() || (!file && !linkUrl.trim())}
-            className="w-full py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 text-sm"
+            className="w-full py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 text-sm"
           >
             {uploading ? (
               <span className="flex items-center justify-center gap-2">
@@ -211,16 +211,17 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
           ))}
         </div>
       ) : !materials || materials.length === 0 ? (
-        <p className="text-sm text-muted-foreground py-6 text-center">
-          {isTrainer
-            ? 'No materials shared yet. Add your first resource above.'
-            : 'No materials have been shared yet.'}
+        <p className="text-sm text-body-foreground py-6 text-center">
+          {isTrainer ? 'No materials shared yet. Add your first resource above.' : 'No materials have been shared yet.'}
         </p>
       ) : (
         <div className="space-y-2">
           {materials.map((m: any) => (
-            <div key={m.id} className="flex items-center gap-3 p-3 rounded-card hover:bg-accent transition-colors group">
-              <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <div
+              key={m.id}
+              className="flex items-center gap-3 p-3 rounded-card hover:bg-accent transition-colors group"
+            >
+              <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center flex-shrink-0">
                 {m.fileType === 'pdf' || m.fileType === 'doc' ? (
                   <FileText size={16} className="text-primary" />
                 ) : m.fileType === 'image' ? (
@@ -231,8 +232,8 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-dark truncate">{m.title}</p>
-                {m.description && <p className="text-xs text-muted-foreground truncate">{m.description}</p>}
-                <p className="text-xs text-muted-foreground mt-0.5">{formatDate(m.createdAt)}</p>
+                {m.description && <p className="text-xs text-body-foreground truncate">{m.description}</p>}
+                <p className="text-xs text-body-foreground mt-0.5">{formatDate(m.createdAt)}</p>
               </div>
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {m.fileUrl && (
@@ -240,7 +241,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
                     href={m.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 text-primary hover:bg-primary/10 rounded-btn"
+                    className="p-2 text-primary hover:bg-surface rounded-btn"
                     aria-label="Open material"
                   >
                     <ExternalLink size={14} />
@@ -249,7 +250,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
                 {isTrainer && m.uploadedBy === user?.id && (
                   <button
                     onClick={() => deleteMutation.mutate(m.id)}
-                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-red-50 rounded-btn"
+                    className="p-2 text-body-foreground hover:text-primary hover:bg-primary rounded-btn"
                     aria-label="Delete material"
                   >
                     <Trash2 size={14} />

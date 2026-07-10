@@ -5,7 +5,7 @@ const sections = [
   {
     icon: ShieldCheck,
     title: 'Payment Protection via Escrow',
-    color: 'text-emerald-600',
+    color: 'text-foreground',
     bg: 'from-emerald-500/20 to-emerald-500/5',
     items: [
       'Every payment is held in a secure M-Pesa float account until the training milestone is confirmed by both parties.',
@@ -16,7 +16,7 @@ const sections = [
   {
     icon: BadgeCheck,
     title: 'Verified Trainers',
-    color: 'text-blue-600',
+    color: 'text-foreground',
     bg: 'from-blue-500/20 to-blue-500/5',
     items: [
       'Trainers with the Verified Badge have submitted government-issued ID and a video introduction.',
@@ -26,7 +26,7 @@ const sections = [
   {
     icon: Star,
     title: 'Ratings & Reviews',
-    color: 'text-amber-600',
+    color: 'text-body',
     bg: 'from-amber-500/20 to-amber-500/5',
     items: [
       'After course completion, trainees can rate their trainer and leave a written review.',
@@ -46,7 +46,7 @@ const sections = [
   {
     icon: Users,
     title: 'Code of Conduct',
-    color: 'text-red-600',
+    color: 'text-primary',
     bg: 'from-red-500/20 to-red-500/5',
     items: [
       'Trainers: Deliver training as described. Be professional and respectful.',
@@ -57,7 +57,7 @@ const sections = [
   {
     icon: Lock,
     title: 'Data Privacy',
-    color: 'text-indigo-600',
+    color: 'text-foreground',
     bg: 'from-indigo-500/20 to-indigo-500/5',
     items: ['Your personal information is stored securely and never shared without consent.'],
   },
@@ -86,10 +86,7 @@ export default function TrustSafety() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-16">
         <div className="grid gap-6">
           {sections.map((section, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 hover:shadow-xl hover:-translate-y-0.5"
-            >
+            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-8 hover: hover:-translate-y-0.5">
               <div className="flex items-start gap-4">
                 <div
                   className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${section.bg} flex items-center justify-center ${section.color}`}
@@ -101,7 +98,7 @@ export default function TrustSafety() {
                   <ul className="space-y-2.5">
                     {section.items.map((item, j) => (
                       <li key={j} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-primary/40 mt-2" />
+                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-surface mt-2" />
                         {item}
                       </li>
                     ))}

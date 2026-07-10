@@ -12,7 +12,7 @@ export function RatingStars({ rating, size = 16 }: RatingStarsProps) {
         <Star
           key={star}
           size={size}
-          className={star <= Math.round(rating) ? 'text-warning fill-warning' : 'text-gray-200'}
+          className={star <= Math.round(rating) ? 'text-body fill-warning' : 'text-gray-200'}
         />
       ))}
     </span>

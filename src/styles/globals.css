@@ -4,7 +4,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border outline-none;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -21,17 +21,18 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
+  /* card hover is simplified to just use the base card shadow to stay consistent with the design system */
   .card-hover {
-    @apply transition-shadow duration-200;
+    @apply transition-transform duration-200;
   }
   .card-hover:hover {
-    @apply shadow-cardHover;
+    transform: translateY(-2px);
   }
 }
 
 @layer utilities {
   .animate-shimmer {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -66,7 +67,7 @@
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .hover\:shadow-cardHover:hover {
-    box-shadow: none;
+  .card-hover:hover {
+    transform: none;
   }
 }

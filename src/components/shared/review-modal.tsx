@@ -34,8 +34,8 @@ export function ReviewModal({ open, onClose, onSubmit }: ReviewModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-dark">
+      <div className="bg-white rounded-2xl -modal max-w-md w-full p-6 relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-body-foreground hover:text-dark">
           <X size={20} />
         </button>
 
@@ -59,7 +59,7 @@ export function ReviewModal({ open, onClose, onSubmit }: ReviewModalProps) {
                   size={32}
                   className={cn(
                     'transition-colors',
-                    (hoverRating || rating) >= star ? 'text-warning fill-warning' : 'text-gray-200',
+                    (hoverRating || rating) >= star ? 'text-body fill-warning' : 'text-gray-200',
                   )}
                 />
               </button>
@@ -79,7 +79,7 @@ export function ReviewModal({ open, onClose, onSubmit }: ReviewModalProps) {
           <button
             type="submit"
             disabled={loading || rating === 0}
-            className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
             Submit Review

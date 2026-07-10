@@ -43,8 +43,7 @@ export default function Earnings() {
       return sum;
     }, 0) || 0;
 
-  const pendingEarnings =
-    enrolments?.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
+  const pendingEarnings = enrolments?.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
 
   const totalEarnings = settledEarnings + pendingEarnings;
   const availableBalance = user?.trainer?.availableBalance || 0;
@@ -53,7 +52,8 @@ export default function Earnings() {
   const handleWithdraw = async (data: { amount: number; phone: string }) => {
     await requestPayout({ trainerId: trainerId!, amount: data.amount, phone: data.phone });
     toast.success('Withdrawal request submitted', {
-      description: 'Your withdrawal request has been submitted for review. An admin will process your payment within 24 hours. You will receive an M-Pesa notification when payment is sent.',
+      description:
+        'Your withdrawal request has been submitted for review. An admin will process your payment within 24 hours. You will receive an M-Pesa notification when payment is sent.',
       duration: 6000,
     });
     setWithdrawOpen(false);
@@ -69,7 +69,7 @@ export default function Earnings() {
         <button
           onClick={() => setWithdrawOpen(true)}
           disabled={availableBalance <= 0}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface disabled:opacity-50 transition-colors"
         >
           <Download size={16} /> Withdraw
         </button>
@@ -80,22 +80,22 @@ export default function Earnings() {
           icon={Wallet}
           label="Available Balance"
           value={formatCurrency(availableBalance)}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Wallet}
           label="Total Earned"
           value={formatCurrency(totalEarnings)}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={RefreshCw}
           label="Pending Payouts"
           value={pendingPayouts.length}
-          iconBg="bg-yellow-50"
-          iconColor="text-yellow-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
       </div>
 
@@ -107,20 +107,20 @@ export default function Earnings() {
               <div key={tx.id} className="flex items-center gap-4 p-4">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    tx.direction === 'DEBIT' ? 'bg-red-50' : 'bg-green-50'
+                    tx.direction === 'DEBIT' ? 'bg-primary' : 'bg-surface'
                   }`}
                 >
                   {tx.direction === 'DEBIT' ? (
-                    <ArrowUpRight size={18} className="text-red-500" />
+                    <ArrowUpRight size={18} className="text-primary" />
                   ) : (
-                    <ArrowDownLeft size={18} className="text-green-500" />
+                    <ArrowDownLeft size={18} className="text-foreground" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-dark">{tx.description || tx.direction}</p>
-                  <p className="text-xs text-muted-foreground">{formatDate(tx.createdAt)}</p>
+                  <p className="text-xs text-body-foreground">{formatDate(tx.createdAt)}</p>
                 </div>
-                <p className={`text-sm font-bold ${tx.direction === 'DEBIT' ? 'text-red-500' : 'text-green-500'}`}>
+                <p className={`text-sm font-bold ${tx.direction === 'DEBIT' ? 'text-primary' : 'text-foreground'}`}>
                   {tx.direction === 'DEBIT' ? '-' : '+'}
                   {formatCurrency(tx.amountKes)}
                 </p>
@@ -138,7 +138,7 @@ export default function Earnings() {
               <div key={payout.id} className="flex items-center justify-between p-4">
                 <div>
                   <p className="text-sm font-medium text-dark">{formatCurrency(payout.amount)}</p>
-                  <p className="text-xs text-muted-foreground">{formatDate(payout.createdAt)}</p>
+                  <p className="text-xs text-body-foreground">{formatDate(payout.createdAt)}</p>
                 </div>
                 <StatusBadge status={payout.status} />
               </div>

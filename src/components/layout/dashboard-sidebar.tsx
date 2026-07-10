@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
 
-const traineeLinks = [
+export const traineeLinks = [
   { href: '/trainee', label: 'Overview', icon: LayoutDashboard },
   { href: '/trainee/enrolments', label: 'My Enrolments', icon: BookOpen },
   { href: '/trainee/payments', label: 'Payments', icon: Receipt },
@@ -26,7 +26,7 @@ const traineeLinks = [
   { href: '/trainers', label: 'Browse Trainers', icon: Search },
 ];
 
-const trainerLinks = [
+export const trainerLinks = [
   { href: '/trainer', label: 'Overview', icon: LayoutDashboard },
   { href: '/trainer/courses', label: 'My Courses', icon: Book },
   { href: '/trainer/enrolments', label: 'Enrolments', icon: Users },
@@ -36,7 +36,7 @@ const trainerLinks = [
   { href: '/trainer/reviews', label: 'Reviews', icon: Star },
 ];
 
-const adminLinks = [
+export const adminLinks = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/earnings', label: 'Earnings', icon: Wallet },
   { href: '/admin/courses', label: 'Courses', icon: BookOpen },
@@ -68,9 +68,7 @@ export function DashboardSidebar() {
               to={link.href}
               className={cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary/10 text-primary border-r-2 border-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-dark',
+                isActive ? 'bg-primary text-white' : 'text-body-foreground hover:bg-accent hover:text-dark',
               )}
             >
               <link.icon size={18} />
@@ -82,17 +80,17 @@ export function DashboardSidebar() {
 
       <div className="p-3 border-t border-border">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
             {user?.fullName?.[0]}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-dark truncate">{user?.fullName}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role?.toLowerCase()}</p>
+            <p className="text-xs text-body-foreground capitalize">{user?.role?.toLowerCase()}</p>
           </div>
         </div>
         <button
           onClick={logout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm text-muted-foreground hover:bg-accent hover:text-destructive w-full transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-btn text-sm text-body-foreground hover:bg-accent hover:text-primary w-full transition-colors"
         >
           <LogOut size={18} /> Logout
         </button>

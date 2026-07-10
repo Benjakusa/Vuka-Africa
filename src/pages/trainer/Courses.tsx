@@ -67,7 +67,7 @@ export default function Courses() {
         </div>
         <Link
           to="/trainer/courses/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface transition-colors"
         >
           <Plus size={16} /> New Course
         </Link>
@@ -105,16 +105,16 @@ export default function Courses() {
               <div className="absolute top-2 right-2 z-10">
                 <button
                   onClick={() => setOpenMenu(openMenu === course.id ? null : course.id)}
-                  className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
+                  className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
                 >
-                  <MoreVertical size={14} className="text-muted-foreground" />
+                  <MoreVertical size={14} className="text-body-foreground" />
                 </button>
               </div>
 
               {openMenu === course.id && (
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setOpenMenu(null)} />
-                  <div className="absolute top-10 right-2 z-30 bg-white rounded-card shadow-lg border border-border py-1 w-44">
+                  <div className="absolute top-10 right-2 z-30 bg-white rounded-card border border-border py-1 w-44">
                     <button
                       onClick={() => {
                         toggleMutation.mutate({ id: course.id, isPublished: !course.isPublished });
@@ -139,7 +139,7 @@ export default function Courses() {
                         setDeleteTarget(course);
                         setOpenMenu(null);
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-destructive hover:bg-destructive/5 transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary text-white/5 transition-colors"
                     >
                       <Trash2 size={14} /> Delete
                     </button>

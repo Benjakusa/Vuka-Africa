@@ -95,7 +95,7 @@ export default function Verifications() {
             key={tab.value}
             onClick={() => handleTabChange(tab.value)}
             className={`flex-1 py-2 text-sm font-medium rounded-btn transition-colors ${
-              status === tab.value ? 'bg-primary text-white' : 'text-muted-foreground hover:text-dark'
+              status === tab.value ? 'bg-primary text-white' : 'text-body-foreground hover:text-dark'
             }`}
           >
             {tab.label}
@@ -130,25 +130,25 @@ export default function Verifications() {
                     <tr key={v.id}>
                       <td className="p-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                          <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary font-bold text-xs">
                             {getInitials(userData.fullName || 'T')}
                           </div>
                           <span className="font-medium text-dark">{userData.fullName || 'Unknown'}</span>
                         </div>
                       </td>
-                      <td className="p-3 text-muted-foreground">{userData.email || 'N/A'}</td>
-                      <td className="p-3 text-muted-foreground">{userData.phone || 'N/A'}</td>
-                      <td className="p-3 text-muted-foreground whitespace-nowrap">
+                      <td className="p-3 text-body-foreground">{userData.email || 'N/A'}</td>
+                      <td className="p-3 text-body-foreground">{userData.phone || 'N/A'}</td>
+                      <td className="p-3 text-body-foreground whitespace-nowrap">
                         {formatDate(v.updatedAt || v.createdAt)}
                       </td>
                       <td className="p-3">
                         <span
                           className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                             v.verificationStatus === 'APPROVED'
-                              ? 'bg-green-100 text-green-700'
+                              ? 'bg-surface text-foreground'
                               : v.verificationStatus === 'REJECTED'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-surface text-primary'
+                                : 'bg-surface text-body'
                           }`}
                         >
                           {v.verificationStatus}
@@ -160,7 +160,7 @@ export default function Verifications() {
                             <button
                               onClick={() => handleApprove(v.id)}
                               disabled={actionLoading === v.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-surface text-white text-xs font-medium rounded hover:bg-surface disabled:opacity-50"
                             >
                               {actionLoading === v.id ? (
                                 <Loader2 size={12} className="animate-spin" />
@@ -172,7 +172,7 @@ export default function Verifications() {
                             <button
                               onClick={() => handleReject(v.id)}
                               disabled={actionLoading === v.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded hover:bg-primary disabled:opacity-50"
                             >
                               <XCircle size={12} />
                               Reject
@@ -180,9 +180,9 @@ export default function Verifications() {
                           </div>
                         )}
                         {v.verificationStatus === 'APPROVED' && (
-                          <span className="text-xs text-green-600">Approved</span>
+                          <span className="text-xs text-foreground">Approved</span>
                         )}
-                        {v.verificationStatus === 'REJECTED' && <span className="text-xs text-red-600">Rejected</span>}
+                        {v.verificationStatus === 'REJECTED' && <span className="text-xs text-primary">Rejected</span>}
                       </td>
                     </tr>
                   );
@@ -196,26 +196,26 @@ export default function Verifications() {
               return (
                 <div key={v.id} className="p-4 space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                    <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-primary font-bold text-xs">
                       {getInitials(userData.fullName || 'T')}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-dark text-sm truncate">{userData.fullName || 'Unknown'}</p>
-                      <p className="text-xs text-muted-foreground truncate">{userData.email || 'N/A'}</p>
+                      <p className="text-xs text-body-foreground truncate">{userData.email || 'N/A'}</p>
                     </div>
                     <span
                       className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                         v.verificationStatus === 'APPROVED'
-                          ? 'bg-green-100 text-green-700'
+                          ? 'bg-surface text-foreground'
                           : v.verificationStatus === 'REJECTED'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-surface text-primary'
+                            : 'bg-surface text-body'
                       }`}
                     >
                       {v.verificationStatus}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between text-xs text-body-foreground">
                     <span>Phone: {userData.phone || 'N/A'}</span>
                     <span>{formatDate(v.updatedAt || v.createdAt)}</span>
                   </div>
@@ -224,7 +224,7 @@ export default function Verifications() {
                       <button
                         onClick={() => handleApprove(v.id)}
                         disabled={actionLoading === v.id}
-                        className="flex-1 py-2 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                        className="flex-1 py-2 bg-surface text-white text-xs font-medium rounded hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-1"
                       >
                         {actionLoading === v.id ? (
                           <Loader2 size={12} className="animate-spin" />
@@ -236,7 +236,7 @@ export default function Verifications() {
                       <button
                         onClick={() => handleReject(v.id)}
                         disabled={actionLoading === v.id}
-                        className="flex-1 py-2 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50 flex items-center justify-center gap-1"
+                        className="flex-1 py-2 bg-primary text-white text-xs font-medium rounded hover:bg-primary disabled:opacity-50 flex items-center justify-center gap-1"
                       >
                         <XCircle size={12} /> Reject
                       </button>

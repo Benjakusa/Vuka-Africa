@@ -44,8 +44,6 @@ export function MpesaPaymentModal({
     }
   }, [open]);
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStep('processing');
@@ -123,15 +121,15 @@ export function MpesaPaymentModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-dark">
+      <div className="bg-white rounded-2xl -modal max-w-md w-full p-6 relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-body-foreground hover:text-dark">
           <X size={20} />
         </button>
 
         {step === 'form' && (
           <>
             <div className="text-center mb-6">
-              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="w-14 h-14 bg-surface rounded-full flex items-center justify-center mx-auto mb-3">
                 {type === 'enrolment' ? (
                   <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
@@ -167,16 +165,14 @@ export function MpesaPaymentModal({
                   onChange={(e) => setPhone(formatPhone(e.target.value))}
                   placeholder="+254 712 345 678"
                   required
-                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus: focus:/20"
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  You will receive an STK Push prompt on this number.
-                </p>
+                <p className="text-xs text-body-foreground mt-1">You will receive an STK Push prompt on this number.</p>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 transition-colors"
+                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface transition-colors"
               >
                 Pay {formatCurrency(amount)}
               </button>
@@ -199,23 +195,21 @@ export function MpesaPaymentModal({
             <p className="text-sm text-body mb-2">
               Enter your M-Pesa PIN on the STK Push prompt sent to <strong>{phone}</strong>.
             </p>
-            <p className="text-xs text-muted-foreground">Waiting for confirmation...</p>
+            <p className="text-xs text-body-foreground">Waiting for confirmation...</p>
           </div>
         )}
 
         {step === 'success' && (
           <div className="text-center py-8">
-            <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
+            <CheckCircle size={48} className="text-foreground mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-dark mb-1">You're Enrolled!</h2>
             <p className="text-sm text-body mb-2">
               Your payment of {formatCurrency(amount)} has been processed successfully.
             </p>
-            <p className="text-sm text-primary font-medium mb-6">
-              The trainer will contact you soon to coordinate.
-            </p>
+            <p className="text-sm text-primary font-medium mb-6">The trainer will contact you soon to coordinate.</p>
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90"
+              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Done
             </button>
@@ -224,12 +218,12 @@ export function MpesaPaymentModal({
 
         {step === 'error' && (
           <div className="text-center py-8">
-            <AlertCircle size={48} className="text-destructive mx-auto mb-4" />
+            <AlertCircle size={48} className="text-primary mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-dark mb-1">Payment Failed</h2>
             <p className="text-sm text-body mb-4">{message}</p>
             <button
               onClick={() => setStep('form')}
-              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90"
+              className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Try Again
             </button>

@@ -42,29 +42,29 @@ export default function TraineeDashboard() {
           icon={BookOpen}
           label="Active Trainings"
           value={activeEnrolments.length}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={CheckCircle}
           label="Completed"
           value={completedEnrolments.length}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Wallet}
           label="Total Spent"
           value={formatCurrency(totalSpent)}
-          iconBg="bg-purple-50"
-          iconColor="text-purple-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Star}
           label="Pending Reviews"
           value={pendingReviews.length}
-          iconBg="bg-yellow-50"
-          iconColor="text-yellow-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
       </div>
 
@@ -96,7 +96,9 @@ export default function TraineeDashboard() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-lg font-bold text-dark">Awaiting Approval</h2>
-            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">{pendingEnrolments.length}</span>
+            <span className="px-2 py-0.5 bg-surface text-body text-xs font-semibold rounded-full">
+              {pendingEnrolments.length}
+            </span>
           </div>
           <div className="bg-white rounded-card shadow-card divide-y divide-border">
             {pendingEnrolments.map((enrolment: any) => (
@@ -107,9 +109,11 @@ export default function TraineeDashboard() {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-dark truncate">{enrolment.course?.title}</p>
-                  <p className="text-xs text-muted-foreground">Trainer: {enrolment.trainer?.fullName}</p>
+                  <p className="text-xs text-body-foreground">Trainer: {enrolment.trainer?.fullName}</p>
                 </div>
-                <span className="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full ml-3">Pending</span>
+                <span className="px-2.5 py-0.5 bg-surface text-body text-xs font-medium rounded-full ml-3">
+                  Pending
+                </span>
               </Link>
             ))}
           </div>
@@ -120,7 +124,9 @@ export default function TraineeDashboard() {
         <section className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-lg font-bold text-dark">Declined Enrolments</h2>
-            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">{rejectedEnrolments.length}</span>
+            <span className="px-2 py-0.5 bg-surface text-primary text-xs font-semibold rounded-full">
+              {rejectedEnrolments.length}
+            </span>
           </div>
           <div className="bg-white rounded-card shadow-card divide-y divide-border">
             {rejectedEnrolments.slice(0, 5).map((enrolment: any) => (
@@ -131,9 +137,11 @@ export default function TraineeDashboard() {
               >
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-dark truncate">{enrolment.course?.title}</p>
-                  <p className="text-xs text-muted-foreground">Trainer: {enrolment.trainer?.fullName}</p>
+                  <p className="text-xs text-body-foreground">Trainer: {enrolment.trainer?.fullName}</p>
                 </div>
-                <span className="px-2.5 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full ml-3">Declined</span>
+                <span className="px-2.5 py-0.5 bg-surface text-primary text-xs font-medium rounded-full ml-3">
+                  Declined
+                </span>
               </Link>
             ))}
           </div>
@@ -153,11 +161,11 @@ export default function TraineeDashboard() {
               <div key={enrolment.id} className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-dark">{enrolment.course?.title}</p>
-                  <p className="text-xs text-muted-foreground">Trainer: {enrolment.trainer?.fullName}</p>
+                  <p className="text-xs text-body-foreground">Trainer: {enrolment.trainer?.fullName}</p>
                 </div>
                 <button
                   onClick={() => navigate(`/trainee/enrolments/${enrolment.id}`)}
-                  className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-primary/90"
+                  className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface"
                 >
                   Write Review
                 </button>
@@ -170,7 +178,7 @@ export default function TraineeDashboard() {
       <div className="text-center py-8">
         <Link
           to="/trainers"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface transition-colors"
         >
           Browse Trainers <ArrowRight size={18} />
         </Link>

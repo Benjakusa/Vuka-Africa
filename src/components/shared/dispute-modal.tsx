@@ -32,13 +32,13 @@ export function DisputeModal({ open, onClose, onSubmit }: DisputeModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-modal max-w-md w-full p-6 relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-dark">
+      <div className="bg-white rounded-2xl -modal max-w-md w-full p-6 relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-1 text-body-foreground hover:text-dark">
           <X size={20} />
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <AlertTriangle size={24} className="text-destructive" />
+          <AlertTriangle size={24} className="text-primary" />
           <h2 className="text-lg font-bold text-dark">Raise a Dispute</h2>
         </div>
 
@@ -73,7 +73,7 @@ export function DisputeModal({ open, onClose, onSubmit }: DisputeModalProps) {
           <button
             type="submit"
             disabled={loading || !reason}
-            className="w-full py-2.5 bg-destructive text-white font-medium rounded-btn hover:bg-destructive/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full py-2.5 bg-primary text-white text-white font-medium rounded-btn hover:bg-primary text-white/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
             Submit Dispute

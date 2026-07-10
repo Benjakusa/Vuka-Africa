@@ -65,7 +65,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={onClose}>
       <div
-        className="bg-white rounded-card shadow-modal w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-card -modal w-full max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-border">
@@ -75,7 +75,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
             className="p-1 hover:bg-accent rounded-full transition-colors"
             aria-label="Close modal"
           >
-            <X size={20} className="text-muted-foreground" />
+            <X size={20} className="text-body-foreground" />
           </button>
         </div>
 
@@ -111,9 +111,11 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
             <label htmlFor="amountPaid" className="block text-sm font-medium text-dark mb-1.5">
               Payment Amount *
             </label>
-            <p className="text-xs text-muted-foreground mb-2">You can adjust the amount to pay (defaults to requested amount)</p>
+            <p className="text-xs text-body-foreground mb-2">
+              You can adjust the amount to pay (defaults to requested amount)
+            </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">KES</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-body-foreground">KES</span>
               <input
                 id="amountPaid"
                 type="number"
@@ -122,7 +124,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
                 max={payout.amountKes}
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(e.target.value)}
-                className="w-full pl-12 pr-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full pl-12 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
               />
             </div>
           </div>
@@ -135,7 +137,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
               id="paymentMethod"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'mpesa' | 'bank' | 'other')}
-              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring bg-white"
+              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
             >
               <option value="mpesa">Manual M-Pesa (admin sends via M-Pesa)</option>
               <option value="bank">Bank Transfer</option>
@@ -154,7 +156,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
                 placeholder="e.g. SDF34H6K"
                 value={mpesaTransactionId}
                 onChange={(e) => setMpesaTransactionId(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus:"
               />
             </div>
           )}
@@ -169,14 +171,15 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
               placeholder="Optional notes about this payment..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus: resize-none"
             />
           </div>
 
-          <div className="flex items-start gap-2 p-3 bg-yellow-50 rounded-card">
-            <AlertCircle size={16} className="text-yellow-600 mt-0.5 shrink-0" />
-            <p className="text-xs text-yellow-700">
-              This records the payment in the system. Ensure you have sent the funds via M-Pesa or bank transfer before confirming.
+          <div className="flex items-start gap-2 p-3 bg-surface rounded-card">
+            <AlertCircle size={16} className="text-body mt-0.5 shrink-0" />
+            <p className="text-xs text-body">
+              This records the payment in the system. Ensure you have sent the funds via M-Pesa or bank transfer before
+              confirming.
             </p>
           </div>
         </div>
@@ -192,7 +195,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
           <button
             onClick={handleSubmit}
             disabled={processing || numericAmount <= 0}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-btn hover:bg-primary/90 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-white rounded-btn hover:bg-surface transition-colors disabled:opacity-50"
           >
             {processing && <Loader2 size={16} className="animate-spin" />}
             {processing ? 'Processing...' : `Confirm Payment — ${formatCurrency(numericAmount)}`}

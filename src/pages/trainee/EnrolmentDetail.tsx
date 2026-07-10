@@ -85,9 +85,10 @@ export default function EnrolmentDetail() {
   const isActive = enrolment.status === 'ACTIVE';
   const allSessionsDone = milestones.length > 0 && milestones.every((m: any) => m.status === 'COMPLETED');
   const canReview = !hasReview && (isCompleted || allSessionsDone);
-  const progressPercent = milestones.length > 0
-    ? Math.round((milestones.filter((m: any) => m.status === 'COMPLETED').length / milestones.length) * 100)
-    : 0;
+  const progressPercent =
+    milestones.length > 0
+      ? Math.round((milestones.filter((m: any) => m.status === 'COMPLETED').length / milestones.length) * 100)
+      : 0;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -97,17 +98,17 @@ export default function EnrolmentDetail() {
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-xl font-bold text-dark mb-1">{course.title || 'Course'}</h1>
-            <p className="text-xs text-muted-foreground">Enrolled {formatDate(enrolment.createdAt)}</p>
+            <p className="text-xs text-body-foreground">Enrolled {formatDate(enrolment.createdAt)}</p>
           </div>
           <StatusBadge status={enrolment.status} />
         </div>
 
         {isPendingAcceptance && (
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-card flex items-start gap-3">
-            <Clock size={20} className="text-yellow-600 mt-0.5 flex-shrink-0" />
+          <div className="mb-4 p-4 bg-surface border border-border rounded-card flex items-start gap-3">
+            <Clock size={20} className="text-body mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-yellow-800">Awaiting Trainer Approval</p>
-              <p className="text-sm text-yellow-700 mt-1">
+              <p className="text-sm font-medium text-body">Awaiting Trainer Approval</p>
+              <p className="text-sm text-body mt-1">
                 Your enrolment has been received. The trainer will review and accept it shortly.
               </p>
             </div>
@@ -115,17 +116,13 @@ export default function EnrolmentDetail() {
         )}
 
         {isRejected && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-card flex items-start gap-3">
-            <AlertTriangle size={20} className="text-red-600 mt-0.5 flex-shrink-0" />
+          <div className="mb-4 p-4 bg-primary border border-primary rounded-card flex items-start gap-3">
+            <AlertTriangle size={20} className="text-primary mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-red-800">Enrolment Rejected</p>
-              <p className="text-sm text-red-700 mt-1">
-                The trainer has declined your enrolment.
-              </p>
+              <p className="text-sm font-medium text-primary">Enrolment Rejected</p>
+              <p className="text-sm text-primary mt-1">The trainer has declined your enrolment.</p>
               {enrolment.rejectionReason && (
-                <p className="text-sm text-red-600 mt-2 italic">
-                  Reason: &ldquo;{enrolment.rejectionReason}&rdquo;
-                </p>
+                <p className="text-sm text-primary mt-2 italic">Reason: &ldquo;{enrolment.rejectionReason}&rdquo;</p>
               )}
             </div>
           </div>
@@ -148,15 +145,15 @@ export default function EnrolmentDetail() {
 
         <div className="flex flex-wrap gap-4 text-sm text-body mb-4">
           <span className="flex items-center gap-1">
-            <MapPin size={14} className="text-muted-foreground" />
+            <MapPin size={14} className="text-body-foreground" />
             {course.mode || 'N/A'}
           </span>
           <span className="flex items-center gap-1">
-            <Calendar size={14} className="text-muted-foreground" />
+            <Calendar size={14} className="text-body-foreground" />
             {course.duration || 'Flexible'}
           </span>
           <span className="flex items-center gap-1">
-            <BookOpen size={14} className="text-muted-foreground" />
+            <BookOpen size={14} className="text-body-foreground" />
             {course.sessionCount || 0} sessions
           </span>
         </div>
@@ -167,13 +164,13 @@ export default function EnrolmentDetail() {
       <div className="bg-white rounded-card shadow-card p-6 mb-6">
         <h2 className="text-lg font-bold text-dark mb-4">Trainer</h2>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+          <div className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-primary font-bold">
             {getInitials(trainer.fullName || 'T')}
           </div>
           <div>
             <p className="font-medium text-dark">
               {trainer.fullName || 'Unknown'}{' '}
-              {trainer.isVerified && <span className="text-xs text-green-600">✓ Verified</span>}
+              {trainer.isVerified && <span className="text-xs text-foreground">✓ Verified</span>}
             </p>
           </div>
         </div>
@@ -201,7 +198,7 @@ export default function EnrolmentDetail() {
         {canReview && (
           <button
             onClick={() => setShowReview(true)}
-            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90"
+            className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface"
           >
             Write Review
           </button>
@@ -210,13 +207,13 @@ export default function EnrolmentDetail() {
         {!hasDispute && !isCompleted && !isPendingAcceptance && !isRejected && (
           <button
             onClick={() => setShowDispute(true)}
-            className="px-4 py-2 border border-destructive text-destructive text-sm font-medium rounded-btn hover:bg-destructive/5"
+            className="px-4 py-2 border border-destructive text-primary text-sm font-medium rounded-btn hover:bg-primary text-white/5"
           >
             Raise Dispute
           </button>
         )}
 
-        {hasDispute && <p className="text-sm text-yellow-600 font-medium">Dispute in progress</p>}
+        {hasDispute && <p className="text-sm text-body font-medium">Dispute in progress</p>}
       </div>
 
       <DisputeModal open={showDispute} onClose={() => setShowDispute(false)} onSubmit={handleDispute} />

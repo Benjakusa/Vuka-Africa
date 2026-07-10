@@ -62,25 +62,25 @@ export default function Verification() {
   const statusConfig: Record<string, { icon: any; color: string; title: string; desc: string }> = {
     NONE: {
       icon: ShieldCheck,
-      color: 'text-muted-foreground',
+      color: 'text-body-foreground',
       title: 'Not Verified',
       desc: 'Verify your identity to build trust with students and unlock higher earnings.',
     },
     PENDING: {
       icon: Clock,
-      color: 'text-yellow-600',
+      color: 'text-body',
       title: 'Verification Pending',
       desc: 'Your documents are being reviewed. This usually takes 1-2 business days.',
     },
     APPROVED: {
       icon: CheckCircle,
-      color: 'text-green-600',
+      color: 'text-foreground',
       title: 'Verified',
       desc: 'You are verified! Students can see your verified badge.',
     },
     REJECTED: {
       icon: XCircle,
-      color: 'text-red-600',
+      color: 'text-primary',
       title: 'Verification Rejected',
       desc: 'Your documents did not meet our requirements. Please re-submit.',
     },
@@ -88,7 +88,7 @@ export default function Verification() {
 
   const config = statusConfig[status] ?? {
     icon: ShieldCheck,
-    color: 'text-muted-foreground',
+    color: 'text-body-foreground',
     title: 'Not Verified',
     desc: 'Verify your identity to build trust with students and unlock higher earnings.',
   };
@@ -108,15 +108,15 @@ export default function Verification() {
         </div>
 
         {isVerified && (
-          <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-card">
-            <CheckCircle size={16} className="text-green-600" />
-            <span className="text-sm text-green-700 font-medium">Your account is verified</span>
+          <div className="flex items-center gap-2 px-4 py-3 bg-surface border border-border rounded-card">
+            <CheckCircle size={16} className="text-foreground" />
+            <span className="text-sm text-foreground font-medium">Your account is verified</span>
           </div>
         )}
 
         {status === 'REJECTED' && (
-          <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-card mb-4">
-            <p className="text-sm text-red-700">
+          <div className="px-4 py-3 bg-primary border border-primary rounded-card mb-4">
+            <p className="text-sm text-primary">
               {profile?.verificationNote || 'Your application was rejected. Please re-submit with correct documents.'}
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function Verification() {
             <button
               onClick={() => submitMutation.mutate()}
               disabled={submitMutation.isPending}
-              className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitMutation.isPending && <Loader2 size={16} className="animate-spin" />}
               {submitMutation.isPending ? 'Submitting...' : 'Submit for Verification'}
@@ -145,9 +145,9 @@ export default function Verification() {
         )}
 
         {status === 'PENDING' && (
-          <div className="flex items-center gap-2 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-card">
-            <Clock size={16} className="text-yellow-600" />
-            <span className="text-sm text-yellow-700">
+          <div className="flex items-center gap-2 px-4 py-3 bg-surface border border-border rounded-card">
+            <Clock size={16} className="text-body" />
+            <span className="text-sm text-body">
               Submitted {profile?.updatedAt ? formatDate(profile.updatedAt) : 'recently'}. We'll notify you once
               reviewed.
             </span>

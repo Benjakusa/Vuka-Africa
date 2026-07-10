@@ -97,11 +97,9 @@ export default function Config() {
             min={0}
             max={100}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
           />
-          <p className="text-xs text-muted-foreground mt-1">
-            Percentage deducted from trainer earnings as platform fee
-          </p>
+          <p className="text-xs text-body-foreground mt-1">Percentage deducted from trainer earnings as platform fee</p>
         </div>
 
         <div>
@@ -113,9 +111,9 @@ export default function Config() {
             onChange={handleChange}
             min={0}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
           />
-          <p className="text-xs text-muted-foreground mt-1">One-time fee for trainer verification</p>
+          <p className="text-xs text-body-foreground mt-1">One-time fee for trainer verification</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -128,7 +126,7 @@ export default function Config() {
               onChange={handleChange}
               min={0}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
           <div>
@@ -140,7 +138,7 @@ export default function Config() {
               onChange={handleChange}
               min={0}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
             />
           </div>
         </div>
@@ -148,7 +146,7 @@ export default function Config() {
         <button
           type="submit"
           disabled={updateMutation.isPending}
-          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {updateMutation.isPending ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
           {updateMutation.isPending ? 'Saving...' : 'Save Configuration'}

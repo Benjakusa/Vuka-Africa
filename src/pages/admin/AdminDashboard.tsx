@@ -1,5 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { Users, UserCheck, BookOpen, GraduationCap, AlertTriangle, Wallet, Clock, Activity, ShieldCheck, DollarSign } from 'lucide-react';
+import {
+  Users,
+  UserCheck,
+  BookOpen,
+  GraduationCap,
+  AlertTriangle,
+  Wallet,
+  Clock,
+  Activity,
+  ShieldCheck,
+  DollarSign,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getAdminStats, getAdminEarnings } from '@/services/adminService';
 import { getEnrolments } from '@/services/enrolmentService';
@@ -56,22 +67,22 @@ export default function AdminDashboard() {
           icon={Users}
           label="Total Users"
           value={formatNumber(stats?.totalUsers || 0)}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={UserCheck}
           label="Trainers"
           value={formatNumber(stats?.totalTrainers || 0)}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={GraduationCap}
           label="Trainees"
           value={formatNumber(totalTrainees)}
-          iconBg="bg-cyan-50"
-          iconColor="text-cyan-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={BookOpen}
@@ -84,29 +95,29 @@ export default function AdminDashboard() {
           icon={GraduationCap}
           label="Enrolments"
           value={formatNumber(stats?.totalEnrolments || 0)}
-          iconBg="bg-yellow-50"
-          iconColor="text-yellow-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
         <StatCard
           icon={DollarSign}
           label="Total Earnings"
           value={formatCurrency(earnings?.totalCommissions || 0)}
-          iconBg="bg-green-50"
-          iconColor="text-green-600"
+          iconBg="bg-surface"
+          iconColor="text-foreground"
         />
         <StatCard
           icon={Clock}
           label="Pending Payouts"
           value={`${formatNumber(earnings?.pendingPayoutsCount || 0)} (${formatCurrency(earnings?.pendingPayouts || 0)})`}
-          iconBg="bg-orange-50"
-          iconColor="text-orange-600"
+          iconBg="bg-surface"
+          iconColor="text-body"
         />
         <StatCard
           icon={AlertTriangle}
           label="Open Disputes"
           value={formatNumber(stats?.openDisputes || 0)}
-          iconBg="bg-red-50"
-          iconColor="text-red-600"
+          iconBg="bg-primary"
+          iconColor="text-primary"
         />
       </div>
 
@@ -119,45 +130,49 @@ export default function AdminDashboard() {
               className="flex items-center justify-between p-3 bg-surface rounded-card hover:bg-accent transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center">
-                  <ShieldCheck size={18} className="text-yellow-600" />
+                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
+                  <ShieldCheck size={18} className="text-body" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-dark">Pending Verifications</p>
-                  <p className="text-xs text-muted-foreground">Review trainer verification requests</p>
+                  <p className="text-xs text-body-foreground">Review trainer verification requests</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-yellow-600">Review</span>
+              <span className="text-xs font-bold text-body">Review</span>
             </Link>
             <Link
               to="/admin/disputes"
               className="flex items-center justify-between p-3 bg-surface rounded-card hover:bg-accent transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-                  <AlertTriangle size={18} className="text-red-600" />
+                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
+                  <AlertTriangle size={18} className="text-primary" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-dark">Open Disputes</p>
-                  <p className="text-xs text-muted-foreground">{formatNumber(stats?.openDisputes || 0)} disputes need resolution</p>
+                  <p className="text-xs text-body-foreground">
+                    {formatNumber(stats?.openDisputes || 0)} disputes need resolution
+                  </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-red-600">{formatNumber(stats?.openDisputes || 0)}</span>
+              <span className="text-xs font-bold text-primary">{formatNumber(stats?.openDisputes || 0)}</span>
             </Link>
             <Link
               to="/admin/earnings"
               className="flex items-center justify-between p-3 bg-surface rounded-card hover:bg-accent transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center">
-                  <Wallet size={18} className="text-orange-600" />
+                <div className="w-9 h-9 rounded-full bg-surface flex items-center justify-center">
+                  <Wallet size={18} className="text-body" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-dark">Pending Payouts</p>
-                  <p className="text-xs text-muted-foreground">{formatCurrency(earnings?.pendingPayouts || 0)} to process</p>
+                  <p className="text-xs text-body-foreground">
+                    {formatCurrency(earnings?.pendingPayouts || 0)} to process
+                  </p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-orange-600">{formatCurrency(earnings?.pendingPayouts || 0)}</span>
+              <span className="text-xs font-bold text-body">{formatCurrency(earnings?.pendingPayouts || 0)}</span>
             </Link>
           </div>
         </div>
@@ -169,21 +184,15 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-card shadow-card p-6">
           <h2 className="text-lg font-bold text-dark mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
-            <Link
-              to="/admin/earnings"
-              className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors"
-            >
+            <Link to="/admin/earnings" className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors">
               <Wallet size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Earnings</p>
-              <p className="text-xs text-muted-foreground">View financials</p>
+              <p className="text-xs text-body-foreground">View financials</p>
             </Link>
-            <Link
-              to="/admin/courses"
-              className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors"
-            >
+            <Link to="/admin/courses" className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors">
               <BookOpen size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Courses</p>
-              <p className="text-xs text-muted-foreground">Manage courses</p>
+              <p className="text-xs text-body-foreground">Manage courses</p>
             </Link>
             <Link
               to="/admin/verifications"
@@ -191,31 +200,22 @@ export default function AdminDashboard() {
             >
               <ShieldCheck size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Verifications</p>
-              <p className="text-xs text-muted-foreground">Review trainers</p>
+              <p className="text-xs text-body-foreground">Review trainers</p>
             </Link>
-            <Link
-              to="/admin/disputes"
-              className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors"
-            >
+            <Link to="/admin/disputes" className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors">
               <AlertTriangle size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Disputes</p>
-              <p className="text-xs text-muted-foreground">Resolve issues</p>
+              <p className="text-xs text-body-foreground">Resolve issues</p>
             </Link>
-            <Link
-              to="/admin/users"
-              className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors"
-            >
+            <Link to="/admin/users" className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors">
               <Users size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Users</p>
-              <p className="text-xs text-muted-foreground">Manage accounts</p>
+              <p className="text-xs text-body-foreground">Manage accounts</p>
             </Link>
-            <Link
-              to="/admin/config"
-              className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors"
-            >
+            <Link to="/admin/config" className="block p-3 bg-surface rounded-card hover:bg-accent transition-colors">
               <Activity size={18} className="text-primary mb-1" />
               <p className="font-medium text-dark text-sm">Settings</p>
-              <p className="text-xs text-muted-foreground">Platform config</p>
+              <p className="text-xs text-body-foreground">Platform config</p>
             </Link>
           </div>
         </div>
@@ -249,11 +249,11 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-body">Pending Payouts</span>
-              <span className="text-sm font-bold text-orange-600">{formatCurrency(earnings?.pendingPayouts || 0)}</span>
+              <span className="text-sm font-bold text-body">{formatCurrency(earnings?.pendingPayouts || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-body">Open Disputes</span>
-              <span className="text-sm font-bold text-red-600">{formatNumber(stats?.openDisputes || 0)}</span>
+              <span className="text-sm font-bold text-primary">{formatNumber(stats?.openDisputes || 0)}</span>
             </div>
           </div>
         </div>
@@ -298,7 +298,9 @@ function RecentActivity() {
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Recent Enrolments</h3>
+          <h3 className="text-xs font-semibold text-body-foreground uppercase tracking-wider mb-2">
+            Recent Enrolments
+          </h3>
           {loadingEnrolments ? (
             <CardSkeleton />
           ) : recentEnrolments?.length ? (
@@ -307,52 +309,52 @@ function RecentActivity() {
                 <div key={e.id} className="flex items-center justify-between py-1.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-dark truncate">{e.course?.title || 'Course'}</p>
-                    <p className="text-xs text-muted-foreground">{e.trainee?.fullName || 'Trainee'}</p>
+                    <p className="text-xs text-body-foreground">{e.trainee?.fullName || 'Trainee'}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0 ml-2">{timeAgo(e.createdAt)}</span>
+                  <span className="text-xs text-body-foreground shrink-0 ml-2">{timeAgo(e.createdAt)}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-2">No enrolments yet</p>
+            <p className="text-xs text-body-foreground py-2">No enrolments yet</p>
           )}
         </div>
 
         <div className="border-t border-border pt-3">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Recent Payouts</h3>
+          <h3 className="text-xs font-semibold text-body-foreground uppercase tracking-wider mb-2">Recent Payouts</h3>
           {recentPayouts?.length ? (
             <div className="space-y-1.5">
               {recentPayouts.map((p: any) => (
                 <div key={p.id} className="flex items-center justify-between py-1.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-dark truncate">{p.trainer?.user?.fullName || 'Trainer'}</p>
-                    <p className="text-xs text-muted-foreground">{formatCurrency(p.amount)}</p>
+                    <p className="text-xs text-body-foreground">{formatCurrency(p.amount)}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0 ml-2">{timeAgo(p.createdAt)}</span>
+                  <span className="text-xs text-body-foreground shrink-0 ml-2">{timeAgo(p.createdAt)}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-2">No payouts yet</p>
+            <p className="text-xs text-body-foreground py-2">No payouts yet</p>
           )}
         </div>
 
         <div className="border-t border-border pt-3">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Recent Disputes</h3>
+          <h3 className="text-xs font-semibold text-body-foreground uppercase tracking-wider mb-2">Recent Disputes</h3>
           {recentDisputes?.length ? (
             <div className="space-y-1.5">
               {recentDisputes.map((d: any) => (
                 <div key={d.id} className="flex items-center justify-between py-1.5">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium text-dark truncate">{d.enrolment?.course?.title || 'Course'}</p>
-                    <p className="text-xs text-muted-foreground">{d.status}</p>
+                    <p className="text-xs text-body-foreground">{d.status}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground shrink-0 ml-2">{timeAgo(d.createdAt)}</span>
+                  <span className="text-xs text-body-foreground shrink-0 ml-2">{timeAgo(d.createdAt)}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-muted-foreground py-2">No disputes</p>
+            <p className="text-xs text-body-foreground py-2">No disputes</p>
           )}
         </div>
       </div>

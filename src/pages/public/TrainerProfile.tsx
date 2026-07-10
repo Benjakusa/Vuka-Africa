@@ -65,7 +65,7 @@ export default function TrainerProfile() {
         </div>
         <div className="px-6 pb-6 -mt-16">
           <div className="flex items-end gap-4">
-            <div className="w-24 h-24 rounded-full border-4 border-white bg-primary/10 flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 overflow-hidden">
+            <div className="w-24 h-24 rounded-full border-4 border-white bg-surface flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 overflow-hidden">
               {t.user?.avatarUrl ? (
                 <img src={t.user.avatarUrl} alt={t.fullName} className="w-full h-full object-cover" />
               ) : (
@@ -80,7 +80,7 @@ export default function TrainerProfile() {
             </div>
             <button
               onClick={handleShare}
-              className="p-2 text-muted-foreground hover:text-dark border border-border rounded-btn"
+              className="p-2 text-body-foreground hover:text-dark border border-border rounded-btn"
             >
               <Share2 size={18} />
             </button>
@@ -110,7 +110,7 @@ export default function TrainerProfile() {
         <section className="mt-4">
           <div className="flex flex-wrap gap-2">
             {t.skills.map((s: string) => (
-              <span key={s} className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full font-medium">
+              <span key={s} className="px-3 py-1 bg-surface text-primary text-sm rounded-full font-medium">
                 {s}
               </span>
             ))}
@@ -153,7 +153,7 @@ export default function TrainerProfile() {
               <div className="text-center">
                 <p className="text-3xl font-bold text-dark">{t.averageRating?.toFixed(1)}</p>
                 <RatingStars rating={t.averageRating} size={16} />
-                <p className="text-xs text-muted-foreground mt-1">{t.totalReviews} reviews</p>
+                <p className="text-xs text-body-foreground mt-1">{t.totalReviews} reviews</p>
               </div>
             </div>
             <div className="space-y-3">

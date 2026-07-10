@@ -12,7 +12,7 @@ export function ProgressBar({ value, max, label }: ProgressBarProps) {
       <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
         <div className="h-2 bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
       </div>
-      {label && <span className="text-xs text-muted-foreground">{label}</span>}
+      {label && <span className="text-xs text-body-foreground">{label}</span>}
     </div>
   );
 }
