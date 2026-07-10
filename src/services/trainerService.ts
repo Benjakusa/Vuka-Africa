@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 export async function getTrainers(filters?: Record<string, any>) {
-  let query = supabase.from('Trainer').select('*, user:User!userId(id, fullName, email, avatarUrl), courses:Course(*)');
+  let query = supabase.from('Trainer').select('*');
 
   if (filters?.['verifiedOnly']) query = query.eq('isVerified', true);
   if (filters?.['category']) query = query.contains('skills', [filters['category'] as string]);
@@ -20,7 +20,7 @@ export async function getTrainers(filters?: Record<string, any>) {
 export async function getTrainer(id: string) {
   const { data, error } = await supabase
     .from('Trainer')
-    .select('*, user:User!userId(id, fullName, email, avatarUrl), courses:Course(*)')
+    .select('*')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;

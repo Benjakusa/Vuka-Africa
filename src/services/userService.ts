@@ -8,9 +8,7 @@ export async function getCurrentUser() {
 
   const { data, error } = await supabase
     .from('User')
-    .select(
-      '*, trainer:Trainer!userId(id, isVerified, verificationStatus, commissionRate, availableBalance, bio, skills)',
-    )
+    .select('*')
     .eq('id', user.id)
     .maybeSingle();
 

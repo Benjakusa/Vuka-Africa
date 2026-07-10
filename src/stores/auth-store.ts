@@ -61,17 +61,18 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      let { data: dbUser } = await supabase
+      let { data: dbUser, error: userErr } = await supabase
         .from('User')
-        .select(`*, trainer:Trainer!userId(${TRAINER_FIELDS})`)
+        .select('*')
         .eq('id', authUser.id)
         .maybeSingle();
+      if (userErr) console.error('checkAuth/User:', userErr);
 
       if (!dbUser) {
         const meta = authUser.user_metadata || {};
         const role = (meta['role'] as string) || 'TRAINEE';
         const now = new Date().toISOString();
-        await supabase.from('User').upsert({
+        const { error: upsertErr } = await supabase.from('User').upsert({
           id: authUser.id,
           email: (authUser.email || '').toLowerCase().trim(),
           phone: ((meta['phone'] as string) || '').replace(/[^0-9]/g, ''),
@@ -80,23 +81,41 @@ export const useAuthStore = create<AuthState>((set) => ({
           lastLoginAt: now,
           updatedAt: now,
         }).maybeSingle();
+        if (upsertErr) console.error('checkAuth/User-upsert:', upsertErr);
+
+        let trainer = null;
         if (role === 'TRAINER') {
-      const { data: t } = await supabase.from('Trainer').insert({ userId: authUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
-          dbUser = { id: authUser.id, email: authUser.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer: extractTrainer(t) } as any;
-        } else {
-          dbUser = { id: authUser.id, email: authUser.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer: null } as any;
-        }
-      } else {
-        const now = new Date().toISOString();
-        supabase.from('User').update({ lastLoginAt: now, updatedAt: now }).eq('id', authUser.id).maybeSingle();
-        if (!extractTrainer(dbUser.trainer) && dbUser.role === 'TRAINER') {
-          const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', dbUser.id).maybeSingle();
-          dbUser.trainer = extractTrainer(existing);
-          if (!existing) {
-            const { data: t } = await supabase.from('Trainer').insert({ userId: dbUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
-            dbUser.trainer = extractTrainer(t);
+          const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', authUser.id).maybeSingle();
+          if (existing) {
+            trainer = extractTrainer(existing);
+          } else {
+            const { data: inserted, error: insErr } = await supabase.from('Trainer').insert({ userId: authUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+            if (insErr) console.error('checkAuth/Trainer-insert:', insErr);
+            trainer = extractTrainer(inserted);
           }
         }
+        dbUser = { id: authUser.id, email: authUser.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer } as any;
+      } else {
+        const now = new Date().toISOString();
+        await supabase.from('User').update({ lastLoginAt: now, updatedAt: now }).eq('id', authUser.id).maybeSingle();
+
+        let trainer = extractTrainer((dbUser as any).trainer);
+        if (!trainer && dbUser.role === 'TRAINER') {
+          const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', dbUser.id).maybeSingle();
+          if (existing) {
+            trainer = extractTrainer(existing);
+          } else {
+            const { data: inserted, error: insErr } = await supabase.from('Trainer').insert({ userId: dbUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+            if (insErr) console.error('checkAuth/Trainer-insert2:', insErr);
+            trainer = extractTrainer(inserted);
+          }
+        }
+        dbUser = { ...dbUser, trainer };
+      }
+
+      if (!dbUser) {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        return;
       }
 
       set({
@@ -112,7 +131,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         isAuthenticated: true,
         isLoading: false,
       });
-    } catch {
+    } catch (err) {
+      console.error('checkAuth error:', err);
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
@@ -123,7 +143,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     let { data: dbUser } = await supabase
       .from('User')
-      .select(`*, trainer:Trainer!userId(${TRAINER_FIELDS})`)
+      .select('*')
       .eq('id', data.user.id)
       .maybeSingle();
 
@@ -141,23 +161,32 @@ export const useAuthStore = create<AuthState>((set) => ({
         lastLoginAt: now,
         updatedAt: now,
       }).maybeSingle();
+
+      let trainer = null;
       if (role === 'TRAINER') {
-        const { data: t } = await supabase.from('Trainer').insert({ userId: data.user.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
-        dbUser = { id: data.user.id, email: data.user.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer: extractTrainer(t) } as any;
-      } else {
-        dbUser = { id: data.user.id, email: data.user.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer: null } as any;
-      }
-    } else {
-      supabase.from('User').update({ lastLoginAt: now, updatedAt: now }).eq('id', data.user.id).maybeSingle();
-      if (!extractTrainer(dbUser.trainer) && dbUser.role === 'TRAINER') {
-        const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', dbUser.id).maybeSingle();
+        const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', data.user.id).maybeSingle();
         if (existing) {
-          dbUser.trainer = extractTrainer(existing);
+          trainer = extractTrainer(existing);
         } else {
-          const { data: t } = await supabase.from('Trainer').insert({ userId: dbUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
-          dbUser.trainer = extractTrainer(t);
+          const { data: inserted } = await supabase.from('Trainer').insert({ userId: data.user.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+          trainer = extractTrainer(inserted);
         }
       }
+      dbUser = { id: data.user.id, email: data.user.email, phone: meta['phone'] || '', fullName: meta['full_name'] || '', role, avatarUrl: null, trainer } as any;
+    } else {
+      await supabase.from('User').update({ lastLoginAt: now, updatedAt: now }).eq('id', data.user.id).maybeSingle();
+
+      let trainer = extractTrainer((dbUser as any).trainer);
+      if (!trainer && dbUser.role === 'TRAINER') {
+        const { data: existing } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', dbUser.id).maybeSingle();
+        if (existing) {
+          trainer = extractTrainer(existing);
+        } else {
+          const { data: t } = await supabase.from('Trainer').insert({ userId: dbUser.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+          trainer = extractTrainer(t);
+        }
+      }
+      dbUser = { ...dbUser, trainer };
     }
 
     const user: User = {
@@ -198,7 +227,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     let trainer = null;
     if (role === 'TRAINER') {
-      const { data: t } = await supabase.from('Trainer').insert({ userId: data.user.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+      let { data: t } = await supabase.from('Trainer').select(TRAINER_FIELDS).eq('userId', data.user.id).maybeSingle();
+      if (!t) {
+        const { data: inserted } = await supabase.from('Trainer').insert({ userId: data.user.id, updatedAt: now }).select(TRAINER_FIELDS).maybeSingle();
+        t = inserted;
+      }
       trainer = t || null;
     }
 

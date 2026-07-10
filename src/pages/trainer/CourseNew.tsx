@@ -91,7 +91,11 @@ export default function CourseNew() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.trainer?.id) {
-      const { data: newTrainer } = await supabase.from('Trainer').insert({ userId: user!.id }).select('id').maybeSingle();
+      let { data: newTrainer } = await supabase.from('Trainer').select('id').eq('userId', user!.id).maybeSingle();
+      if (!newTrainer) {
+        const r = await supabase.from('Trainer').insert({ userId: user!.id, updatedAt: new Date().toISOString() }).select('id').maybeSingle();
+        newTrainer = r.data ?? null;
+      }
       if (!newTrainer) {
         toast.error('Trainer profile not found — please contact support');
         return;
