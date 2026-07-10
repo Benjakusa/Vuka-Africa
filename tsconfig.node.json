@@ -26,8 +26,7 @@
     }
   },
   "include": [
-    "vite.config.ts",
-    "backend/**/*.ts"
+    "vite.config.ts"
   ],
   "exclude": [
     "backend/**/*.test.ts",
