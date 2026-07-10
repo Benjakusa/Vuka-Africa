@@ -190,7 +190,7 @@ export default function CourseDetail() {
               type="file"
               accept="image/*"
               onChange={handleImageSelect}
-              className="hidden focus:border-primary"
+              className="hidden"
             />
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function CourseDetail() {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
           />
         </div>
 
@@ -214,7 +214,7 @@ export default function CourseDetail() {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none"
           />
         </div>
 
@@ -225,7 +225,7 @@ export default function CourseDetail() {
               name="mode"
               value={form.mode}
               onChange={handleChange}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             >
               <option value="PHYSICAL">Physical</option>
               <option value="VIRTUAL">Virtual</option>
@@ -239,7 +239,7 @@ export default function CourseDetail() {
               value={currentCategory}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             >
               <option value="">Select category</option>
               {CATEGORIES.map((cat) => (
@@ -272,7 +272,7 @@ export default function CourseDetail() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
           <div>
@@ -282,7 +282,7 @@ export default function CourseDetail() {
               value={form.duration}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function CourseDetail() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
           <div>
@@ -308,7 +308,7 @@ export default function CourseDetail() {
               value={form.maxStudents}
               onChange={handleChange}
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
         </div>
@@ -319,7 +319,7 @@ export default function CourseDetail() {
             name="location"
             value={form.location}
             onChange={handleChange}
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
           />
         </div>
 

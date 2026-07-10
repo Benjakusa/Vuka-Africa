@@ -123,7 +123,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Chapter 1 Notes"
               required
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm"
             />
           </div>
 
@@ -137,7 +137,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Brief description of the material..."
               rows={2}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm resize-none"
             />
           </div>
 
@@ -182,7 +182,7 @@ export function MaterialsSection({ enrolmentId, isTrainer, enrolmentStatus }: Ma
                   setFile(null);
                 }}
                 placeholder="Or paste a URL (YouTube, Google Doc, etc.)"
-                className="w-full mt-2 px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
+                className="w-full mt-2 px-3 py-2 border border-border rounded-btn text-sm"
               />
             )}
           </div>

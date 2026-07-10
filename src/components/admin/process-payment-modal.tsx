@@ -124,7 +124,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
                 max={payout.amountKes}
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(e.target.value)}
-                className="w-full pl-12 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
+                className="w-full pl-12 pr-3 py-2 text-sm border border-input rounded-btn"
               />
             </div>
           </div>
@@ -137,7 +137,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
               id="paymentMethod"
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value as 'mpesa' | 'bank' | 'other')}
-              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
+              className="w-full px-3 py-2 text-sm border border-input rounded-btn bg-white"
             >
               <option value="mpesa">Manual M-Pesa (admin sends via M-Pesa)</option>
               <option value="bank">Bank Transfer</option>
@@ -156,7 +156,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
                 placeholder="e.g. SDF34H6K"
                 value={mpesaTransactionId}
                 onChange={(e) => setMpesaTransactionId(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus:"
+                className="w-full px-3 py-2 text-sm border border-input rounded-btn"
               />
             </div>
           )}
@@ -171,7 +171,7 @@ export function ProcessPaymentModal({ open, onClose, payout, onProcessed }: Proc
               placeholder="Optional notes about this payment..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-input rounded-btn focus: focus: resize-none"
+              className="w-full px-3 py-2 text-sm border border-input rounded-btn resize-none"
             />
           </div>
 

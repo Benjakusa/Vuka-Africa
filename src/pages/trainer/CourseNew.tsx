@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
+import { supabase } from '@/lib/supabase';
 import { createCourse, updateCourse, getTrainerCourses } from '@/services/courseService';
 
 import { CATEGORIES } from '@/lib/categories';
@@ -90,8 +91,17 @@ export default function CourseNew() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user?.trainer?.id) {
-      toast.error('Trainer profile not found');
-      return;
+      const { data: newTrainer } = await supabase.from('Trainer').insert({ userId: user!.id }).select('id').maybeSingle();
+      if (!newTrainer) {
+        toast.error('Trainer profile not found — please contact support');
+        return;
+      }
+      await useAuthStore.getState().checkAuth();
+      const updated = useAuthStore.getState().user;
+      if (!updated?.trainer?.id) {
+        toast.error('Trainer profile not found — please contact support');
+        return;
+      }
     }
     setLoading(true);
     try {
@@ -125,7 +135,7 @@ export default function CourseNew() {
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/(^-|-$)/g, '');
         await createCourse({
-          trainerId: user.trainer.id,
+          trainerId: user!.trainer!.id,
           title: form.title,
           slug,
           description: form.description,
@@ -202,7 +212,7 @@ export default function CourseNew() {
               type="file"
               accept="image/*"
               onChange={handleImageSelect}
-              className="hidden focus:border-primary"
+              className="hidden"
             />
           </div>
         </div>
@@ -214,7 +224,7 @@ export default function CourseNew() {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             placeholder="e.g. Professional Cake Baking"
           />
         </div>
@@ -227,7 +237,7 @@ export default function CourseNew() {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm resize-none"
             placeholder="Describe what students will learn..."
           />
         </div>
@@ -239,7 +249,7 @@ export default function CourseNew() {
               name="mode"
               value={form.mode}
               onChange={handleChange}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             >
               <option value="PHYSICAL">Physical</option>
               <option value="VIRTUAL">Virtual</option>
@@ -299,7 +309,7 @@ export default function CourseNew() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
               placeholder="e.g. 5000"
             />
           </div>
@@ -310,7 +320,7 @@ export default function CourseNew() {
               value={form.duration}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
               placeholder="e.g. 8 weeks"
             />
           </div>
@@ -326,7 +336,7 @@ export default function CourseNew() {
               onChange={handleChange}
               required
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
               placeholder="e.g. 8"
             />
           </div>
@@ -338,7 +348,7 @@ export default function CourseNew() {
               value={form.maxStudents}
               onChange={handleChange}
               min={1}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
               placeholder="Optional"
             />
           </div>
@@ -350,7 +360,7 @@ export default function CourseNew() {
             name="location"
             value={form.location}
             onChange={handleChange}
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             placeholder="e.g. Nairobi, Kenya (optional)"
           />
         </div>

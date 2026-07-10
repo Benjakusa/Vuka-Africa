@@ -97,7 +97,7 @@ export default function Config() {
             min={0}
             max={100}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
           />
           <p className="text-xs text-body-foreground mt-1">Percentage deducted from trainer earnings as platform fee</p>
         </div>
@@ -111,7 +111,7 @@ export default function Config() {
             onChange={handleChange}
             min={0}
             required
-            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+            className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
           />
           <p className="text-xs text-body-foreground mt-1">One-time fee for trainer verification</p>
         </div>
@@ -126,7 +126,7 @@ export default function Config() {
               onChange={handleChange}
               min={0}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
           <div>
@@ -138,7 +138,7 @@ export default function Config() {
               onChange={handleChange}
               min={0}
               required
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
             />
           </div>
         </div>

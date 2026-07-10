@@ -165,7 +165,7 @@ export function MpesaPaymentModal({
                   onChange={(e) => setPhone(formatPhone(e.target.value))}
                   placeholder="+254 712 345 678"
                   required
-                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm focus: focus:/20"
+                  className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
                 />
                 <p className="text-xs text-body-foreground mt-1">You will receive an STK Push prompt on this number.</p>
               </div>

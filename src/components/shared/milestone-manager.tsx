@@ -193,7 +193,7 @@ export function MilestoneManager({
               onChange={(e) => setNewLabel(e.target.value)}
               placeholder={`Session ${milestones.length + 1}: Topic name`}
               required
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm"
             />
           </div>
           <div>
@@ -206,7 +206,7 @@ export function MilestoneManager({
               onChange={(e) => setNewNotes(e.target.value)}
               placeholder="What this session covers..."
               rows={2}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm resize-none"
             />
           </div>
           <button
@@ -255,13 +255,13 @@ export function MilestoneManager({
                       type="text"
                       value={editLabel}
                       onChange={(e) => setEditLabel(e.target.value)}
-                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
+                      className="w-full px-3 py-2 border border-border rounded-btn text-sm"
                     />
                     <textarea
                       value={editNotes}
                       onChange={(e) => setEditNotes(e.target.value)}
                       rows={2}
-                      className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none"
+                      className="w-full px-3 py-2 border border-border rounded-btn text-sm resize-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -404,7 +404,7 @@ export function MilestoneManager({
               onChange={(e) => setCompleteNotes(e.target.value)}
               placeholder="Session summary, what was covered..."
               rows={3}
-              className="w-full px-3 py-2 border border-border rounded-btn text-sm focus: focus:/20 resize-none mb-4"
+              className="w-full px-3 py-2 border border-border rounded-btn text-sm resize-none mb-4"
             />
             <div className="flex gap-3">
               <button

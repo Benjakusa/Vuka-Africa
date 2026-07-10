@@ -43,7 +43,7 @@ export function FilterBar() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search trainers..."
-            className="w-full pl-9 pr-3 py-2 border border-border rounded-btn text-sm focus: focus:/20"
+            className="w-full pl-9 pr-3 py-2 border border-border rounded-btn text-sm"
           />
         </div>
         <button

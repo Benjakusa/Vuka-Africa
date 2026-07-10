@@ -93,10 +93,17 @@ export default function ProfileEdit() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile?.id) {
-      toast.error('Trainer profile not found');
+      const { data: newTrainer } = await supabase.from('Trainer').insert({ userId: user!.id }).select('id').maybeSingle();
+      if (!newTrainer) {
+        toast.error('Trainer profile not found — please contact support');
+        return;
+      }
+      useAuthStore.getState().checkAuth();
+      await new Promise((r) => setTimeout(r, 500));
+      window.location.reload();
       return;
     }
     saveMutation.mutate();

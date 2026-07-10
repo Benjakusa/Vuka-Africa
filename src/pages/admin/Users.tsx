@@ -77,7 +77,7 @@ export default function AdminUsers() {
           value={searchInput}
           onChange={handleSearchChange}
           placeholder="Search by name or email..."
-          className="w-full pl-9 pr-3 py-2.5 border border-border rounded-btn text-sm focus:border-primary"
+          className="w-full pl-9 pr-3 py-2.5 border border-border rounded-btn text-sm"
         />
       </div>
 

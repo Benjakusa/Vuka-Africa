@@ -92,7 +92,7 @@ export default function AdminCourses() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn"
           />
         </div>
         <select
@@ -101,7 +101,7 @@ export default function AdminCourses() {
             setCategoryFilter(e.target.value);
             setPage(1);
           }}
-          className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
+          className="px-3 py-2 text-sm border border-input rounded-btn bg-white"
           aria-label="Filter by category"
         >
           <option value="">All Categories</option>
@@ -118,7 +118,7 @@ export default function AdminCourses() {
             setModeFilter(e.target.value);
             setPage(1);
           }}
-          className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
+          className="px-3 py-2 text-sm border border-input rounded-btn bg-white"
           aria-label="Filter by mode"
         >
           <option value="">All Modes</option>

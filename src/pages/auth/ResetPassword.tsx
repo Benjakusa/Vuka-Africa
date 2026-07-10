@@ -72,7 +72,7 @@ function ResetForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm pr-10 focus: focus:/20"
+              className="w-full px-3 py-2.5 border border-border rounded-btn text-sm pr-10"
               placeholder="At least 8 characters"
             />
             <button

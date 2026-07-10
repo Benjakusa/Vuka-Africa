@@ -85,7 +85,7 @@ export function FileUpload({
           type="file"
           accept={accept}
           onChange={handleSelect}
-          className="hidden focus:border-primary"
+          className="hidden "
         />
       </div>
       {error && <p className="text-xs text-primary">{error}</p>}

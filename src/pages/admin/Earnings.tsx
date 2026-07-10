@@ -215,7 +215,7 @@ export default function AdminEarnings() {
                       setPayoutSearch(e.target.value);
                       setPayoutPage(1);
                     }}
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn focus: focus:"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-input rounded-btn"
                   />
                 </div>
                 <select
@@ -224,7 +224,7 @@ export default function AdminEarnings() {
                     setPayoutStatusFilter(e.target.value);
                     setPayoutPage(1);
                   }}
-                  className="px-3 py-2 text-sm border border-input rounded-btn focus: focus: bg-white"
+                  className="px-3 py-2 text-sm border border-input rounded-btn bg-white"
                   aria-label="Filter by status"
                 >
                   <option value="">All Statuses</option>
