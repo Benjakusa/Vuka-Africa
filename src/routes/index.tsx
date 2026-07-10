@@ -37,6 +37,8 @@ import ProfileEdit from '@/pages/trainer/ProfileEdit';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminConfig from '@/pages/admin/Config';
 import AdminDisputes from '@/pages/admin/Disputes';
+import AdminEarnings from '@/pages/admin/Earnings';
+import AdminCourses from '@/pages/admin/Courses';
 import AdminTransactions from '@/pages/admin/Transactions';
 import AdminUsers from '@/pages/admin/Users';
 import AdminVerifications from '@/pages/admin/Verifications';
@@ -84,6 +86,8 @@ export function AppRoutes() {
 
           <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/earnings" element={<AdminEarnings />} />
+            <Route path="/admin/courses" element={<AdminCourses />} />
             <Route path="/admin/config" element={<AdminConfig />} />
             <Route path="/admin/disputes" element={<AdminDisputes />} />
             <Route path="/admin/transactions" element={<AdminTransactions />} />

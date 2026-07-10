@@ -38,6 +38,8 @@ const trainerLinks = [
 
 const adminLinks = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/admin/courses', label: 'Courses', icon: BookOpen },
   { href: '/admin/verifications', label: 'Verifications', icon: ShieldCheck },
   { href: '/admin/disputes', label: 'Disputes', icon: AlertTriangle },
   { href: '/admin/users', label: 'Users', icon: Users },

@@ -6,6 +6,7 @@ import { CheckCircle, MapPin, Monitor, Globe, Clock, Users } from 'lucide-react'
 import { BackButton } from '@/components/shared/back-button';
 import { courseKeys } from '@/lib/query-keys';
 import { getCourseBySlug } from '@/services/courseService';
+import { supabase } from '@/lib/supabase';
 import { VerifiedBadge } from '@/components/shared/verified-badge';
 import { RatingStars } from '@/components/shared/rating-stars';
 import { ErrorState } from '@/components/shared/error-state';
@@ -36,12 +37,29 @@ export default function CourseDetail() {
     enabled: !!slug,
   });
 
+  const { data: existingEnrolment } = useQuery({
+    queryKey: ['enrolment', 'check', course?.id, user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('Enrolment')
+        .select('id, status')
+        .eq('courseId', course!.id)
+        .eq('traineeId', user!.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!course?.id && !!user?.id && user?.role === 'TRAINEE',
+  });
+
+  const isEnrolled = !!existingEnrolment;
+
   const handleEnrol = () => {
     if (!isAuthenticated) {
       navigate(`/auth/login?redirect=/course/${slug}`);
       return;
     }
     if (user?.role !== 'TRAINEE') return;
+    if (isEnrolled) return;
     setShowPayment(true);
   };
 
@@ -156,14 +174,16 @@ export default function CourseDetail() {
                 </div>
                 <button
                   onClick={handleEnrol}
-                  disabled={isAuthenticated && user?.role !== 'TRAINEE'}
+                  disabled={isAuthenticated && (user?.role !== 'TRAINEE' || isEnrolled)}
                   className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {!isAuthenticated
                     ? 'Login to Enrol'
                     : user?.role !== 'TRAINEE'
                       ? 'Trainers cannot enrol'
-                      : 'Enrol Now'}
+                      : isEnrolled
+                        ? 'Already Enrolled'
+                        : 'Enrol Now'}
                 </button>
               </div>
             </div>

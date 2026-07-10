@@ -82,8 +82,8 @@ async function processEnrolmentPayment(
     return;
   }
 
-  if (enrolment.status === 'ACTIVE') {
-    console.log(`[mpesa-callback] Enrolment ${enrolmentId} already active, skipping`);
+  if (enrolment.status !== 'PENDING_ACCEPTANCE') {
+    console.log(`[mpesa-callback] Enrolment ${enrolmentId} status is ${enrolment.status}, skipping`);
     return;
   }
 
@@ -94,7 +94,6 @@ async function processEnrolmentPayment(
   const { error: updateError } = await supabase
     .from('Enrolment')
     .update({
-      status: 'ACTIVE',
       mpesaTransactionId: receipt,
       mpesaReceiptNumber: receipt,
       mpesaCheckoutRequestId: checkoutRequestId,
@@ -173,10 +172,11 @@ async function processEnrolmentPayment(
   if (trainerEmail) {
     await sendEmail(
       trainerEmail,
-      `New Enrolment — ${enrolment.trainee.fullName} joined ${enrolment.course.title}`,
+      `New Enrolment Requires Review — ${enrolment.trainee.fullName} joined ${enrolment.course.title}`,
       `<p>Hi ${trainerName},</p>
 <p><strong>${enrolment.trainee.fullName}</strong> has enrolled in your course <strong>${enrolment.course.title}</strong>.</p>
-<p>Payment of KES ${paidAmount.toLocaleString()} has been received and held in escrow.</p>`,
+<p>Payment of KES ${paidAmount.toLocaleString()} has been received and is awaiting your acceptance.</p>
+<p>Please review and accept this enrolment in your trainer dashboard to begin.</p>`,
     );
   }
 }

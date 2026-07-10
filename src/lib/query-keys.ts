@@ -39,6 +39,10 @@ export const adminKeys = {
   disputes: (status?: string, page?: number) => ['admin', 'disputes', status, page] as const,
   transactions: (filters?: Record<string, unknown>) => ['admin', 'transactions', filters] as const,
   users: (search?: string, page?: number) => ['admin', 'users', search, page] as const,
+  earnings: ['admin', 'earnings'] as const,
+  payouts: (status?: string, page?: number) => ['admin', 'payouts', status, page] as const,
+  adminCourses: (filters?: Record<string, unknown>) => ['admin', 'courses', filters] as const,
+  adminCourseDetail: (id: string) => ['admin', 'courses', id] as const,
 };
 
 export const miscKeys = {

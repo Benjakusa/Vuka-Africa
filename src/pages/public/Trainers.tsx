@@ -72,6 +72,7 @@ function TrainerListing() {
                     bio={trainer.bio}
                     skills={trainer.skills}
                     courses={trainer.courses}
+                    user={user}
                   />
                 );
               })}

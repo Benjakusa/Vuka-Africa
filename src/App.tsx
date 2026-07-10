@@ -6,7 +6,7 @@ import { AppRoutes } from '@/routes';
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 30000, retry: 1, refetchOnWindowFocus: false },
+    queries: { staleTime: 5 * 60 * 1000, gcTime: 30 * 60 * 1000, retry: 1, refetchOnWindowFocus: false },
   },
 });
 

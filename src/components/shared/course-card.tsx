@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { Clock, MapPin, Monitor, Globe } from 'lucide-react';
+import { courseKeys } from '@/lib/query-keys';
+import { getCourseBySlug } from '@/services/courseService';
 import { formatCurrency } from '@/lib/utils';
 
 interface CourseCardProps {
@@ -20,9 +23,18 @@ const modeIcons: Record<string, any> = {
   HYBRID: Globe,
 };
 
-export function CourseCard({ id, title, slug, mode, duration, priceKes, imageUrl }: CourseCardProps) {
+export const CourseCard = React.memo(function CourseCard({ id, title, slug, mode, duration, priceKes, imageUrl }: CourseCardProps) {
   const [imgError, setImgError] = useState(false);
+  const queryClient = useQueryClient();
   const ModeIcon = modeIcons[mode] || MapPin;
+
+  const prefetch = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: courseKeys.detail(slug),
+      queryFn: () => getCourseBySlug(slug),
+      staleTime: 60_000,
+    });
+  }, [queryClient, slug]);
 
   const colors = [
     'from-blue-500/20 to-blue-600/10',
@@ -37,6 +49,7 @@ export function CourseCard({ id, title, slug, mode, duration, priceKes, imageUrl
   return (
     <Link
       to={`/course/${slug}`}
+      onMouseEnter={prefetch}
       className="block bg-white rounded-card shadow-card hover:shadow-cardHover transition-shadow overflow-hidden"
     >
       <div className={`h-32 bg-gradient-to-br ${colors[colorIndex]} flex items-center justify-center`}>
@@ -60,4 +73,4 @@ export function CourseCard({ id, title, slug, mode, duration, priceKes, imageUrl
       </div>
     </Link>
   );
-}
+});

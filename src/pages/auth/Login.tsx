@@ -26,7 +26,7 @@ export default function AuthPage() {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, register, setUser, isAuthenticated } = useAuthStore();
+  const { login, register, setUser, isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
     if (searchParams.get('panel') === 'register') setPanel('register');
@@ -35,9 +35,16 @@ export default function AuthPage() {
   useEffect(() => {
     if (isAuthenticated) {
       const redirect = searchParams.get('redirect') || '/trainee';
-      navigate(redirect, { replace: true });
+      if (redirect === '/trainee' || redirect === '/') {
+        const role = user?.role;
+        if (role === 'ADMIN') navigate('/admin', { replace: true });
+        else if (role === 'TRAINER') navigate('/trainer', { replace: true });
+        else navigate(redirect, { replace: true });
+      } else {
+        navigate(redirect, { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, searchParams]);
+  }, [isAuthenticated, navigate, searchParams, user]);
 
   const isRegister = panel === 'register';
 
@@ -49,7 +56,8 @@ export default function AuthPage() {
       const user = await login(loginEmail, loginPassword);
       setUser(user);
       toast.success('Welcome back!');
-      const redirect = searchParams.get('redirect') || '/';
+      const role = user?.role;
+      const redirect = searchParams.get('redirect') || (role === 'ADMIN' ? '/admin' : role === 'TRAINER' ? '/trainer' : '/trainee');
       navigate(redirect, { replace: true });
     } catch (err: any) {
       setLoginError(

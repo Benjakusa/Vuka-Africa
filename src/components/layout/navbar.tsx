@@ -1,13 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, LayoutDashboard, Users, LogIn } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Phone, Mail, MapPin, LogIn, LayoutDashboard, LogOut, ChevronDown } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
-import { useUIStore } from '@/stores/ui-store';
-
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();
-  const { mobileMenuOpen, setMobileMenuOpen } = useUIStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -15,90 +16,202 @@ export function Navbar() {
   };
 
   const dashboardLink = user?.role === 'TRAINER' ? '/trainer' : user?.role === 'ADMIN' ? '/admin' : '/trainee';
+  const isActive = (href: string) => location.pathname === href;
+
+  const scrollToCourses = () => {
+    if (location.pathname === '/') {
+      document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+    setMobileOpen(false);
+  };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-border">
+    <header className="sticky top-0 z-50 bg-white border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-bold text-primary">Vuka</span>
+        <div className="flex items-center justify-between h-16 lg:h-[72px] gap-4">
+          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 512 512" fill="none">
+                <path d="M120 380L256 120L392 380" stroke="white" strokeWidth="48" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M180 300L256 200L332 300" stroke="white" strokeWidth="40" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <span className="text-xl lg:text-2xl font-bold text-dark tracking-tight">Vuka</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-1 bg-dark text-white px-1.5 py-1.5 rounded-full">
+            <Link
+              to="/"
+              className={cn(
+                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
+                isActive('/') ? 'bg-white/15 text-white' : 'text-white/70 hover:text-white hover:bg-white/10',
+              )}
+            >
+              Home
+            </Link>
+            <button
+              onClick={scrollToCourses}
+              className="px-4 py-1.5 text-sm font-medium rounded-full transition-colors text-white/70 hover:text-white hover:bg-white/10"
+            >
+              Browse Courses
+            </button>
             <Link
               to="/trainers"
-              className="flex items-center gap-1.5 text-sm text-body hover:text-dark transition-colors font-medium"
+              className={cn(
+                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
+                isActive('/trainers') ? 'bg-white/15 text-white' : 'text-white/70 hover:text-white hover:bg-white/10',
+              )}
             >
-              <Users size={16} /> Browse Trainers
+              Browse Trainers
             </Link>
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <Link
-                  to={dashboardLink}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
-                >
-                  <LayoutDashboard size={16} />
-                  Dashboard
-                </Link>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-body">{user?.fullName}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="p-1.5 text-muted-foreground hover:text-dark transition-colors"
-                  >
-                    <LogOut size={16} />
+              <div className="relative group ml-2">
+                <button className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+                  <LayoutDashboard size={14} />
+                  <span>{user?.fullName?.split(' ')[0] || 'Dashboard'}</span>
+                  <ChevronDown size={12} />
+                </button>
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-modal border border-border py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <Link to={dashboardLink} className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors">
+                    Dashboard
+                  </Link>
+                  <Link to="/trainer/profile" className="block px-4 py-2 text-sm text-dark hover:bg-surface/80 transition-colors">
+                    My Profile
+                  </Link>
+                  <hr className="my-1 border-border/50" />
+                  <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-destructive hover:bg-surface/80 transition-colors flex items-center gap-2">
+                    <LogOut size={14} /> Logout
                   </button>
                 </div>
               </div>
             ) : (
               <Link
-                to="/auth/login"
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90 transition-colors"
+                to="/auth/register"
+                className="ml-2 px-5 py-1.5 text-sm font-semibold rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
               >
-                <LogIn size={16} /> Get Started
+                Get Started
               </Link>
             )}
+          </nav>
+
+          <div className="hidden lg:flex items-center gap-4 text-xs text-muted-foreground flex-shrink-0">
+            <span className="flex items-center gap-1.5">
+              <Phone size={12} className="text-primary" />
+              +254 712 345 678
+            </span>
+            <span className="text-border">|</span>
+            <span className="flex items-center gap-1.5">
+              <Mail size={12} className="text-primary" />
+              hello@vuka.africa
+            </span>
+            <span className="text-border">|</span>
+            <span className="flex items-center gap-1.5">
+              <MapPin size={12} className="text-primary" />
+              Kasarani, Nairobi
+            </span>
           </div>
 
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="md:hidden p-2 text-body">
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="lg:hidden flex items-center gap-2 text-body hover:text-dark transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-white px-4 py-4 space-y-3">
-          <Link
-            to="/trainers"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2 text-sm text-body font-medium"
-          >
-            <Users size={16} /> Browse Trainers
-          </Link>
-          {isAuthenticated ? (
-            <>
+      {mobileOpen && (
+        <div className="lg:hidden border-t border-border bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-4">
+            <div className="space-y-2 text-sm text-muted-foreground pb-3 border-b border-border/50">
+              <div className="flex items-center gap-2">
+                <Phone size={14} className="text-primary" />
+                +254 712 345 678
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail size={14} className="text-primary" />
+                hello@vuka.africa
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin size={14} className="text-primary" />
+                Kasarani, Nairobi, Kenya
+              </div>
+            </div>
+
+            <div className="space-y-1">
               <Link
-                to={dashboardLink}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 text-sm text-primary font-medium"
+                to="/"
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                  isActive('/') ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-surface/80',
+                )}
               >
-                <LayoutDashboard size={16} /> Dashboard
+                Home
               </Link>
-              <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-destructive font-medium">
-                <LogOut size={16} /> Logout
+              <button
+                onClick={scrollToCourses}
+                className="block w-full text-left px-3 py-2.5 text-sm font-medium rounded-lg text-dark hover:bg-surface/80 transition-colors"
+              >
+                Browse Courses
               </button>
-            </>
-          ) : (
-            <Link
-              to="/auth/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-2 text-sm text-primary font-medium"
-            >
-              <LogIn size={16} /> Get Started
-            </Link>
-          )}
+              <Link
+                to="/trainers"
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                  isActive('/trainers') ? 'bg-primary/10 text-primary' : 'text-dark hover:bg-surface/80',
+                )}
+              >
+                Browse Trainers
+              </Link>
+            </div>
+
+            <div className="pt-2 border-t border-border/50 space-y-2">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to={dashboardLink}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-primary rounded-lg hover:bg-surface/80 transition-colors"
+                  >
+                    <LayoutDashboard size={16} /> Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-destructive rounded-lg hover:bg-surface/80 transition-colors w-full text-left"
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                </>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    to="/auth/login"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-white text-sm font-semibold rounded-full hover:bg-primary/90 transition-colors"
+                  >
+                    <LogIn size={16} /> Sign In
+                  </Link>
+                  <Link
+                    to="/auth/register"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-primary text-primary text-sm font-semibold rounded-full hover:bg-primary/5 transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

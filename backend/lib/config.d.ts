@@ -5,7 +5,7 @@
 export declare const PLATFORM: {
     readonly name: "Vuka";
     readonly tagline: "U-Learn, U-Earn";
-    readonly domain: any;
+    readonly domain: string;
 };
 export declare const COMMISSION: {
     readonly DEFAULT: 20;

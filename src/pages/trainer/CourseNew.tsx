@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -61,13 +61,13 @@ export default function CourseNew() {
         setLoadingCourse(false);
       }
     })();
-  }, [id, isEdit]);
+  }, [id, isEdit, navigate, user?.trainer?.id]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
@@ -76,13 +76,13 @@ export default function CourseNew() {
     }
     setImageFile(file);
     setImagePreview(URL.createObjectURL(file));
-  };
+  }, []);
 
-  const removeImage = () => {
+  const removeImage = useCallback(() => {
     setImageFile(null);
     setImagePreview(null);
     if (imageInputRef.current) imageInputRef.current.value = '';
-  };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

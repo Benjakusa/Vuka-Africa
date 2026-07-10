@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/utils';
 
 interface MpesaPaymentModalProps {
@@ -70,29 +69,38 @@ export function MpesaPaymentModal({
           })
           .maybeSingle();
 
-        const { data: enrolment, error: createError } = await supabase
-          .from('Enrolment')
-          .upsert(
-            {
-              courseId,
-              trainerId,
-              traineeId: user!.id,
-              pricePaidKes: amount,
-              commissionKes: 0,
-              trainerPayoutKes: 0,
-              status: 'ACTIVE',
-            },
-            { onConflict: 'courseId,traineeId' },
-          )
-          .select('id')
+        const now = new Date().toISOString();
+        const { data: trainerProfile } = await supabase
+          .from('Trainer')
+          .select('commissionRate')
+          .eq('id', trainerId)
           .maybeSingle();
+        const rate = Number(trainerProfile?.commissionRate || 20);
+        const commissionKes = Math.round(amount * (rate / 100) * 100) / 100;
+        const trainerPayoutKes = amount - commissionKes;
 
-        if (createError) throw new Error(createError.message);
-        if (!enrolment) throw new Error('Failed to create enrolment');
-        enrolmentIdRef.current = enrolment.id;
+        const { error: createError } = await supabase.from('Enrolment').insert({
+          courseId,
+          trainerId,
+          traineeId: user!.id,
+          pricePaidKes: amount,
+          commissionKes,
+          trainerPayoutKes,
+          status: 'PENDING_ACCEPTANCE',
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        if (createError) {
+          if (createError.code === '23505') {
+            setStep('success');
+            onSuccess?.();
+            return;
+          }
+          throw new Error(createError.message);
+        }
 
         setStep('success');
-        toast.success('Payment successful!');
         onSuccess?.();
         return;
       }
@@ -198,8 +206,13 @@ export function MpesaPaymentModal({
         {step === 'success' && (
           <div className="text-center py-8">
             <CheckCircle size={48} className="text-green-500 mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-dark mb-1">Payment Successful!</h2>
-            <p className="text-sm text-body mb-4">Your payment of {formatCurrency(amount)} has been processed.</p>
+            <h2 className="text-lg font-semibold text-dark mb-1">You're Enrolled!</h2>
+            <p className="text-sm text-body mb-2">
+              Your payment of {formatCurrency(amount)} has been processed successfully.
+            </p>
+            <p className="text-sm text-primary font-medium mb-6">
+              The trainer will contact you soon to coordinate.
+            </p>
             <button
               onClick={onClose}
               className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-primary/90"

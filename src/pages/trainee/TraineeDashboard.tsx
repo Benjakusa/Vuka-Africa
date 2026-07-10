@@ -20,8 +20,10 @@ export default function TraineeDashboard() {
     enabled: !!user?.id,
   });
 
+  const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
   const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
   const completedEnrolments = enrolments?.filter((e: any) => e.status === 'COMPLETED') || [];
+  const rejectedEnrolments = enrolments?.filter((e: any) => e.status === 'REJECTED') || [];
   const totalSpent = enrolments?.reduce((sum: number, e: any) => sum + (e.pricePaidKes || 0), 0) || 0;
   const pendingReviews =
     enrolments?.filter((e: any) => e.status === 'COMPLETED' && (!e.reviews || e.reviews.length === 0)) || [];
@@ -87,6 +89,54 @@ export default function TraineeDashboard() {
               ))}
             </div>
           )}
+        </section>
+      )}
+
+      {pendingEnrolments.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-lg font-bold text-dark">Awaiting Approval</h2>
+            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">{pendingEnrolments.length}</span>
+          </div>
+          <div className="bg-white rounded-card shadow-card divide-y divide-border">
+            {pendingEnrolments.map((enrolment: any) => (
+              <Link
+                key={enrolment.id}
+                to={`/trainee/enrolments/${enrolment.id}`}
+                className="flex items-center justify-between p-3 hover:bg-accent transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-dark truncate">{enrolment.course?.title}</p>
+                  <p className="text-xs text-muted-foreground">Trainer: {enrolment.trainer?.fullName}</p>
+                </div>
+                <span className="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full ml-3">Pending</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {rejectedEnrolments.length > 0 && (
+        <section className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <h2 className="text-lg font-bold text-dark">Declined Enrolments</h2>
+            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full">{rejectedEnrolments.length}</span>
+          </div>
+          <div className="bg-white rounded-card shadow-card divide-y divide-border">
+            {rejectedEnrolments.slice(0, 5).map((enrolment: any) => (
+              <Link
+                key={enrolment.id}
+                to={`/trainee/enrolments/${enrolment.id}`}
+                className="flex items-center justify-between p-3 hover:bg-accent transition-colors"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-dark truncate">{enrolment.course?.title}</p>
+                  <p className="text-xs text-muted-foreground">Trainer: {enrolment.trainer?.fullName}</p>
+                </div>
+                <span className="px-2.5 py-0.5 bg-red-100 text-red-700 text-xs font-medium rounded-full ml-3">Declined</span>
+              </Link>
+            ))}
+          </div>
         </section>
       )}
 

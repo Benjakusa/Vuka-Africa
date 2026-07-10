@@ -44,13 +44,14 @@ export async function getTrainerCourses(trainerId: string) {
 }
 
 export async function createCourse(course: Record<string, any>) {
-  const { data, error } = await supabase.from('Course').insert(course).select().single();
+  const now = new Date().toISOString();
+  const { data, error } = await supabase.from('Course').insert({ ...course, createdAt: now, updatedAt: now }).select().single();
   if (error) throw error;
   return data;
 }
 
 export async function updateCourse(id: string, updates: Record<string, any>) {
-  const { data, error } = await supabase.from('Course').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('Course').update({ ...updates, updatedAt: new Date().toISOString() }).eq('id', id).select().single();
   if (error) throw error;
   return data;
 }

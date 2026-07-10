@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { BookOpen, MapPin, Calendar } from 'lucide-react';
+import { BookOpen, MapPin, Calendar, Clock, AlertTriangle } from 'lucide-react';
 
 import { useAuthStore } from '@/stores/auth-store';
 import { getEnrolment, createDispute, createReview } from '@/services/enrolmentService';
@@ -10,6 +10,9 @@ import { BackButton } from '@/components/shared/back-button';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { DisputeModal } from '@/components/shared/dispute-modal';
 import { ReviewModal } from '@/components/shared/review-modal';
+
+import { MilestoneManager } from '@/components/shared/milestone-manager';
+import { MaterialsSection } from '@/components/shared/materials-section';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ErrorState } from '@/components/shared/error-state';
 import { formatCurrency, formatDate, getInitials } from '@/lib/utils';
@@ -19,7 +22,6 @@ export default function EnrolmentDetail() {
   const { user } = useAuthStore();
   const [showDispute, setShowDispute] = useState(false);
   const [showReview, setShowReview] = useState(false);
-
   const {
     data: enrolment,
     isLoading,
@@ -74,11 +76,18 @@ export default function EnrolmentDetail() {
 
   const course = enrolment.course || {};
   const trainer = enrolment.trainer || {};
+  const milestones = enrolment.milestones || [];
   const hasReview = enrolment.reviews && enrolment.reviews.length > 0;
   const isCompleted = enrolment.status === 'COMPLETED';
   const hasDispute = enrolment.disputeStatus === 'OPEN';
-
-
+  const isPendingAcceptance = enrolment.status === 'PENDING_ACCEPTANCE';
+  const isRejected = enrolment.status === 'REJECTED';
+  const isActive = enrolment.status === 'ACTIVE';
+  const allSessionsDone = milestones.length > 0 && milestones.every((m: any) => m.status === 'COMPLETED');
+  const canReview = !hasReview && (isCompleted || allSessionsDone);
+  const progressPercent = milestones.length > 0
+    ? Math.round((milestones.filter((m: any) => m.status === 'COMPLETED').length / milestones.length) * 100)
+    : 0;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -92,6 +101,50 @@ export default function EnrolmentDetail() {
           </div>
           <StatusBadge status={enrolment.status} />
         </div>
+
+        {isPendingAcceptance && (
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-card flex items-start gap-3">
+            <Clock size={20} className="text-yellow-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-yellow-800">Awaiting Trainer Approval</p>
+              <p className="text-sm text-yellow-700 mt-1">
+                Your enrolment has been received. The trainer will review and accept it shortly.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {isRejected && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-card flex items-start gap-3">
+            <AlertTriangle size={20} className="text-red-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-red-800">Enrolment Rejected</p>
+              <p className="text-sm text-red-700 mt-1">
+                The trainer has declined your enrolment.
+              </p>
+              {enrolment.rejectionReason && (
+                <p className="text-sm text-red-600 mt-2 italic">
+                  Reason: &ldquo;{enrolment.rejectionReason}&rdquo;
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {isActive && progressPercent > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between text-sm mb-1">
+              <span className="text-body">Course Progress</span>
+              <span className="font-medium text-dark">{progressPercent}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-4 text-sm text-body mb-4">
           <span className="flex items-center gap-1">
@@ -126,8 +179,26 @@ export default function EnrolmentDetail() {
         </div>
       </div>
 
+      {(isActive || isCompleted) && (
+        <div className="mb-6">
+          <MaterialsSection enrolmentId={enrolment.id} isTrainer={false} enrolmentStatus={enrolment.status} />
+        </div>
+      )}
+
+      {(isActive || isCompleted) && (
+        <div className="bg-white rounded-card shadow-card p-6 mb-6">
+          <MilestoneManager
+            enrolmentId={enrolment.id}
+            role="trainee"
+            courseSessionCount={course.sessionCount || 10}
+            milestones={milestones}
+            onRefresh={refetch}
+          />
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-3">
-        {isCompleted && !hasReview && (
+        {canReview && (
           <button
             onClick={() => setShowReview(true)}
             className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-btn hover:bg-primary/90"
@@ -136,7 +207,7 @@ export default function EnrolmentDetail() {
           </button>
         )}
 
-        {!hasDispute && !isCompleted && (
+        {!hasDispute && !isCompleted && !isPendingAcceptance && !isRejected && (
           <button
             onClick={() => setShowDispute(true)}
             className="px-4 py-2 border border-destructive text-destructive text-sm font-medium rounded-btn hover:bg-destructive/5"

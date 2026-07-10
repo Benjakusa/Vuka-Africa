@@ -13,12 +13,11 @@ export async function initiateMpesaPayment(data: {
   return result;
 }
 
-export async function getTransactionHistory(userId: string, role: 'trainee' | 'trainer') {
-  const field = role === 'trainee' ? 'traineeId' : 'trainerId';
+export async function getTransactionHistory(userId: string) {
   const { data, error } = await supabase
     .from('TransactionLedger')
     .select('*')
-    .eq(field, userId)
+    .eq('userId', userId)
     .order('createdAt', { ascending: false });
   if (error) throw error;
   return data || [];

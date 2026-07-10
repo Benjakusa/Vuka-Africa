@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { BookOpen, Users, Wallet, Star, ArrowRight, AlertTriangle } from 'lucide-react';
+import { BookOpen, Users, Wallet, Star, ArrowRight, AlertTriangle, Bell, UserPlus, Play } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { getTrainerCourses } from '@/services/courseService';
 import { getEnrolments } from '@/services/enrolmentService';
@@ -40,9 +40,18 @@ export default function TrainerDashboard() {
     enabled: !!trainerId,
   });
 
+  const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
   const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
+  const activeSessions = enrolments?.reduce((count: number, e: any) => {
+    return count + (e.milestones?.filter((m: any) => m.status === 'IN_PROGRESS').length || 0);
+  }, 0) || 0;
 
-  const totalEarnings = earnings?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
+  const settledEarnings = earnings?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
+  const pendingEarnings = activeEnrolments.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
+  const totalEarnings = settledEarnings + pendingEarnings;
+
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const newEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE' && e.createdAt >= oneDayAgo) || [];
   const recentReviews = reviewsData?.data || [];
   const needsVerification = user?.trainer && !user.trainer.isVerified && user.trainer.verificationStatus !== 'PENDING';
 
@@ -65,7 +74,7 @@ export default function TrainerDashboard() {
         <p className="text-body text-sm">Manage your training business</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <StatCard
           icon={BookOpen}
           label="Courses"
@@ -94,7 +103,74 @@ export default function TrainerDashboard() {
           iconBg="bg-yellow-50"
           iconColor="text-yellow-600"
         />
+        <StatCard
+          icon={Play}
+          label="Active Sessions"
+          value={activeSessions}
+          iconBg="bg-blue-50"
+          iconColor="text-blue-600"
+        />
       </div>
+
+      {pendingEnrolments.length > 0 && (
+        <section className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Bell size={16} className="text-primary" />
+            <h2 className="text-lg font-bold text-dark">Pending Review</h2>
+            <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full">{pendingEnrolments.length} pending</span>
+          </div>
+          <div className="bg-white rounded-card shadow-card divide-y divide-border">
+            {pendingEnrolments.slice(0, 10).map((enrolment: any) => (
+              <Link
+                key={enrolment.id}
+                to={`/trainer/enrolments/${enrolment.id}`}
+                className="flex items-center gap-3 p-3 hover:bg-accent transition-colors"
+              >
+                <div className="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                  <UserPlus size={16} className="text-yellow-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-dark">
+                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> wants to join <span className="font-semibold">{enrolment.course?.title}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">{formatDate(enrolment.createdAt)}</p>
+                </div>
+                <span className="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">REVIEW</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {newEnrolments.length > 0 && (
+        <section className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Bell size={16} className="text-primary" />
+            <h2 className="text-lg font-bold text-dark">New Enrolments</h2>
+            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full">{newEnrolments.length} new</span>
+          </div>
+          <div className="bg-white rounded-card shadow-card divide-y divide-border">
+            {newEnrolments.slice(0, 5).map((enrolment: any) => (
+              <Link
+                key={enrolment.id}
+                to={`/trainer/enrolments/${enrolment.id}`}
+                className="flex items-center gap-3 p-3 hover:bg-accent transition-colors"
+              >
+                <div className="w-9 h-9 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                  <UserPlus size={16} className="text-green-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-dark">
+                    <span className="font-semibold">{enrolment.trainee?.fullName}</span> enrolled in <span className="font-semibold">{enrolment.course?.title}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">{formatDate(enrolment.createdAt)}</p>
+                </div>
+                <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs font-medium rounded-full">NEW</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <section>

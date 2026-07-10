@@ -16,7 +16,7 @@ CREATE TYPE "NotificationStatus" AS ENUM ('QUEUED', 'SENT', 'FAILED');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE "User" (
 );
 
 CREATE TABLE "Trainer" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "userId" TEXT NOT NULL,
     "bio" TEXT,
     "skills" TEXT[],
@@ -54,7 +54,7 @@ CREATE TABLE "Trainer" (
 );
 
 CREATE TABLE "Course" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "trainerId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
@@ -77,7 +77,7 @@ CREATE TABLE "Course" (
 );
 
 CREATE TABLE "Enrolment" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "courseId" TEXT NOT NULL,
     "traineeId" TEXT NOT NULL,
     "trainerId" TEXT NOT NULL,
@@ -98,7 +98,7 @@ CREATE TABLE "Enrolment" (
 );
 
 CREATE TABLE "Milestone" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "enrolmentId" TEXT NOT NULL,
     "sequence" INTEGER NOT NULL,
     "label" TEXT NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE "Milestone" (
 );
 
 CREATE TABLE "TransactionLedger" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "userId" TEXT NOT NULL,
     "type" "LedgerEntryType" NOT NULL,
     "direction" "LedgerDirection" NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE "TransactionLedger" (
 );
 
 CREATE TABLE "Payout" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "trainerId" TEXT NOT NULL,
     "amountKes" DECIMAL(12,2) NOT NULL,
     "mpesaPhone" TEXT NOT NULL,
@@ -151,7 +151,7 @@ CREATE TABLE "Payout" (
 );
 
 CREATE TABLE "Review" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "enrolmentId" TEXT NOT NULL,
     "trainerId" TEXT NOT NULL,
     "traineeId" TEXT NOT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE "Review" (
 );
 
 CREATE TABLE "Dispute" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "enrolmentId" TEXT NOT NULL,
     "milestoneId" TEXT,
     "raisedById" TEXT NOT NULL,
@@ -178,7 +178,7 @@ CREATE TABLE "Dispute" (
 );
 
 CREATE TABLE "SessionLog" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "enrolmentId" TEXT NOT NULL,
     "milestoneId" TEXT NOT NULL,
     "mode" "CourseMode" NOT NULL,
@@ -192,7 +192,7 @@ CREATE TABLE "SessionLog" (
 );
 
 CREATE TABLE "Notification" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "userId" TEXT NOT NULL,
     "type" TEXT NOT NULL DEFAULT 'EMAIL',
     "channel" TEXT NOT NULL DEFAULT 'email',
@@ -329,3 +329,80 @@ CREATE POLICY "Anyone can view platform config" ON "PlatformConfig" FOR SELECT U
 -- ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "verificationFee" DECIMAL(12,2) NOT NULL DEFAULT 5000.00;
 -- ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "minPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 100.00;
 -- ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "maxPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 50000.00;
+
+
+-- ── Policies and Additional Migrations ──
+
+
+-- Missing Foreign Key Indexes
+CREATE INDEX IF NOT EXISTS "Trainer_userId_idx" ON "Trainer"("userId");
+CREATE INDEX IF NOT EXISTS "Course_trainerId_idx" ON "Course"("trainerId");
+CREATE INDEX IF NOT EXISTS "Enrolment_courseId_idx" ON "Enrolment"("courseId");
+CREATE INDEX IF NOT EXISTS "Enrolment_traineeId_idx" ON "Enrolment"("traineeId");
+CREATE INDEX IF NOT EXISTS "Enrolment_trainerId_idx" ON "Enrolment"("trainerId");
+CREATE INDEX IF NOT EXISTS "Milestone_enrolmentId_idx" ON "Milestone"("enrolmentId");
+CREATE INDEX IF NOT EXISTS "TransactionLedger_userId_idx" ON "TransactionLedger"("userId");
+CREATE INDEX IF NOT EXISTS "Payout_trainerId_idx" ON "Payout"("trainerId");
+CREATE INDEX IF NOT EXISTS "Review_trainerId_idx" ON "Review"("trainerId");
+CREATE INDEX IF NOT EXISTS "Review_traineeId_idx" ON "Review"("traineeId");
+CREATE INDEX IF NOT EXISTS "Dispute_enrolmentId_idx" ON "Dispute"("enrolmentId");
+CREATE INDEX IF NOT EXISTS "Dispute_raisedById_idx" ON "Dispute"("raisedById");
+CREATE INDEX IF NOT EXISTS "Dispute_resolvedById_idx" ON "Dispute"("resolvedById");
+CREATE INDEX IF NOT EXISTS "SessionLog_enrolmentId_idx" ON "SessionLog"("enrolmentId");
+CREATE INDEX IF NOT EXISTS "Notification_userId_idx" ON "Notification"("userId");
+
+
+﻿-- RLS Policies (from supabase-schema.sql)
+CREATE POLICY "Anyone can view user profiles" ON "User" FOR SELECT USING (true);
+CREATE POLICY "Users can insert own record" ON "User" FOR INSERT WITH CHECK (id = auth.uid());
+CREATE POLICY "Users can update own record" ON "User" FOR UPDATE USING (id = auth.uid());
+
+CREATE POLICY "Anyone can view trainer profiles" ON "Trainer" FOR SELECT USING (true);
+CREATE POLICY "Trainers can insert own record" ON "Trainer" FOR INSERT WITH CHECK ("userId" = auth.uid());
+CREATE POLICY "Trainers can update own record" ON "Trainer" FOR UPDATE USING ("userId" = auth.uid());
+
+CREATE POLICY "Anyone can view published courses" ON "Course" FOR SELECT USING ("isPublished" = true AND "deletedAt" IS NULL);
+CREATE POLICY "Trainers can view own courses" ON "Course" FOR SELECT USING ("trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()));
+CREATE POLICY "Trainers can create courses" ON "Course" FOR INSERT WITH CHECK ("trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()));
+CREATE POLICY "Trainers can update own courses" ON "Course" FOR UPDATE USING ("trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()));
+
+CREATE POLICY "Trainees can view own enrolments" ON "Enrolment" FOR SELECT USING ("traineeId" = auth.uid());
+CREATE POLICY "Trainers can view enrolments for their courses" ON "Enrolment" FOR SELECT USING ("trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()));
+CREATE POLICY "Trainees can enrol" ON "Enrolment" FOR INSERT WITH CHECK ("traineeId" = auth.uid());
+
+CREATE POLICY "Users can view own milestones" ON "Milestone" FOR SELECT USING (
+  "enrolmentId" IN (SELECT id FROM "Enrolment" WHERE "traineeId" = auth.uid() OR "trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()))
+);
+
+CREATE POLICY "Users can view own transactions" ON "TransactionLedger" FOR SELECT USING ("userId" = auth.uid());
+
+CREATE POLICY "Trainers can view own payouts" ON "Payout" FOR SELECT USING ("trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()));
+
+CREATE POLICY "Anyone can view public reviews" ON "Review" FOR SELECT USING ("isPublic" = true);
+CREATE POLICY "Users can view own reviews" ON "Review" FOR SELECT USING ("traineeId" = auth.uid());
+CREATE POLICY "Trainees can create reviews" ON "Review" FOR INSERT WITH CHECK ("traineeId" = auth.uid());
+
+CREATE POLICY "Users can view own disputes" ON "Dispute" FOR SELECT USING (
+  "raisedById" = auth.uid() OR "enrolmentId" IN (
+    SELECT id FROM "Enrolment" WHERE "traineeId" = auth.uid() OR "trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid())
+  )
+);
+CREATE POLICY "Users can create disputes" ON "Dispute" FOR INSERT WITH CHECK ("raisedById" = auth.uid());
+
+CREATE POLICY "Users can view session logs for their enrolments" ON "SessionLog" FOR SELECT USING (
+  "enrolmentId" IN (SELECT id FROM "Enrolment" WHERE "traineeId" = auth.uid() OR "trainerId" IN (SELECT id FROM "Trainer" WHERE "userId" = auth.uid()))
+);
+
+CREATE POLICY "Users can view own notifications" ON "Notification" FOR SELECT USING ("userId" = auth.uid());
+CREATE POLICY "Users can update own notifications" ON "Notification" FOR UPDATE USING ("userId" = auth.uid());
+
+CREATE POLICY "Anyone can view platform config" ON "PlatformConfig" FOR SELECT USING (true);
+
+-- PlatformConfig migration (add missing columns)
+ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "commissionRate" DECIMAL(5,2) NOT NULL DEFAULT 12.00;
+ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "verificationFee" DECIMAL(12,2) NOT NULL DEFAULT 5000.00;
+ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "minPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 100.00;
+ALTER TABLE "PlatformConfig" ADD COLUMN IF NOT EXISTS "maxPayoutAmount" DECIMAL(12,2) NOT NULL DEFAULT 50000.00;
+
+-- Trainer profile: add cover photo column
+ALTER TABLE "Trainer" ADD COLUMN IF NOT EXISTS "coverPhoto" TEXT;

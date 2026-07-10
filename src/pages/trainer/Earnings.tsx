@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth-store';
 
 import { getTransactionHistory } from '@/services/paymentService';
 import { getPayoutHistory, requestPayout } from '@/services/payoutService';
+import { getEnrolments } from '@/services/enrolmentService';
 import { WithdrawModal } from '@/components/payment/withdraw-modal';
 
 import { EmptyState } from '@/components/shared/empty-state';
@@ -26,22 +27,35 @@ export default function Earnings() {
 
   const { data: transactions } = useQuery({
     queryKey: ['transactions', user?.id, 'trainer'],
-    queryFn: () => getTransactionHistory(user!.id, 'trainer'),
+    queryFn: () => getTransactionHistory(user!.id),
     enabled: !!user?.id,
   });
 
-  const totalEarnings =
+  const { data: enrolments } = useQuery({
+    queryKey: ['trainer', 'enrolments-earnings', trainerId],
+    queryFn: () => getEnrolments({ trainerId, status: 'ACTIVE' }),
+    enabled: !!trainerId,
+  });
+
+  const settledEarnings =
     transactions?.reduce((sum: number, tx: any) => {
-      if (tx.entryType === 'CREDIT') return sum + (tx.amountKes || 0);
+      if (tx.direction === 'CREDIT') return sum + (tx.amountKes || 0);
       return sum;
     }, 0) || 0;
 
+  const pendingEarnings =
+    enrolments?.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
+
+  const totalEarnings = settledEarnings + pendingEarnings;
   const availableBalance = user?.trainer?.availableBalance || 0;
   const pendingPayouts = payouts?.filter((p: any) => p.status === 'PENDING') || [];
 
   const handleWithdraw = async (data: { amount: number; phone: string }) => {
     await requestPayout({ trainerId: trainerId!, amount: data.amount, phone: data.phone });
-    toast.success('Withdrawal request submitted');
+    toast.success('Withdrawal request submitted', {
+      description: 'Your withdrawal request has been submitted for review. An admin will process your payment within 24 hours. You will receive an M-Pesa notification when payment is sent.',
+      duration: 6000,
+    });
     setWithdrawOpen(false);
   };
 
@@ -93,21 +107,21 @@ export default function Earnings() {
               <div key={tx.id} className="flex items-center gap-4 p-4">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    tx.entryType === 'DEBIT' ? 'bg-red-50' : 'bg-green-50'
+                    tx.direction === 'DEBIT' ? 'bg-red-50' : 'bg-green-50'
                   }`}
                 >
-                  {tx.entryType === 'DEBIT' ? (
+                  {tx.direction === 'DEBIT' ? (
                     <ArrowUpRight size={18} className="text-red-500" />
                   ) : (
                     <ArrowDownLeft size={18} className="text-green-500" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-dark">{tx.description || tx.entryType}</p>
+                  <p className="text-sm font-medium text-dark">{tx.description || tx.direction}</p>
                   <p className="text-xs text-muted-foreground">{formatDate(tx.createdAt)}</p>
                 </div>
-                <p className={`text-sm font-bold ${tx.entryType === 'DEBIT' ? 'text-red-500' : 'text-green-500'}`}>
-                  {tx.entryType === 'DEBIT' ? '-' : '+'}
+                <p className={`text-sm font-bold ${tx.direction === 'DEBIT' ? 'text-red-500' : 'text-green-500'}`}>
+                  {tx.direction === 'DEBIT' ? '-' : '+'}
                   {formatCurrency(tx.amountKes)}
                 </p>
               </div>

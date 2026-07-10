@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Monitor, MapPin } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
+import { MilestoneProgress } from './milestone-progress';
 
 interface EnrolmentCardProps {
   enrolment: any;
@@ -9,7 +10,13 @@ interface EnrolmentCardProps {
   showPrice?: boolean;
 }
 
-export function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps) {
+import React from 'react';
+
+export const EnrolmentCard = React.memo(function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps) {
+  const milestones = enrolment.milestones || [];
+  const completedCount = milestones.filter((m: any) => m.status === 'COMPLETED').length;
+  const totalCount = milestones.length;
+
   return (
     <Link
       to={`/${role}/enrolments/${enrolment.id}`}
@@ -33,9 +40,14 @@ export function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps
           {showPrice && enrolment.pricePaidKes && (
             <p className="text-xs font-medium text-primary mt-1">{formatCurrency(enrolment.pricePaidKes)}</p>
           )}
+          {role === 'trainee' && enrolment.status === 'ACTIVE' && totalCount > 0 && (
+            <div className="mt-2">
+              <MilestoneProgress completed={completedCount} total={totalCount} size="sm" />
+            </div>
+          )}
         </div>
         <StatusBadge status={enrolment.status} />
       </div>
     </Link>
   );
-}
+});

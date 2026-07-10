@@ -1,21 +1,26 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { BookOpen, MapPin, Calendar } from 'lucide-react';
+import { BookOpen, MapPin, Calendar, Wallet, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getEnrolment, confirmMilestone } from '@/services/enrolmentService';
+import { getEnrolment, confirmMilestone, acceptEnrolment, rejectEnrolment } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';
 import { BackButton } from '@/components/shared/back-button';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { MilestoneStepper } from '@/components/shared/milestone-stepper';
+import { MilestoneManager } from '@/components/shared/milestone-manager';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ErrorState } from '@/components/shared/error-state';
+import { AcceptEnrolmentModal } from '@/components/shared/accept-enrolment-modal';
+import { MaterialsSection } from '@/components/shared/materials-section';
 import { formatCurrency, formatDate, getInitials } from '@/lib/utils';
 
 export default function TrainerEnrolmentDetail() {
   const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [actionModal, setActionModal] = useState<'accept' | 'reject' | null>(null);
 
   const {
     data: enrolment,
@@ -41,6 +46,20 @@ export default function TrainerEnrolmentDetail() {
     }
   };
 
+  const handleAccept = async () => {
+    await acceptEnrolment(id!);
+    toast.success('Enrolment accepted');
+    queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
+    refetch();
+  };
+
+  const handleReject = async (reason?: string) => {
+    await rejectEnrolment(id!, reason || '');
+    toast.success('Enrolment rejected');
+    queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
+    refetch();
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -59,8 +78,9 @@ export default function TrainerEnrolmentDetail() {
   const course = enrolment.course || {};
   const trainee = enrolment.trainee || {};
   const milestones = enrolment.milestones || [];
-
-
+  const isPending = enrolment.status === 'PENDING_ACCEPTANCE';
+  const isRejected = enrolment.status === 'REJECTED';
+  const isActive = enrolment.status === 'ACTIVE';
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -74,6 +94,13 @@ export default function TrainerEnrolmentDetail() {
           </div>
           <StatusBadge status={enrolment.status} />
         </div>
+
+        {isRejected && enrolment.rejectionReason && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-card">
+            <p className="text-sm font-medium text-red-700">Rejection Reason</p>
+            <p className="text-sm text-red-600 mt-1">{enrolment.rejectionReason}</p>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-4 text-sm text-body mb-4">
           <span className="flex items-center gap-1">
@@ -90,7 +117,46 @@ export default function TrainerEnrolmentDetail() {
           </span>
         </div>
 
-        {enrolment.pricePaidKes && <p className="text-primary font-bold">{formatCurrency(enrolment.pricePaidKes)}</p>}
+        {enrolment.pricePaidKes && (
+          <div className="bg-surface rounded-card p-4 space-y-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-dark mb-2">
+              <Wallet size={16} className="text-primary" />
+              Payment Breakdown
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-body">Course Price</span>
+              <span className="font-medium text-dark">{formatCurrency(enrolment.pricePaidKes)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-body">Platform Fee</span>
+              <span className="font-medium text-destructive">-{formatCurrency(enrolment.commissionKes || 0)}</span>
+            </div>
+            <hr className="border-border/50" />
+            <div className="flex justify-between text-sm font-semibold">
+              <span className="text-dark">Your Earnings</span>
+              <span className="text-primary">{formatCurrency(enrolment.trainerPayoutKes || 0)}</span>
+            </div>
+          </div>
+        )}
+
+        {isPending && (
+          <div className="flex gap-3 mt-4">
+            <button
+              onClick={() => setActionModal('accept')}
+              className="flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-btn hover:bg-green-700 transition-colors text-sm"
+            >
+              <CheckCircle size={16} />
+              Accept Enrolment
+            </button>
+            <button
+              onClick={() => setActionModal('reject')}
+              className="flex items-center gap-2 px-5 py-2.5 border border-destructive text-destructive font-medium rounded-btn hover:bg-red-50 transition-colors text-sm"
+            >
+              <XCircle size={16} />
+              Reject
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-card shadow-card p-6 mb-6">
@@ -108,15 +174,50 @@ export default function TrainerEnrolmentDetail() {
         </div>
       </div>
 
-      <div className="bg-white rounded-card shadow-card p-6">
-        <h2 className="text-lg font-bold text-dark mb-4">Milestones</h2>
-        <MilestoneStepper
-          milestones={milestones}
-          role="trainer"
-          onConfirm={handleConfirmMilestone}
-          confirming={confirming}
-        />
-      </div>
+      {(isActive || enrolment.status === 'COMPLETED') && (
+        <div className="mb-6">
+          <MaterialsSection enrolmentId={enrolment.id} isTrainer={true} enrolmentStatus={enrolment.status} />
+        </div>
+      )}
+
+      {(isActive || enrolment.status === 'COMPLETED') && (
+        <div className="bg-white rounded-card shadow-card p-6 mb-6">
+          <MilestoneManager
+            enrolmentId={enrolment.id}
+            role="trainer"
+            courseSessionCount={course.sessionCount || 10}
+            milestones={milestones}
+            onRefresh={refetch}
+          />
+        </div>
+      )}
+
+      {(isActive || enrolment.status === 'COMPLETED') && milestones.length > 0 && (
+        <div className="bg-white rounded-card shadow-card p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <DollarSign size={16} className="text-muted-foreground" />
+            <h2 className="text-lg font-bold text-dark">Escrow Confirmation</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            Both parties must confirm milestones to release funds. This is separate from session tracking.
+          </p>
+          <MilestoneStepper
+            milestones={milestones}
+            role="trainer"
+            onConfirm={handleConfirmMilestone}
+            confirming={confirming}
+          />
+        </div>
+      )}
+
+      <AcceptEnrolmentModal
+        open={actionModal !== null}
+        mode={actionModal || 'accept'}
+        onClose={() => setActionModal(null)}
+        onConfirm={actionModal === 'accept' ? handleAccept : handleReject}
+        traineeName={trainee.fullName}
+        courseTitle={course.title}
+      />
     </div>
   );
 }

@@ -17,7 +17,7 @@ export default function Payments() {
     refetch,
   } = useQuery({
     queryKey: ['transactions', user?.id, 'trainee'],
-    queryFn: () => getTransactionHistory(user!.id, 'trainee'),
+    queryFn: () => getTransactionHistory(user!.id),
     enabled: !!user?.id,
   });
 

@@ -40,7 +40,7 @@ export async function applyAsTrainer(data: Record<string, any>) {
 }
 
 export async function updateTrainerProfile(id: string, updates: Record<string, any>) {
-  const { data, error } = await supabase.from('Trainer').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('Trainer').update({ ...updates, updatedAt: new Date().toISOString() }).eq('id', id).select().single();
   if (error) throw error;
   return data;
 }
