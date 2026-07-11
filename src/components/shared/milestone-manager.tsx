@@ -12,6 +12,7 @@ import {
 } from '@/services/enrolmentService';
 import { MilestoneProgress } from './milestone-progress';
 import { useAuthStore } from '@/stores/auth-store';
+import { enrolmentKeys } from '@/lib/query-keys';
 
 interface MilestoneManagerProps {
   enrolmentId: string;
@@ -56,7 +57,7 @@ export function MilestoneManager({
       setShowCreate(false);
       setNewLabel('');
       setNewNotes('');
-      queryClient.invalidateQueries({ queryKey: ['enrolments'] });
+      queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
       onRefresh();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to create milestone'),
@@ -66,7 +67,7 @@ export function MilestoneManager({
     mutationFn: (milestoneId: string) => startMilestone(milestoneId, user!.id),
     onSuccess: () => {
       toast.success('Session started');
-      queryClient.invalidateQueries({ queryKey: ['enrolments'] });
+      queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
       onRefresh();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to start session'),
@@ -79,7 +80,7 @@ export function MilestoneManager({
       toast.success('Session completed');
       setCompleteId(null);
       setCompleteNotes('');
-      queryClient.invalidateQueries({ queryKey: ['enrolments'] });
+      queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
       onRefresh();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to complete session'),
@@ -89,7 +90,7 @@ export function MilestoneManager({
     mutationFn: deleteMilestone,
     onSuccess: () => {
       toast.success('Milestone deleted');
-      queryClient.invalidateQueries({ queryKey: ['enrolments'] });
+      queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
       onRefresh();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to delete milestone'),
@@ -101,7 +102,7 @@ export function MilestoneManager({
     onSuccess: () => {
       toast.success('Milestone updated');
       setEditId(null);
-      queryClient.invalidateQueries({ queryKey: ['enrolments'] });
+      queryClient.invalidateQueries({ queryKey: enrolmentKeys.all });
       onRefresh();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to update milestone'),

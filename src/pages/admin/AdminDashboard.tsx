@@ -264,12 +264,12 @@ export default function AdminDashboard() {
 
 function RecentActivity() {
   const { data: recentEnrolments, isLoading: loadingEnrolments } = useQuery({
-    queryKey: ['admin', 'recent-enrolments'],
+    queryKey: adminKeys.recentEnrolments,
     queryFn: () => getEnrolments({ limit: 5 }),
   });
 
   const { data: recentPayouts } = useQuery({
-    queryKey: ['admin', 'recent-payouts'],
+    queryKey: adminKeys.recentPayouts,
     queryFn: async () => {
       const { data } = await supabase
         .from('Payout')
@@ -281,7 +281,7 @@ function RecentActivity() {
   });
 
   const { data: recentDisputes } = useQuery({
-    queryKey: ['admin', 'recent-disputes'],
+    queryKey: adminKeys.recentDisputes,
     queryFn: async () => {
       const { data } = await supabase
         .from('Dispute')

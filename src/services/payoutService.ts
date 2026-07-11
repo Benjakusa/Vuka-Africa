@@ -20,7 +20,8 @@ export async function getPayoutHistory(trainerId: string) {
     .from('Payout')
     .select('*')
     .eq('trainerId', trainerId)
-    .order('createdAt', { ascending: false });
+    .order('createdAt', { ascending: false })
+    .limit(100);
   if (error) throw error;
   return data || [];
 }

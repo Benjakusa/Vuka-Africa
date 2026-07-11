@@ -10,10 +10,15 @@ function flattenTrainer(enrolment: any) {
 }
 
 export async function getEnrolments(filters?: Record<string, any>) {
+  const page = filters?.['page'] as number | undefined;
+  const perPage = (filters?.['perPage'] as number | undefined) ?? 20;
+  const paginated = page !== undefined;
+
   let query = supabase
     .from('Enrolment')
     .select(
-      '*, trainee:User!traineeId(id, fullName, email, phone), trainer:Trainer!trainerId(id, user:User!userId(fullName)), course:Course(id, title, slug, mode, duration, sessionCount), milestones:Milestone(*), reviews:Review(*)',
+      '*, trainee:User!traineeId(id, fullName, email, phone), trainer:Trainer!trainerId(id, user:User!userId(fullName)), course:Course(id, title, slug, mode, duration, sessionCount), milestones:Milestone(status), reviews:Review(id)',
+      paginated ? { count: 'exact' } : undefined,
     );
 
   if (filters?.['status']) query = query.eq('status', filters['status'] as string);
@@ -22,6 +27,14 @@ export async function getEnrolments(filters?: Record<string, any>) {
   if (filters?.['limit']) query = query.limit(filters['limit'] as number);
 
   query = query.order('createdAt', { ascending: false });
+
+  if (paginated) {
+    const from = (page! - 1) * perPage;
+    query = query.range(from, from + perPage - 1);
+    const { data, error, count } = await query;
+    if (error) throw error;
+    return { data: (data || []).map(flattenTrainer), total: count || 0, page: page!, perPage };
+  }
 
   const { data, error } = await query;
   if (error) throw error;
@@ -108,7 +121,7 @@ export async function rejectEnrolment(enrolmentId: string, reason: string) {
 export async function getCourseMaterials(enrolmentId: string) {
   const { data, error } = await supabase
     .from('CourseMaterial')
-    .select('*')
+    .select('id, enrolmentId, title, description, fileUrl, fileType, uploadedBy, createdAt, updatedAt')
     .eq('enrolmentId', enrolmentId)
     .order('createdAt', { ascending: false });
   if (error) throw error;
@@ -138,12 +151,7 @@ export async function deleteCourseMaterial(id: string) {
   if (error) throw error;
 }
 
-export async function createMilestone(data: {
-  enrolmentId: string;
-  sequence: number;
-  label: string;
-  notes?: string;
-}) {
+export async function createMilestone(data: { enrolmentId: string; sequence: number; label: string; notes?: string }) {
   const now = new Date().toISOString();
   const { data: milestone, error } = await supabase
     .from('Milestone')

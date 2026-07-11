@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
 import { TableSkeleton } from '@/components/shared/loading-skeleton';
 import { formatDate, getInitials } from '@/lib/utils';
+import { VerificationReviewModal } from '@/components/admin/verification-review-modal';
 
 const TABS = [
   { label: 'Pending', value: 'PENDING' },
@@ -24,6 +25,7 @@ export default function Verifications() {
   const status = searchParams.get('status') || 'PENDING';
   const page = Number(searchParams.get('page')) || 1;
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedVerification, setSelectedVerification] = useState<any>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: adminKeys.verifications(status || undefined, page),
@@ -156,28 +158,12 @@ export default function Verifications() {
                       </td>
                       <td className="p-3">
                         {v.verificationStatus === 'PENDING' && (
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => handleApprove(v.id)}
-                              disabled={actionLoading === v.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-surface text-white text-xs font-medium rounded hover:bg-surface disabled:opacity-50"
-                            >
-                              {actionLoading === v.id ? (
-                                <Loader2 size={12} className="animate-spin" />
-                              ) : (
-                                <CheckCircle size={12} />
-                              )}
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleReject(v.id)}
-                              disabled={actionLoading === v.id}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary text-white text-xs font-medium rounded hover:bg-primary disabled:opacity-50"
-                            >
-                              <XCircle size={12} />
-                              Reject
-                            </button>
-                          </div>
+                          <button
+                            onClick={() => setSelectedVerification(v)}
+                            className="inline-flex items-center px-3 py-1.5 bg-dark text-white text-xs font-medium rounded hover:bg-surface"
+                          >
+                            Review
+                          </button>
                         )}
                         {v.verificationStatus === 'APPROVED' && (
                           <span className="text-xs text-foreground">Approved</span>
@@ -220,25 +206,12 @@ export default function Verifications() {
                     <span>{formatDate(v.updatedAt || v.createdAt)}</span>
                   </div>
                   {v.verificationStatus === 'PENDING' && (
-                    <div className="flex gap-2 pt-1">
+                    <div className="pt-1">
                       <button
-                        onClick={() => handleApprove(v.id)}
-                        disabled={actionLoading === v.id}
-                        className="flex-1 py-2 bg-surface text-white text-xs font-medium rounded hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-1"
+                        onClick={() => setSelectedVerification(v)}
+                        className="w-full py-2 bg-dark text-white text-xs font-medium rounded hover:bg-surface"
                       >
-                        {actionLoading === v.id ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <CheckCircle size={12} />
-                        )}
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(v.id)}
-                        disabled={actionLoading === v.id}
-                        className="flex-1 py-2 bg-primary text-white text-xs font-medium rounded hover:bg-primary disabled:opacity-50 flex items-center justify-center gap-1"
-                      >
-                        <XCircle size={12} /> Reject
+                        Review Documents
                       </button>
                     </div>
                   )}
@@ -250,6 +223,15 @@ export default function Verifications() {
       )}
 
       <Pagination page={page} totalPages={totalPages} total={total} />
+
+      <VerificationReviewModal
+        open={!!selectedVerification}
+        onClose={() => setSelectedVerification(null)}
+        verification={selectedVerification}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        actionLoading={actionLoading}
+      />
     </div>
   );
 }

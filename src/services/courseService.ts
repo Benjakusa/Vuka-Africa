@@ -38,20 +38,34 @@ export async function getCourses(filters?: Record<string, any>) {
 }
 
 export async function getTrainerCourses(trainerId: string) {
-  const { data, error } = await supabase.from('Course').select('*').eq('trainerId', trainerId);
+  const { data, error } = await supabase
+    .from('Course')
+    .select(
+      'id, title, slug, description, mode, duration, sessionCount, priceKes, isPublished, imageUrl, createdAt, updatedAt',
+    )
+    .eq('trainerId', trainerId);
   if (error) throw error;
   return data || [];
 }
 
 export async function createCourse(course: Record<string, any>) {
   const now = new Date().toISOString();
-  const { data, error } = await supabase.from('Course').insert({ ...course, createdAt: now, updatedAt: now }).select().single();
+  const { data, error } = await supabase
+    .from('Course')
+    .insert({ ...course, createdAt: now, updatedAt: now })
+    .select()
+    .single();
   if (error) throw error;
   return data;
 }
 
 export async function updateCourse(id: string, updates: Record<string, any>) {
-  const { data, error } = await supabase.from('Course').update({ ...updates, updatedAt: new Date().toISOString() }).eq('id', id).select().single();
+  const { data, error } = await supabase
+    .from('Course')
+    .update({ ...updates, updatedAt: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
   if (error) throw error;
   return data;
 }

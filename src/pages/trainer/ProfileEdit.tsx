@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/auth-store';
 import { getMyTrainerProfile, updateTrainerProfile } from '@/services/trainerService';
 import { supabase } from '@/lib/supabase';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
+import { trainerKeys } from '@/lib/query-keys';
 
 export default function ProfileEdit() {
   const { user } = useAuthStore();
@@ -22,7 +23,7 @@ export default function ProfileEdit() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['trainer', 'profile-edit', user?.id],
+    queryKey: trainerKeys.profileEdit(user?.id),
     queryFn: async () => {
       const p = await getMyTrainerProfile(user!.id);
       if (p) {
@@ -59,7 +60,7 @@ export default function ProfileEdit() {
     },
     onSuccess: () => {
       toast.success('Profile updated successfully');
-      queryClient.invalidateQueries({ queryKey: ['trainer', 'profile-edit', user?.id] });
+      queryClient.invalidateQueries({ queryKey: trainerKeys.profileEdit(user?.id) });
       useAuthStore.getState().checkAuth();
     },
     onError: (err: any) => toast.error(err.message || 'Failed to update profile'),
@@ -98,7 +99,11 @@ export default function ProfileEdit() {
     if (!profile?.id) {
       let { data: newTrainer } = await supabase.from('Trainer').select('id').eq('userId', user!.id).maybeSingle();
       if (!newTrainer) {
-        const r = await supabase.from('Trainer').insert({ userId: user!.id, updatedAt: new Date().toISOString() }).select('id').maybeSingle();
+        const r = await supabase
+          .from('Trainer')
+          .insert({ userId: user!.id, updatedAt: new Date().toISOString() })
+          .select('id')
+          .maybeSingle();
         newTrainer = r.data ?? null;
       }
       if (!newTrainer) {

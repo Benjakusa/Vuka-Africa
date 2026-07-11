@@ -105,7 +105,7 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-4 text-xs text-body-foreground flex-shrink-0">
             <span className="flex items-center gap-1.5">
               <Phone size={12} className="text-primary" />
-              +254 712 345 678
+              0796144879
             </span>
             <span className="text-border">|</span>
             <span className="flex items-center gap-1.5">
@@ -135,7 +135,7 @@ export function Navbar() {
             <div className="space-y-2 text-sm text-body-foreground pb-3 border-b border-border/50">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-primary" />
-                +254 712 345 678
+                0796144879
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-primary" />

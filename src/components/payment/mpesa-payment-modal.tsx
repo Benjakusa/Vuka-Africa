@@ -136,13 +136,14 @@ export function MpesaPaymentModal({
       }
 
       setStep('polling');
+      startPolling(trainerId!);
     } catch (err: any) {
       setStep('error');
       setMessage(err.message || 'Payment failed. Please try again.');
     }
   };
 
-  const startPolling = (enrolmentId: string) => {
+  const startPolling = (recordId: string) => {
     const POLL_INTERVAL = 2500;
     const POLL_TIMEOUT = 120000;
 
@@ -150,23 +151,37 @@ export function MpesaPaymentModal({
       cleanup();
       if (stepRef.current === 'polling') {
         setStep('error');
-        setMessage('Payment confirmation timed out. Check your enrolments for updates.');
+        setMessage('Payment confirmation timed out. Please check again later.');
       }
     }, POLL_TIMEOUT);
 
     pollingRef.current = setInterval(async () => {
-      const { data, error } = await supabase.from('Enrolment').select('status').eq('id', enrolmentId).maybeSingle();
+      if (type === 'enrolment') {
+        const { data, error } = await supabase.from('Enrolment').select('status').eq('id', recordId).maybeSingle();
+        if (error || !data) return;
 
-      if (error || !data) return;
+        if (data.status === 'PENDING_ACCEPTANCE') {
+          cleanup();
+          setStep('success');
+          onSuccess?.();
+        } else if (data.status === 'CANCELLED') {
+          cleanup();
+          setStep('error');
+          setMessage('Payment was cancelled. Please try again.');
+        }
+      } else {
+        const { data, error } = await supabase
+          .from('Trainer')
+          .select('verificationFeePaid')
+          .eq('id', recordId)
+          .maybeSingle();
+        if (error || !data) return;
 
-      if (data.status === 'PENDING_ACCEPTANCE') {
-        cleanup();
-        setStep('success');
-        onSuccess?.();
-      } else if (data.status === 'CANCELLED') {
-        cleanup();
-        setStep('error');
-        setMessage('Payment was cancelled. Please try again.');
+        if (data.verificationFeePaid) {
+          cleanup();
+          setStep('success');
+          onSuccess?.();
+        }
       }
     }, POLL_INTERVAL);
   };

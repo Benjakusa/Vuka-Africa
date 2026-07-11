@@ -4,8 +4,8 @@ import { BookOpen, Users, Wallet, Star, ArrowRight, AlertTriangle, Bell, UserPlu
 import { useAuthStore } from '@/stores/auth-store';
 import { getTrainerCourses } from '@/services/courseService';
 import { getEnrolments } from '@/services/enrolmentService';
-import { getTrainerEarnings, getTrainerReviews } from '@/services/trainerService';
-import { courseKeys, enrolmentKeys } from '@/lib/query-keys';
+import { getTrainerDashboardStats, getTrainerReviews } from '@/services/trainerService';
+import { courseKeys, enrolmentKeys, trainerKeys } from '@/lib/query-keys';
 import { OfflineBanner } from '@/components/shared/offline-banner';
 import { StatCard } from '@/components/shared/stat-card';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
@@ -23,32 +23,28 @@ export default function TrainerDashboard() {
   });
 
   const { data: enrolments } = useQuery({
-    queryKey: enrolmentKeys.list({ trainerId }),
-    queryFn: () => getEnrolments({ trainerId }),
+    queryKey: enrolmentKeys.list({ trainerId, limit: 50 }),
+    queryFn: () => getEnrolments({ trainerId, limit: 50 }),
     enabled: !!trainerId,
   });
 
-  const { data: earnings } = useQuery({
-    queryKey: ['trainer', 'earnings', trainerId],
-    queryFn: () => getTrainerEarnings(trainerId!),
+  const { data: stats } = useQuery({
+    queryKey: trainerKeys.stats(trainerId),
+    queryFn: () => getTrainerDashboardStats(trainerId!),
     enabled: !!trainerId,
   });
 
   const { data: reviewsData } = useQuery({
-    queryKey: ['trainer', 'reviews', trainerId],
+    queryKey: trainerKeys.trainerReviews(trainerId),
     queryFn: () => getTrainerReviews(trainerId!, 1, 5),
     enabled: !!trainerId,
   });
 
   const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
   const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
-  const activeSessions =
-    enrolments?.reduce((count: number, e: any) => {
-      return count + (e.milestones?.filter((m: any) => m.status === 'IN_PROGRESS').length || 0);
-    }, 0) || 0;
-
-  const settledEarnings = earnings?.reduce((sum: number, p: any) => sum + (p.amount || 0), 0) || 0;
-  const pendingEarnings = activeEnrolments.reduce((sum: number, e: any) => sum + (e.trainerPayoutKes || 0), 0) || 0;
+  const activeSessions = Number(stats?.active_sessions_count) || 0;
+  const settledEarnings = Number(stats?.settled_earnings) || 0;
+  const pendingEarnings = Number(stats?.pending_earnings) || 0;
   const totalEarnings = settledEarnings + pendingEarnings;
 
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();

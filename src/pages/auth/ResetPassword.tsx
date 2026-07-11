@@ -1,27 +1,43 @@
-import { useState, Suspense } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import { useState, Suspense, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 import { resetPassword } from '@/services/authService';
 
 function ResetForm() {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token = searchParams.get('token');
+  const [sessionReady, setSessionReady] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setSessionReady(true);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (!sessionReady) {
+    return (
+      <div className="text-center">
+        <Loader2 size={24} className="animate-spin mx-auto mb-4" />
+        <p className="text-sm text-body">Verifying reset link...</p>
+      </div>
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token) {
-      toast.error('Invalid reset link');
-      return;
-    }
     setLoading(true);
     try {
-      await resetPassword(token, password);
+      await resetPassword(password);
       setDone(true);
       setTimeout(() => navigate('/auth/login'), 3000);
     } catch (err: any) {
@@ -30,17 +46,6 @@ function ResetForm() {
       setLoading(false);
     }
   };
-
-  if (!token) {
-    return (
-      <div className="text-center">
-        <p className="text-primary mb-4">Invalid or missing reset token.</p>
-        <Link to="/auth/forgot-password" className="text-primary hover:underline">
-          Request a new reset link
-        </Link>
-      </div>
-    );
-  }
 
   if (done) {
     return (

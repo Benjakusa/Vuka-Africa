@@ -35,7 +35,7 @@ export default function AdminEarnings() {
   });
 
   const { data: config } = useQuery({
-    queryKey: ['admin', 'config'],
+    queryKey: adminKeys.config,
     queryFn: getPlatformConfig,
   });
 
@@ -331,13 +331,14 @@ export default function AdminEarnings() {
 
 function CommissionsTab() {
   const { data: commissions, isLoading } = useQuery({
-    queryKey: ['admin', 'commissions'],
+    queryKey: adminKeys.commissions,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('TransactionLedger')
         .select('*, user:User!userId(id, fullName, email)')
         .eq('entryType', 'COMMISSION')
-        .order('createdAt', { ascending: false });
+        .order('createdAt', { ascending: false })
+        .limit(200);
       if (error) throw error;
       return data || [];
     },

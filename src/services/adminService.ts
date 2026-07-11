@@ -1,58 +1,51 @@
 import { supabase } from '@/lib/supabase';
 
 export async function getAdminStats() {
-  const [users, trainers, courses, enrolments, disputes] = await Promise.all([
-    supabase.from('User').select('*', { count: 'exact', head: true }),
-    supabase.from('Trainer').select('*', { count: 'exact', head: true }),
-    supabase.from('Course').select('*', { count: 'exact', head: true }),
-    supabase.from('Enrolment').select('*', { count: 'exact', head: true }),
-    supabase.from('Dispute').select('*', { count: 'exact', head: true }).eq('status', 'OPEN'),
-  ]);
-
+  const { data, error } = await supabase.rpc('get_admin_stats');
+  if (error) throw error;
+  const stats = data?.[0] || {
+    total_users: 0,
+    total_trainers: 0,
+    total_courses: 0,
+    total_enrolments: 0,
+    open_disputes: 0,
+  };
   return {
-    totalUsers: users.count || 0,
-    totalTrainers: trainers.count || 0,
-    totalCourses: courses.count || 0,
-    totalEnrolments: enrolments.count || 0,
-    openDisputes: disputes.count || 0,
+    totalUsers: Number(stats.total_users),
+    totalTrainers: Number(stats.total_trainers),
+    totalCourses: Number(stats.total_courses),
+    totalEnrolments: Number(stats.total_enrolments),
+    openDisputes: Number(stats.open_disputes),
   };
 }
 
 export async function getAdminEarnings() {
-  const [commissions, disbursements, pendingPayouts, monthlyData] = await Promise.all([
-    supabase.from('TransactionLedger').select('amountKes').eq('entryType', 'COMMISSION'),
-    supabase.from('TransactionLedger').select('amountKes').eq('entryType', 'PAYOUT'),
-    supabase
-      .from('Payout')
-      .select('amount')
-      .eq('status', 'PENDING'),
-    supabase
-      .from('TransactionLedger')
-      .select('amountKes, createdAt, entryType')
-      .order('createdAt', { ascending: false }),
+  const [financialsRes, monthlyRes] = await Promise.all([
+    supabase.rpc('get_admin_financials'),
+    supabase.rpc('get_admin_monthly_earnings'),
   ]);
 
-  const totalCommissions = (commissions.data || []).reduce((sum: number, t: any) => sum + (Number(t.amountKes) || 0), 0);
-  const totalDisbursed = (disbursements.data || []).reduce((sum: number, t: any) => sum + (Number(t.amountKes) || 0), 0);
-  const pendingAmount = (pendingPayouts.data || []).reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+  if (financialsRes.error) throw financialsRes.error;
+  if (monthlyRes.error) throw monthlyRes.error;
 
-  const monthlyMap: Record<string, { commissions: number; disbursements: number }> = {};
-  (monthlyData.data || []).forEach((t: any) => {
-    const month = new Date(t.createdAt).toISOString().slice(0, 7);
-    if (!monthlyMap[month]) monthlyMap[month] = { commissions: 0, disbursements: 0 };
-    if (t.entryType === 'COMMISSION') monthlyMap[month].commissions += Number(t.amountKes) || 0;
-    if (t.entryType === 'PAYOUT') monthlyMap[month].disbursements += Number(t.amountKes) || 0;
-  });
+  const fin = financialsRes.data?.[0] || {
+    total_commissions: 0,
+    total_disbursed: 0,
+    pending_payouts: 0,
+    pending_payouts_count: 0,
+  };
 
-  const monthlyEarnings = Object.entries(monthlyMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([month, data]) => ({ month, ...data }));
+  const monthlyEarnings = (monthlyRes.data || []).map((row: any) => ({
+    month: row.month,
+    commissions: Number(row.commissions),
+    disbursements: Number(row.disbursements),
+  }));
 
   return {
-    totalCommissions,
-    totalDisbursed,
-    pendingPayouts: pendingAmount,
-    pendingPayoutsCount: pendingPayouts.count || 0,
+    totalCommissions: Number(fin.total_commissions),
+    totalDisbursed: Number(fin.total_disbursed),
+    pendingPayouts: Number(fin.pending_payouts),
+    pendingPayoutsCount: Number(fin.pending_payouts_count),
     monthlyEarnings,
   };
 }
@@ -90,28 +83,15 @@ export async function processTrainerPayment(data: {
   notes?: string;
   adminId: string;
 }) {
-  const { error: payoutError } = await supabase
-    .from('Payout')
-    .update({
-      status: 'COMPLETED',
-      amountPaid: data.amountPaid,
-      paymentMethod: data.paymentMethod,
-      adminNotes: data.notes || null,
-      processedBy: data.adminId,
-      processedAt: new Date().toISOString(),
-    })
-    .eq('id', data.payoutId);
-  if (payoutError) throw payoutError;
-
-  const { error: ledgerError } = await supabase.from('TransactionLedger').insert({
-    userId: data.adminId,
-    amountKes: data.amountPaid,
-    entryType: 'PAYOUT',
-    direction: 'DEBIT',
-    description: `Payout processed — ${data.mpesaTransactionId || data.paymentMethod}`,
-    metadata: { payoutId: data.payoutId },
+  const { error } = await supabase.rpc('process_trainer_payout', {
+    p_payout_id: data.payoutId,
+    p_amount_paid: data.amountPaid,
+    p_payment_method: data.paymentMethod,
+    p_admin_notes: data.notes || null,
+    p_admin_id: data.adminId,
+    p_reference: data.mpesaTransactionId || data.paymentMethod,
   });
-  if (ledgerError) throw ledgerError;
+  if (error) throw error;
 }
 
 export async function getAllCourses(filters?: {
@@ -131,9 +111,7 @@ export async function getAllCourses(filters?: {
     });
 
   if (filters?.search) {
-    query = query.or(
-      `title.ilike.%${filters.search}%,trainer.user.fullName.ilike.%${filters.search}%`,
-    );
+    query = query.or(`title.ilike.%${filters.search}%,trainer.user.fullName.ilike.%${filters.search}%`);
   }
   if (filters?.category) query = query.eq('category', filters.category);
   if (filters?.mode) query = query.eq('mode', filters.mode);
@@ -156,29 +134,31 @@ export async function getAllCourses(filters?: {
 }
 
 export async function getAdminCourseDetail(courseId: string) {
-  const { data: course, error: courseError } = await supabase
-    .from('Course')
-    .select('*, trainer:Trainer!trainerId(user:User!userId(fullName, email))')
-    .eq('id', courseId)
-    .single();
-  if (courseError) throw courseError;
+  const [courseRes, enrolRes, revenueRes] = await Promise.all([
+    supabase
+      .from('Course')
+      .select('*, trainer:Trainer!trainerId(user:User!userId(fullName, email))')
+      .eq('id', courseId)
+      .single(),
+    supabase
+      .from('Enrolment')
+      .select(
+        'id, status, pricePaidKes, createdAt, trainee:User!traineeId(id, fullName, email), milestones:Milestone(status)',
+      )
+      .eq('courseId', courseId)
+      .order('createdAt', { ascending: false }),
+    supabase.from('Enrolment').select('pricePaidKes').eq('courseId', courseId),
+  ]);
 
-  const { data: enrolments, error: enrolError } = await supabase
-    .from('Enrolment')
-    .select('*, trainee:User!traineeId(id, fullName, email), milestones:Milestone(*)')
-    .eq('courseId', courseId)
-    .order('createdAt', { ascending: false });
-  if (enrolError) throw enrolError;
+  if (courseRes.error) throw courseRes.error;
+  if (enrolRes.error) throw enrolRes.error;
 
-  const totalRevenue = (enrolments || []).reduce(
-    (sum: number, e: any) => sum + (Number(e.pricePaidKes) || 0),
-    0,
-  );
+  const totalRevenue = (revenueRes.data || []).reduce((sum: number, e: any) => sum + (Number(e.pricePaidKes) || 0), 0);
 
   return {
-    ...course,
-    trainerName: course.trainer?.user?.fullName || 'Unknown',
-    enrolments: enrolments || [],
+    ...courseRes.data,
+    trainerName: courseRes.data.trainer?.user?.fullName || 'Unknown',
+    enrolments: enrolRes.data || [],
     totalRevenue,
   };
 }
@@ -194,10 +174,7 @@ export async function publishCourse(courseId: string) {
 }
 
 export async function softDeleteCourse(courseId: string) {
-  const { error } = await supabase
-    .from('Course')
-    .update({ deletedAt: new Date().toISOString() })
-    .eq('id', courseId);
+  const { error } = await supabase.from('Course').update({ deletedAt: new Date().toISOString() }).eq('id', courseId);
   if (error) throw error;
 }
 
@@ -303,7 +280,10 @@ export async function getTransactions(filters?: Record<string, any>, page = 1, p
 }
 
 export async function getPlatformConfig() {
-  const { data, error } = await supabase.from('PlatformConfig').select('*').maybeSingle();
+  const { data, error } = await supabase
+    .from('PlatformConfig')
+    .select('id, commissionRate, minimumWithdrawalKes, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt')
+    .maybeSingle();
   if (error) throw error;
   return (
     data || {

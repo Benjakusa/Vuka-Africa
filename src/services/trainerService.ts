@@ -49,8 +49,18 @@ export async function getTrainer(id: string) {
   return { ...trainer, fullName: user.fullName };
 }
 
+// Private column list for a trainer's own profile (includes sensitive financial/internal fields)
+const TRAINER_PRIVATE_COLUMNS =
+  'id, userId, bio, skills, isVerified, verificationStatus, verificationFeePaid, coverPhoto, ' +
+  'averageRating, totalReviews, totalStudents, availableBalance, commissionRate, createdAt, updatedAt, ' +
+  'idDocumentUrl, kraPinUrl, passportPhotoUrl, verificationVideoUrl, verificationFeeAmount';
+
 export async function getMyTrainerProfile(userId: string) {
-  const { data, error } = await supabase.from('Trainer').select('*').eq('userId', userId).maybeSingle();
+  const { data, error } = await supabase
+    .from('Trainer')
+    .select(TRAINER_PRIVATE_COLUMNS)
+    .eq('userId', userId)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -72,15 +82,8 @@ export async function updateTrainerProfile(id: string, updates: Record<string, a
   return data;
 }
 
-export async function getTrainerEarnings(trainerId: string) {
-  const { data, error } = await supabase
-    .from('Payout')
-    .select('*')
-    .eq('trainerId', trainerId)
-    .order('createdAt', { ascending: false });
-  if (error) throw error;
-  return data || [];
-}
+// getTrainerEarnings removed — was dead code with no callers.
+// Use getPayoutHistory (payoutService.ts) + getTrainerDashboardStats RPC instead.
 
 export async function getTrainerReviews(trainerId: string, page = 1, perPage = 10) {
   const from = (page - 1) * perPage;
@@ -103,4 +106,10 @@ export async function getVerificationStatus(trainerId: string) {
     .maybeSingle();
   if (error) throw error;
   return data;
+}
+
+export async function getTrainerDashboardStats(trainerId: string) {
+  const { data, error } = await supabase.rpc('get_trainer_dashboard_stats', { p_trainer_id: trainerId });
+  if (error) throw error;
+  return data?.[0] || { settled_earnings: 0, pending_earnings: 0, active_sessions_count: 0 };
 }

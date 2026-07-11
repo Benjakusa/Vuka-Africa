@@ -3,6 +3,9 @@ import { BookOpen, Monitor, MapPin } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
 import { MilestoneProgress } from './milestone-progress';
+import { useQueryClient } from '@tanstack/react-query';
+import { getEnrolment } from '@/services/enrolmentService';
+import { useCallback } from 'react';
 
 interface EnrolmentCardProps {
   enrolment: any;
@@ -16,9 +19,22 @@ export const EnrolmentCard = React.memo(function EnrolmentCard({ enrolment, role
   const milestones = enrolment.milestones || [];
   const completedCount = milestones.filter((m: any) => m.status === 'COMPLETED').length;
   const totalCount = milestones.length;
+  const queryClient = useQueryClient();
+
+  const prefetch = useCallback(() => {
+    queryClient.prefetchQuery({
+      queryKey: ['enrolment', enrolment.id],
+      queryFn: () => getEnrolment(enrolment.id),
+      staleTime: 60_000,
+    });
+  }, [queryClient, enrolment.id]);
 
   return (
-    <Link to={`/${role}/enrolments/${enrolment.id}`} className="block bg-white rounded-card shadow-card card-hover p-4">
+    <Link
+      to={`/${role}/enrolments/${enrolment.id}`}
+      onMouseEnter={prefetch}
+      className="block bg-white rounded-card shadow-card card-hover p-4"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

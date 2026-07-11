@@ -4,6 +4,11 @@ export const trainerKeys = {
   list: (filters: Record<string, string | number | boolean | undefined>) => [...trainerKeys.lists(), filters] as const,
   details: () => [...trainerKeys.all, 'detail'] as const,
   detail: (id: string) => [...trainerKeys.details(), id] as const,
+  profile: (userId?: string) => ['trainer', 'profile', userId] as const,
+  profileEdit: (userId?: string) => ['trainer', 'profile-edit', userId] as const,
+  stats: (trainerId?: string) => ['trainer', 'stats', trainerId] as const,
+  trainerReviews: (trainerId?: string) => ['trainer', 'reviews', trainerId] as const,
+  trainerPayouts: (trainerId?: string) => ['trainer', 'payouts', trainerId] as const,
 };
 
 export const courseKeys = {
@@ -43,8 +48,14 @@ export const adminKeys = {
   payouts: (status?: string, page?: number) => ['admin', 'payouts', status, page] as const,
   adminCourses: (filters?: Record<string, unknown>) => ['admin', 'courses', filters] as const,
   adminCourseDetail: (id: string) => ['admin', 'courses', id] as const,
+  config: ['admin', 'config'] as const,
+  commissions: ['admin', 'commissions'] as const,
+  recentEnrolments: ['admin', 'recent-enrolments'] as const,
+  recentPayouts: ['admin', 'recent-payouts'] as const,
+  recentDisputes: ['admin', 'recent-disputes'] as const,
 };
 
 export const miscKeys = {
   platformConfig: ['platform', 'config'] as const,
+  userTransactions: (userId?: string, role?: string) => ['transactions', userId, role] as const,
 };

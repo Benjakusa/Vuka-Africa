@@ -1,50 +1,66 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ShieldCheck, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { ShieldCheck, Loader2, CheckCircle, XCircle, Clock, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabase } from '@/lib/supabase';
 import { getMyTrainerProfile, updateTrainerProfile } from '@/services/trainerService';
+import { trainerKeys } from '@/lib/query-keys';
 import { FileUpload } from '@/components/shared/file-upload';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatCurrency } from '@/lib/utils';
+import { MpesaPaymentModal } from '@/components/payment/mpesa-payment-modal';
 
 export default function Verification() {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['trainer', 'profile', user?.id],
+    queryKey: trainerKeys.profile(user?.id),
     queryFn: () => getMyTrainerProfile(user!.id),
     enabled: !!user?.id,
   });
 
-  const [govIdUrl, setGovIdUrl] = useState<string | null>(null);
+  const [idDocumentUrl, setIdDocumentUrl] = useState<string | null>(null);
+  const [kraPinUrl, setKraPinUrl] = useState<string | null>(null);
+  const [passportPhotoUrl, setPassportPhotoUrl] = useState<string | null>(null);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   const submitMutation = useMutation({
-    mutationFn: () =>
-      updateTrainerProfile(profile!.id, {
+    mutationFn: () => {
+      const finalId = idDocumentUrl || profile?.idDocumentUrl;
+      const finalKra = kraPinUrl || profile?.kraPinUrl;
+      const finalPassport = passportPhotoUrl || profile?.passportPhotoUrl;
+
+      if (!finalId || !finalKra || !finalPassport) {
+        throw new Error('Please upload all three required documents');
+      }
+
+      return updateTrainerProfile(profile!.id, {
         verificationStatus: 'PENDING',
-        govIdUrl: govIdUrl || profile?.govIdUrl,
-      }),
+        idDocumentUrl: finalId,
+        kraPinUrl: finalKra,
+        passportPhotoUrl: finalPassport,
+      });
+    },
     onSuccess: () => {
       toast.success('Verification application submitted');
-      queryClient.invalidateQueries({ queryKey: ['trainer', 'profile', user?.id] });
+      queryClient.invalidateQueries({ queryKey: trainerKeys.profile(user?.id) });
     },
     onError: (err: any) => {
       toast.error(err.message || 'Failed to submit verification');
     },
   });
 
-  const uploadId = async (file: File) => {
+  const uploadFile = async (file: File, type: string, setter: (url: string) => void) => {
     const formData = new FormData();
     formData.append('file', file);
     const { data, error } = await supabase.storage
       .from('verifications')
-      .upload(`gov-ids/${user!.id}/${file.name}`, file);
+      .upload(`${type}/${user!.id}/${Date.now()}_${file.name}`, file);
     if (error) throw error;
     const { data: urlData } = supabase.storage.from('verifications').getPublicUrl(data.path);
-    setGovIdUrl(urlData.publicUrl);
+    setter(urlData.publicUrl);
     toast.success('Document uploaded');
   };
 
@@ -58,6 +74,8 @@ export default function Verification() {
 
   const status = profile?.verificationStatus || 'NONE';
   const isVerified = profile?.isVerified;
+  const feePaid = profile?.verificationFeePaid;
+  const feeAmount = profile?.verificationFeeAmount || 5000;
 
   const statusConfig: Record<string, { icon: any; color: string; title: string; desc: string }> = {
     NONE: {
@@ -86,13 +104,13 @@ export default function Verification() {
     },
   };
 
-  const config = statusConfig[status] ?? {
-    icon: ShieldCheck,
-    color: 'text-body-foreground',
-    title: 'Not Verified',
-    desc: 'Verify your identity to build trust with students and unlock higher earnings.',
-  };
+  const config = statusConfig[status] ?? statusConfig.NONE;
   const StatusIcon = config.icon;
+
+  const canSubmit =
+    (idDocumentUrl || profile?.idDocumentUrl) &&
+    (kraPinUrl || profile?.kraPinUrl) &&
+    (passportPhotoUrl || profile?.passportPhotoUrl);
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -122,20 +140,75 @@ export default function Verification() {
           </div>
         )}
 
-        {(status === 'NONE' || status === 'REJECTED') && !isVerified && (
-          <div className="space-y-4 mt-4">
+        {(status === 'NONE' || status === 'REJECTED') && !isVerified && !feePaid && (
+          <div className="mt-6 border border-border rounded-card p-6 bg-surface">
+            <div className="flex items-center gap-3 mb-4">
+              <Wallet size={24} className="text-primary" />
+              <div>
+                <h3 className="font-semibold text-dark">Verification Fee</h3>
+                <p className="text-sm text-body">A one-time fee of {formatCurrency(feeAmount)} is required.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setPaymentModalOpen(true)}
+              className="w-full py-2.5 bg-dark text-white font-medium rounded-btn hover:bg-surface flex items-center justify-center gap-2 transition-colors"
+            >
+              Pay {formatCurrency(feeAmount)} via M-Pesa
+            </button>
+          </div>
+        )}
+
+        {(status === 'NONE' || status === 'REJECTED') && !isVerified && feePaid && (
+          <div className="space-y-6 mt-6 pt-6 border-t border-border">
+            <div className="flex items-center gap-2 text-sm text-foreground font-medium mb-4 bg-surface px-3 py-2 rounded">
+              <CheckCircle size={16} /> Verification fee paid successfully
+            </div>
+
             <div>
-              <label className="text-sm font-medium text-dark mb-1 block">Upload Government ID</label>
+              <label className="text-sm font-medium text-dark mb-1 block">1. Upload National ID or Passport</label>
               <FileUpload
                 accept="image/*,.pdf"
-                onUpload={uploadId}
-                label="Upload ID (KRA PIN, National ID, or Passport)"
+                onUpload={(file) => uploadFile(file, 'ids', setIdDocumentUrl)}
+                label="Front and Back of ID, or Passport page"
               />
+              {(idDocumentUrl || profile?.idDocumentUrl) && (
+                <p className="text-xs text-foreground mt-1 flex items-center gap-1">
+                  <CheckCircle size={12} /> Uploaded
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-dark mb-1 block">2. Upload KRA PIN Certificate</label>
+              <FileUpload
+                accept="image/*,.pdf"
+                onUpload={(file) => uploadFile(file, 'kra', setKraPinUrl)}
+                label="Official KRA PIN document"
+              />
+              {(kraPinUrl || profile?.kraPinUrl) && (
+                <p className="text-xs text-foreground mt-1 flex items-center gap-1">
+                  <CheckCircle size={12} /> Uploaded
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-dark mb-1 block">3. Upload Passport Photo</label>
+              <FileUpload
+                accept="image/*"
+                onUpload={(file) => uploadFile(file, 'photos', setPassportPhotoUrl)}
+                label="Clear, recent passport-sized photo"
+              />
+              {(passportPhotoUrl || profile?.passportPhotoUrl) && (
+                <p className="text-xs text-foreground mt-1 flex items-center gap-1">
+                  <CheckCircle size={12} /> Uploaded
+                </p>
+              )}
             </div>
 
             <button
               onClick={() => submitMutation.mutate()}
-              disabled={submitMutation.isPending}
+              disabled={submitMutation.isPending || !canSubmit}
               className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {submitMutation.isPending && <Loader2 size={16} className="animate-spin" />}
@@ -145,7 +218,7 @@ export default function Verification() {
         )}
 
         {status === 'PENDING' && (
-          <div className="flex items-center gap-2 px-4 py-3 bg-surface border border-border rounded-card">
+          <div className="flex items-center gap-2 px-4 py-3 bg-surface border border-border rounded-card mt-4">
             <Clock size={16} className="text-body" />
             <span className="text-sm text-body">
               Submitted {profile?.updatedAt ? formatDate(profile.updatedAt) : 'recently'}. We'll notify you once
@@ -166,6 +239,19 @@ export default function Verification() {
           </div>
         )}
       </div>
+
+      <MpesaPaymentModal
+        open={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        type="verification"
+        trainerId={profile?.id}
+        amount={feeAmount}
+        phone={user?.phone || ''}
+        onSuccess={() => {
+          setPaymentModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: trainerKeys.profile(user?.id) });
+        }}
+      />
     </div>
   );
 }
