@@ -107,8 +107,8 @@ export default function AuthPage() {
         .ap-back:hover { text-decoration: underline; }
         .ap-field { margin-bottom: .8rem; }
         .ap-label { display: block; font-size: .78rem; font-weight: 600; color: #1A1A1A; margin-bottom: .3rem; }
-        .ap-input { width: 100%; padding: .58rem .85rem; border: 1.5px solid #E5E7EB; border-radius: .5rem; font-size: .875rem; color: #1A1A1A; background: #FAFAFA; outline: none; transition: border-color .18s, box-shadow .18s, background .18s; font-family: inherit; }
-        .ap-input:focus { border-color: #ff3f34; box-shadow: 0 0 0 3px rgba(255,63,52,.15); background: #fff; }
+        .ap-input { width: 100%; padding: .58rem .85rem; border: 1.5px solid #E5E7EB; border-radius: .5rem; font-size: .875rem; color: #1A1A1A; background: #FAFAFA; outline: none; transition: border-color .18s, background .18s; font-family: inherit; }
+        .ap-input:focus { border-color: #ff3f34; background: #fff; }
         .ap-input-wrap { position: relative; }
         .ap-input-wrap .ap-input { padding-right: 2.4rem; }
         .ap-eye { position: absolute; right: .7rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #9AA3AF; display: flex; align-items: center; padding: 0; line-height: 1; }

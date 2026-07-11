@@ -6,6 +6,13 @@
   * {
     @apply border-border outline-none;
   }
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #ff3f34;
+    box-shadow: none !important;
+    outline: none;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     -webkit-tap-highlight-color: transparent;
