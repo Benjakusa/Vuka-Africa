@@ -82,8 +82,8 @@ async function processEnrolmentPayment(
     return;
   }
 
-  if (enrolment.status !== 'PENDING_ACCEPTANCE') {
-    console.log(`[mpesa-callback] Enrolment ${enrolmentId} status is ${enrolment.status}, skipping`);
+  if (enrolment.status !== 'PENDING_PAYMENT') {
+    console.log(`[mpesa-callback] Enrolment ${enrolmentId} status is ${enrolment.status}, expected PENDING_PAYMENT`);
     return;
   }
 
@@ -94,6 +94,7 @@ async function processEnrolmentPayment(
   const { error: updateError } = await supabase
     .from('Enrolment')
     .update({
+      status: 'PENDING_ACCEPTANCE',
       mpesaTransactionId: receipt,
       mpesaReceiptNumber: receipt,
       mpesaCheckoutRequestId: checkoutRequestId,
@@ -152,11 +153,7 @@ async function processEnrolmentPayment(
     mpesaTransactionId: receipt,
     description: `Commission on ${enrolment.course.title}`,
   });
-
-  await supabase
-    .from('Trainer')
-    .update({ totalStudents: { increment: 1 } })
-    .eq('id', enrolment.trainerId);
+  // totalStudents increment is now handled by the DB trigger trg_enrolment_increment_students
 
   await sendEmail(
     enrolment.trainee.email,

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
 import { supabase } from '@/lib/supabase';
+import { initiateMpesaPayment } from '@/services/paymentService';
 import { formatCurrency } from '@/lib/utils';
 
 interface MpesaPaymentModalProps {
@@ -28,21 +29,31 @@ export function MpesaPaymentModal({
   const [phone, setPhone] = useState(initialPhone || '+254');
   const [step, setStep] = useState<'form' | 'processing' | 'polling' | 'success' | 'error'>('form');
   const [message, setMessage] = useState('');
-  const enrolmentIdRef = useRef<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stepRef = useRef(step);
   const { user } = useAuthStore();
+
+  stepRef.current = step;
+
+  const cleanup = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (!open) {
       setStep('form');
       setMessage('');
-      enrolmentIdRef.current = null;
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
+      cleanup();
     }
-  }, [open]);
+  }, [open, cleanup]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,17 +67,6 @@ export function MpesaPaymentModal({
       }
 
       if (type === 'enrolment') {
-        await supabase
-          .from('User')
-          .upsert({
-            id: user!.id,
-            email: user!.email,
-            phone: user!.phone.replace(/[^0-9]/g, ''),
-            fullName: user!.fullName,
-            role: 'TRAINEE',
-          })
-          .maybeSingle();
-
         const now = new Date().toISOString();
         const { data: trainerProfile } = await supabase
           .from('Trainer')
@@ -77,17 +77,21 @@ export function MpesaPaymentModal({
         const commissionKes = Math.round(amount * (rate / 100) * 100) / 100;
         const trainerPayoutKes = amount - commissionKes;
 
-        const { error: createError } = await supabase.from('Enrolment').insert({
-          courseId,
-          trainerId,
-          traineeId: user!.id,
-          pricePaidKes: amount,
-          commissionKes,
-          trainerPayoutKes,
-          status: 'PENDING_ACCEPTANCE',
-          createdAt: now,
-          updatedAt: now,
-        });
+        const { data: enrolment, error: createError } = await supabase
+          .from('Enrolment')
+          .insert({
+            courseId,
+            trainerId,
+            traineeId: user!.id,
+            pricePaidKes: amount,
+            commissionKes,
+            trainerPayoutKes,
+            status: 'PENDING_PAYMENT',
+            createdAt: now,
+            updatedAt: now,
+          })
+          .select('id')
+          .single();
 
         if (createError) {
           if (createError.code === '23505') {
@@ -98,9 +102,37 @@ export function MpesaPaymentModal({
           throw new Error(createError.message);
         }
 
-        setStep('success');
-        onSuccess?.();
+        // Invoke M-Pesa STK Push
+        const result = await initiateMpesaPayment({
+          phone: cleanPhone,
+          amount,
+          reference: `ENROL-${enrolment.id.slice(0, 6)}`,
+          description: 'Course Enrolment',
+          enrolmentId: enrolment.id,
+          trainerId,
+        });
+
+        if (!result.CheckoutRequestID) {
+          throw new Error(result.ResponseDescription || 'Failed to initiate payment');
+        }
+
+        // Transition to polling and wait for M-Pesa callback
+        setStep('polling');
+        startPolling(enrolment.id);
         return;
+      }
+
+      // Verification flow kept as-is but invoke STK Push
+      const result = await initiateMpesaPayment({
+        phone: cleanPhone,
+        amount,
+        reference: `VERIFY-${user!.id.slice(0, 6)}`,
+        description: 'Verification Fee',
+        trainerId,
+      });
+
+      if (!result.CheckoutRequestID) {
+        throw new Error(result.ResponseDescription || 'Failed to initiate payment');
       }
 
       setStep('polling');
@@ -108,6 +140,35 @@ export function MpesaPaymentModal({
       setStep('error');
       setMessage(err.message || 'Payment failed. Please try again.');
     }
+  };
+
+  const startPolling = (enrolmentId: string) => {
+    const POLL_INTERVAL = 2500;
+    const POLL_TIMEOUT = 120000;
+
+    timeoutRef.current = setTimeout(() => {
+      cleanup();
+      if (stepRef.current === 'polling') {
+        setStep('error');
+        setMessage('Payment confirmation timed out. Check your enrolments for updates.');
+      }
+    }, POLL_TIMEOUT);
+
+    pollingRef.current = setInterval(async () => {
+      const { data, error } = await supabase.from('Enrolment').select('status').eq('id', enrolmentId).maybeSingle();
+
+      if (error || !data) return;
+
+      if (data.status === 'PENDING_ACCEPTANCE') {
+        cleanup();
+        setStep('success');
+        onSuccess?.();
+      } else if (data.status === 'CANCELLED') {
+        cleanup();
+        setStep('error');
+        setMessage('Payment was cancelled. Please try again.');
+      }
+    }, POLL_INTERVAL);
   };
 
   if (!open) return null;

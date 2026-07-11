@@ -8,8 +8,11 @@ import { TrainerCard } from '@/components/shared/trainer-card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { ErrorState } from '@/components/shared/error-state';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
+import { Pagination } from '@/components/shared/pagination';
 import { Search } from 'lucide-react';
 import { BackButton } from '@/components/shared/back-button';
+
+const PER_PAGE = 12;
 
 function TrainerListing() {
   const [searchParams] = useSearchParams();
@@ -21,16 +24,20 @@ function TrainerListing() {
     verifiedOnly: searchParams.get('verifiedOnly') === 'true' ? true : undefined,
     sortBy: searchParams.get('sortBy') || 'averageRating',
   };
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
 
   const {
-    data: trainers,
+    data: result,
     isLoading,
     isError,
     refetch,
   } = useQuery({
-    queryKey: trainerKeys.list(filters as any),
-    queryFn: () => getTrainers(filters as any),
+    queryKey: [...trainerKeys.list(filters as any), page],
+    queryFn: () => getTrainers(filters as any, page, PER_PAGE),
   });
+
+  const trainers = result?.data;
+  const totalPages = Math.ceil((result?.total || 0) / PER_PAGE);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -77,6 +84,7 @@ function TrainerListing() {
                 );
               })}
             </div>
+            <Pagination page={page} totalPages={totalPages} total={result?.total || 0} />
           </>
         )}
       </div>

@@ -1,7 +1,20 @@
 import { supabase } from '@/lib/supabase';
 
-export async function getTrainers(filters?: Record<string, any>) {
-  let query = supabase.from('Trainer').select('*');
+// Public-safe column list: excludes financial/internal fields
+// (commissionRate, availableBalance, verificationFeePaid, verificationFeeAmount,
+// idDocumentUrl, verificationVideoUrl) that should never reach the browser
+// on a public listing.
+const TRAINER_PUBLIC_COLUMNS =
+  'id, userId, bio, skills, isVerified, coverPhoto, averageRating, totalReviews, totalStudents, createdAt, ' +
+  'user:User!userId(id, fullName, avatarUrl), ' +
+  'courses:Course(id, title, slug, mode, duration, sessionCount, priceKes, imageUrl)';
+
+export async function getTrainers(filters?: Record<string, any>, page = 1, perPage = 12) {
+  let query = supabase
+    .from('Trainer')
+    .select(TRAINER_PUBLIC_COLUMNS, { count: 'exact' })
+    .eq('courses.isPublished', true)
+    .is('courses.deletedAt', null);
 
   if (filters?.['verifiedOnly']) query = query.eq('isVerified', true);
   if (filters?.['category']) query = query.contains('skills', [filters['category'] as string]);
@@ -12,19 +25,28 @@ export async function getTrainers(filters?: Record<string, any>) {
   const sortBy = (filters?.['sortBy'] as string) || 'averageRating';
   query = query.order(sortBy, { ascending: false });
 
-  const { data, error } = await query;
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+  const { data, error, count } = await query.range(from, to);
   if (error) throw error;
-  return data || [];
+  return { data: data || [], total: count || 0, page, perPage };
 }
 
 export async function getTrainer(id: string) {
   const { data, error } = await supabase
     .from('Trainer')
-    .select('*')
+    .select(TRAINER_PUBLIC_COLUMNS)
     .eq('id', id)
+    .eq('courses.isPublished', true)
+    .is('courses.deletedAt', null)
     .maybeSingle();
   if (error) throw error;
-  return data;
+  if (!data) return data;
+  // Flatten user.fullName onto the trainer object to match what
+  // TrainerProfile.tsx / TrainerCard already expect (t.fullName, t.user.avatarUrl).
+  const trainer = data as any;
+  const user = trainer.user || {};
+  return { ...trainer, fullName: user.fullName };
 }
 
 export async function getMyTrainerProfile(userId: string) {
@@ -40,7 +62,12 @@ export async function applyAsTrainer(data: Record<string, any>) {
 }
 
 export async function updateTrainerProfile(id: string, updates: Record<string, any>) {
-  const { data, error } = await supabase.from('Trainer').update({ ...updates, updatedAt: new Date().toISOString() }).eq('id', id).select().single();
+  const { data, error } = await supabase
+    .from('Trainer')
+    .update({ ...updates, updatedAt: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .single();
   if (error) throw error;
   return data;
 }

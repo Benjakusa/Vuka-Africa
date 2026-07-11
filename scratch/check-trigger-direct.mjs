@@ -1,7 +1,11 @@
 import { Client } from 'pg';
 
-// Direct connection string
-const connectionString = 'postgresql://postgres:%40B3n.Jakusa@db.yghndmkuogaepegibxhd.supabase.co:5432/postgres';
+// Reads from DATABASE_URL — never hardcode credentials in scripts.
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error('DATABASE_URL is not set. Load your .env before running this script.');
+  process.exit(1);
+}
 
 async function main() {
   const client = new Client({ connectionString });

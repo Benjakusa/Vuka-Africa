@@ -1,9 +1,21 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    // Generates dist/stats.html with a treemap of what's in the bundle.
+    // Opt-in only: run `npm run build:analyze` (doesn't run on normal builds/CI).
+    process.env.ANALYZE === 'true' &&
+      visualizer({
+        filename: 'dist/stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap',
+      }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

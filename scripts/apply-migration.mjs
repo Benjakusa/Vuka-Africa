@@ -1,6 +1,13 @@
 import { readFileSync } from 'fs';
 import pg from 'pg';
 
+const projectRef = process.env.SUPABASE_PROJECT_REF;
+const dbPassword = process.env.SUPABASE_DB_PASSWORD;
+if (!projectRef || !dbPassword) {
+  console.error('Set SUPABASE_PROJECT_REF and SUPABASE_DB_PASSWORD (see .env.example) before running this script.');
+  process.exit(1);
+}
+
 const sql = readFileSync('../migrate.sql', 'utf-8');
 
 const regions = [
@@ -18,8 +25,8 @@ for (const region of regions) {
   const client = new pg.Client({
     host,
     port: 6543,
-    user: `postgres.yghndmkuogaepegibxhd`,
-    password: '@B3n.Jakusa',
+    user: `postgres.${projectRef}`,
+    password: dbPassword,
     database: 'postgres',
     ssl: { rejectUnauthorized: false },
     connectionTimeoutMillis: 5000,

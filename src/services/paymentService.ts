@@ -5,6 +5,8 @@ export async function initiateMpesaPayment(data: {
   amount: number;
   reference: string;
   description: string;
+  enrolmentId?: string;
+  trainerId?: string;
 }) {
   const { data: result, error } = await supabase.functions.invoke('mpesa-stkpush', {
     body: data,
