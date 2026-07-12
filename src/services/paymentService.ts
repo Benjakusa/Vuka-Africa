@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
-const FUNCTIONS_URL = 'https://yghndmkuogaepegibxhd.supabase.co/functions/v1';
+const FUNCTIONS_URL = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1`;
 
 export async function initiateMpesaPayment(data: {
   phone: string;

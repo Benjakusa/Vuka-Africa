@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 interface DisputeModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { reason: string; description: string }) => Promise<void>;
+  onSubmit: (data: { reason: string; description?: string }) => Promise<void>;
 }
 
 export function DisputeModal({ open, onClose, onSubmit }: DisputeModalProps) {

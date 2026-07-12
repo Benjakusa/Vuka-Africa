@@ -135,7 +135,7 @@ export async function releaseMilestone(milestoneId: string, enrolmentId: string,
       select: { currentMilestone: true, _count: { select: { milestones: true } } },
     });
 
-    if (enrolment && enrolment.currentMilestone >= 3) {
+    if (enrolment && enrolment.currentMilestone >= enrolment._count.milestones) {
       await tx.enrolment.update({
         where: { id: enrolmentId },
         data: { status: 'COMPLETED', completedAt: new Date() },

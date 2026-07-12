@@ -46,7 +46,7 @@ BEGIN
   INSERT INTO "TransactionLedger" (
     "userId",
     "amountKes",
-    "entryType",
+    "type",
     "direction",
     "description",
     "referenceType",
@@ -57,10 +57,10 @@ BEGIN
   ) VALUES (
     p_admin_id,
     p_amount_paid,
-    'PAYOUT',
+    'TRAINER_PAYOUT',
     'DEBIT',
     'Payout processed — ' || p_reference,
-    'Payout',
+    'payout',
     p_payout_id,
     0,
     0,

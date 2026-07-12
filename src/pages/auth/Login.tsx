@@ -78,11 +78,9 @@ export default function AuthPage() {
     setRegLoading(true);
     try {
       await register(regForm);
-      toast.success('Account created! Please sign in.');
-      navigate('/auth/login', { replace: true });
+      toast.success('Account created!');
     } catch (err: any) {
       setRegError(err.message || 'Registration failed');
-    } finally {
       setRegLoading(false);
     }
   };

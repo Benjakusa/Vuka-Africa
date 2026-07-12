@@ -11,12 +11,17 @@ export function FilterBar() {
   const debouncedSearch = useDebounce(search, 300);
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams);
-    if (debouncedSearch) params.set('search', debouncedSearch);
-    else params.delete('search');
-    params.set('page', '1');
-    setSearchParams(params, { replace: true });
-  }, [debouncedSearch]);
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        if (debouncedSearch) params.set('search', debouncedSearch);
+        else params.delete('search');
+        params.set('page', '1');
+        return params;
+      },
+      { replace: true },
+    );
+  }, [debouncedSearch, setSearchParams]);
 
   const updateFilter = (key: string, value: string | undefined) => {
     const params = new URLSearchParams(searchParams);

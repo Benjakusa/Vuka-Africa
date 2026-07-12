@@ -270,9 +270,6 @@ function createTableMethods(table: TableName) {
     });
   };
 
-  const findRaw = async (_args: any) => ({ data: [] });
-  const aggregateRaw = async (_args: any) => ({ data: [] });
-
   return {
     findUnique,
     findFirst,
@@ -286,8 +283,6 @@ function createTableMethods(table: TableName) {
     updateMany,
     aggregate,
     groupBy,
-    findRaw,
-    aggregateRaw,
   };
 }
 
@@ -320,12 +315,6 @@ supabaseDb.$transaction = async function <T>(fn: (tx: any) => Promise<T>, _optio
   }
   tx.$transaction = supabaseDb.$transaction;
   return await fn(tx);
-};
-
-supabaseDb.$queryRaw = async (strings: TemplateStringsArray, ...params: any[]): Promise<any> => {
-  const { data, error } = await supabaseAdmin.from('User').select('id', { count: 'exact', head: true }).limit(1);
-  if (error) throw error;
-  return [{ 1: 1 }];
 };
 
 export { supabaseDb };

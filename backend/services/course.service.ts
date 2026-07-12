@@ -1,5 +1,5 @@
 import { supabaseDb } from '@backend/lib/db';
-import { generateSlug } from '@frontend/utils/slug';
+import { generateSlug } from '@backend/lib/utils';
 import { setCached, getCached, invalidateCache } from '@backend/lib/cache';
 import { NotFoundError, ValidationError, ForbiddenError } from '@backend/lib/errors';
 import { CACHE } from '@backend/lib/config';

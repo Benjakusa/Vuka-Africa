@@ -1,19 +1,17 @@
+import React, { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Monitor, MapPin } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { formatCurrency } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
 import { MilestoneProgress } from './milestone-progress';
-import { useQueryClient } from '@tanstack/react-query';
 import { getEnrolment } from '@/services/enrolmentService';
-import { useCallback } from 'react';
 
 interface EnrolmentCardProps {
   enrolment: any;
   role: 'trainee' | 'trainer';
   showPrice?: boolean;
 }
-
-import React from 'react';
 
 export const EnrolmentCard = React.memo(function EnrolmentCard({ enrolment, role, showPrice }: EnrolmentCardProps) {
   const milestones = enrolment.milestones || [];

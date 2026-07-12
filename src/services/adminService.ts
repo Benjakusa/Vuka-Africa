@@ -222,14 +222,14 @@ export async function getDisputes(status?: string, page = 1, perPage = 20) {
   return { data: flattened, total: count || 0, page, perPage };
 }
 
-export async function resolveDispute(disputeId: string, resolution: string, adminId: string) {
+export async function resolveDispute(disputeId: string, resolutionNotes: string, adminId: string) {
   const { error } = await supabase
     .from('Dispute')
     .update({
       status: 'RESOLVED',
-      resolvedBy: adminId,
-      resolvedAt: new Date().toISOString(),
-      resolution,
+      resolvedById: adminId,
+      updatedAt: new Date().toISOString(),
+      resolutionNotes,
     })
     .eq('id', disputeId);
   if (error) throw error;
@@ -245,7 +245,7 @@ export async function getVerifications(status?: string, page = 1, perPage = 20) 
       { count: 'exact' },
     );
   if (status) query = query.eq('verificationStatus', status);
-  else query = query.neq('verificationStatus', 'NONE');
+  else query = query.neq('verificationStatus', 'UNSUBMITTED');
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
   const { data, error, count } = await query.range(from, to).order('updatedAt', { ascending: false });
@@ -278,7 +278,7 @@ export async function rejectVerification(trainerId: string) {
 
 export async function getTransactions(filters?: Record<string, any>, page = 1, perPage = 20) {
   let query = supabase.from('TransactionLedger').select('*', { count: 'exact' });
-  if (filters?.['type']) query = query.eq('entryType', filters['type'] as string);
+  if (filters?.['type']) query = query.eq('type', filters['type'] as string);
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
   const { data, error, count } = await query.range(from, to).order('createdAt', { ascending: false });
@@ -289,9 +289,7 @@ export async function getTransactions(filters?: Record<string, any>, page = 1, p
 export async function getPlatformConfig() {
   const { data, error } = await supabase
     .from('PlatformConfig')
-    .select(
-      'id, commissionRate, verificationFee, minPayoutAmount, maxPayoutAmount, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt, freeTrainerLimit',
-    )
+    .select('id, commissionRate, verificationFee, minPayoutAmount, maxPayoutAmount, freeTrainerLimit')
     .maybeSingle();
   if (error) throw error;
   return (

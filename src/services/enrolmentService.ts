@@ -69,17 +69,13 @@ export async function confirmMilestone(milestoneId: string, by: 'trainee' | 'tra
   return data;
 }
 
-export async function createDispute(
-  enrolmentId: string,
-  data: { raisedBy: string; reason: string; description: string },
-) {
+export async function createDispute(enrolmentId: string, data: { raisedById: string; reason: string }) {
   const { data: dispute, error } = await supabase
     .from('Dispute')
     .insert({
       enrolmentId,
-      raisedBy: data.raisedBy,
+      raisedById: data.raisedById,
       reason: data.reason,
-      description: data.description,
       status: 'OPEN',
     })
     .select()

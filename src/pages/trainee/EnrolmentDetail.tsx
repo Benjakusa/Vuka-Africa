@@ -33,12 +33,12 @@ export default function EnrolmentDetail() {
     enabled: !!id,
   });
 
-  const handleDispute = async (data: { reason: string; description: string }) => {
+  const handleDispute = async (data: { reason: string; description?: string }) => {
     if (!enrolment || !user) return;
+    const fullReason = data.description ? `${data.reason}: ${data.description}` : data.reason;
     await createDispute(enrolment.id, {
-      raisedBy: user.id,
-      reason: data.reason,
-      description: data.description,
+      raisedById: user.id,
+      reason: fullReason,
     });
     setShowDispute(false);
     refetch();
