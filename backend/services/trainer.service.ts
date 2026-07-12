@@ -192,7 +192,6 @@ export async function processVerificationCallback(trainerId: string, mpesaTransa
     where: { id: trainerId },
     data: {
       verificationFeePaid: true,
-      verificationStatus: 'PENDING',
     },
   });
 

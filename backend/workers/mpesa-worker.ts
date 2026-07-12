@@ -323,7 +323,6 @@ async function processVerificationFee(trainerId: string, mpesaReceiptNumber: str
       data: {
         verificationFeePaid: true,
         verificationFeeAmount: amount,
-        verificationStatus: 'PENDING',
       },
     });
 

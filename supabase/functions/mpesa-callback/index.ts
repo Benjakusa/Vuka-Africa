@@ -200,7 +200,6 @@ async function processVerificationPayment(trainerId: string, receipt: string, am
     .update({
       verificationFeePaid: true,
       verificationFeeAmount: amount,
-      verificationStatus: 'PENDING',
     })
     .eq('id', trainerId);
 
