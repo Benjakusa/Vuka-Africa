@@ -290,7 +290,7 @@ export async function getPlatformConfig() {
   const { data, error } = await supabase
     .from('PlatformConfig')
     .select(
-      'id, commissionRate, verificationFee, minimumWithdrawalKes, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt',
+      'id, commissionRate, verificationFee, minPayoutAmount, maxPayoutAmount, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt, freeTrainerLimit',
     )
     .maybeSingle();
   if (error) throw error;

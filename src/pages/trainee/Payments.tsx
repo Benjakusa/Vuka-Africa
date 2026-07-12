@@ -12,7 +12,7 @@ export default function Payments() {
   const { user } = useAuthStore();
 
   const {
-    data: transactions,
+    data: txRaw,
     isLoading,
     isError,
     refetch,
@@ -21,6 +21,7 @@ export default function Payments() {
     queryFn: () => getTransactionHistory(user!.id),
     enabled: !!user?.id,
   });
+  const transactions = (txRaw || []) as any[];
 
   return (
     <div className="max-w-4xl mx-auto">

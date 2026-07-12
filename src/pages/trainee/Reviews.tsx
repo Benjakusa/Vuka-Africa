@@ -28,7 +28,7 @@ export default function Reviews() {
     enabled: !!user?.id,
   });
 
-  const pendingReviews = enrolments?.filter((e: any) => !e.reviews || e.reviews.length === 0) || [];
+  const pendingReviews = ((enrolments || []) as any[]).filter((e: any) => !e.reviews || e.reviews.length === 0);
 
   const handleSubmitReview = async (data: { rating: number; comment: string }) => {
     if (!reviewTarget || !user) return;

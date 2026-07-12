@@ -20,13 +20,13 @@ export default function TraineeDashboard() {
     enabled: !!user?.id,
   });
 
-  const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
-  const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
-  const completedEnrolments = enrolments?.filter((e: any) => e.status === 'COMPLETED') || [];
-  const rejectedEnrolments = enrolments?.filter((e: any) => e.status === 'REJECTED') || [];
-  const totalSpent = enrolments?.reduce((sum: number, e: any) => sum + (e.pricePaidKes || 0), 0) || 0;
-  const pendingReviews =
-    enrolments?.filter((e: any) => e.status === 'COMPLETED' && (!e.reviews || e.reviews.length === 0)) || [];
+  const eList = (enrolments || []) as any[];
+  const pendingEnrolments = eList.filter((e: any) => e.status === 'PENDING_ACCEPTANCE');
+  const activeEnrolments = eList.filter((e: any) => e.status === 'ACTIVE');
+  const completedEnrolments = eList.filter((e: any) => e.status === 'COMPLETED');
+  const rejectedEnrolments = eList.filter((e: any) => e.status === 'REJECTED');
+  const totalSpent = eList.reduce((sum: number, e: any) => sum + (e.pricePaidKes || 0), 0);
+  const pendingReviews = eList.filter((e: any) => e.status === 'COMPLETED' && (!e.reviews || e.reviews.length === 0));
 
   return (
     <div className="max-w-5xl mx-auto">

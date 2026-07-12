@@ -116,7 +116,7 @@ export default function Verification() {
     },
   };
 
-  const config = statusConfig[status] ?? statusConfig['NONE'];
+  const config = (statusConfig[status] ?? statusConfig['NONE'])!;
   const StatusIcon = config.icon;
 
   const canSubmit =

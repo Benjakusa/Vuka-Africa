@@ -263,10 +263,11 @@ export default function AdminDashboard() {
 }
 
 function RecentActivity() {
-  const { data: recentEnrolments, isLoading: loadingEnrolments } = useQuery({
+  const { data: recentEnrolmentsRaw, isLoading: loadingEnrolments } = useQuery({
     queryKey: adminKeys.recentEnrolments,
     queryFn: () => getEnrolments({ limit: 5 }),
   });
+  const recentEnrolments = (recentEnrolmentsRaw || []) as any[];
 
   const { data: recentPayouts } = useQuery({
     queryKey: adminKeys.recentPayouts,
@@ -303,7 +304,7 @@ function RecentActivity() {
           </h3>
           {loadingEnrolments ? (
             <CardSkeleton />
-          ) : recentEnrolments?.length ? (
+          ) : recentEnrolments.length ? (
             <div className="space-y-1.5">
               {recentEnrolments.slice(0, 5).map((e: any) => (
                 <div key={e.id} className="flex items-center justify-between py-1.5">

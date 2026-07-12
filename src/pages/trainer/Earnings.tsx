@@ -20,17 +20,19 @@ export default function Earnings() {
   const trainerId = user?.trainer?.id;
   const [withdrawOpen, setWithdrawOpen] = useState(false);
 
-  const { data: payouts } = useQuery({
+  const { data: payoutsRaw } = useQuery({
     queryKey: trainerKeys.trainerPayouts(trainerId),
     queryFn: () => getPayoutHistory(trainerId!),
     enabled: !!trainerId,
   });
+  const payouts = (payoutsRaw || []) as any[];
 
-  const { data: transactions } = useQuery({
+  const { data: txRaw } = useQuery({
     queryKey: miscKeys.userTransactions(user?.id, 'trainer'),
     queryFn: () => getTransactionHistory(user!.id),
     enabled: !!user?.id,
   });
+  const transactions = (txRaw || []) as any[];
 
   const { data: stats } = useQuery({
     queryKey: trainerKeys.stats(trainerId),
@@ -46,7 +48,7 @@ export default function Earnings() {
 
   const totalEarnings = settledEarnings + pendingEarnings;
   const availableBalance = user?.trainer?.availableBalance || 0;
-  const pendingPayouts = payouts?.filter((p: any) => p.status === 'PENDING') || [];
+  const pendingPayouts = payouts.filter((p: any) => p.status === 'PENDING');
 
   const handleWithdraw = async (data: { amount: number; phone: string }) => {
     await requestPayout({ trainerId: trainerId!, amount: data.amount, phone: data.phone });

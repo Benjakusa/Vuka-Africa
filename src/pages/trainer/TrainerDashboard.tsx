@@ -22,11 +22,12 @@ export default function TrainerDashboard() {
     enabled: !!trainerId,
   });
 
-  const { data: enrolments } = useQuery({
+  const { data: enrolmentsRaw } = useQuery({
     queryKey: enrolmentKeys.list({ trainerId, limit: 50 }),
     queryFn: () => getEnrolments({ trainerId, limit: 50 }),
     enabled: !!trainerId,
   });
+  const enrolments = (enrolmentsRaw || []) as any[];
 
   const { data: stats } = useQuery({
     queryKey: trainerKeys.stats(trainerId),
@@ -40,16 +41,15 @@ export default function TrainerDashboard() {
     enabled: !!trainerId,
   });
 
-  const pendingEnrolments = enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE') || [];
-  const activeEnrolments = enrolments?.filter((e: any) => e.status === 'ACTIVE') || [];
+  const pendingEnrolments = enrolments.filter((e: any) => e.status === 'PENDING_ACCEPTANCE');
+  const activeEnrolments = enrolments.filter((e: any) => e.status === 'ACTIVE');
   const activeSessions = Number(stats?.active_sessions_count) || 0;
   const settledEarnings = Number(stats?.settled_earnings) || 0;
   const pendingEarnings = Number(stats?.pending_earnings) || 0;
   const totalEarnings = settledEarnings + pendingEarnings;
 
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const newEnrolments =
-    enrolments?.filter((e: any) => e.status === 'PENDING_ACCEPTANCE' && e.createdAt >= oneDayAgo) || [];
+  const newEnrolments = enrolments.filter((e: any) => e.status === 'PENDING_ACCEPTANCE' && e.createdAt >= oneDayAgo);
   const recentReviews = reviewsData?.data || [];
   const needsVerification = user?.trainer && !user.trainer.isVerified && user.trainer.verificationStatus !== 'PENDING';
 
