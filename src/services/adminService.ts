@@ -236,7 +236,14 @@ export async function resolveDispute(disputeId: string, resolution: string, admi
 }
 
 export async function getVerifications(status?: string, page = 1, perPage = 20) {
-  let query = supabase.from('Trainer').select('*, user:User!userId(id, fullName, email, phone)', { count: 'exact' });
+  let query = supabase
+    .from('Trainer')
+    .select(
+      'id, userId, isVerified, verificationStatus, verificationFeePaid, verificationFeeAmount, ' +
+        'idDocumentUrl, kraPinUrl, passportPhotoUrl, location, alternativeContact, createdAt, updatedAt, ' +
+        'user:User!userId(id, fullName, email, phone)',
+      { count: 'exact' },
+    );
   if (status) query = query.eq('verificationStatus', status);
   else query = query.neq('verificationStatus', 'NONE');
   const from = (page - 1) * perPage;

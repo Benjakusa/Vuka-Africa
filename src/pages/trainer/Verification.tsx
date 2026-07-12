@@ -24,6 +24,8 @@ export default function Verification() {
   const [idDocumentUrl, setIdDocumentUrl] = useState<string | null>(null);
   const [kraPinUrl, setKraPinUrl] = useState<string | null>(null);
   const [passportPhotoUrl, setPassportPhotoUrl] = useState<string | null>(null);
+  const [location, setLocation] = useState('');
+  const [alternativeContact, setAlternativeContact] = useState('');
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   const submitMutation = useMutation({
@@ -36,11 +38,21 @@ export default function Verification() {
         throw new Error('Please upload all three required documents');
       }
 
+      if (!location && !profile?.location) {
+        throw new Error('Please enter your location');
+      }
+
+      if (!alternativeContact && !profile?.alternativeContact) {
+        throw new Error('Please enter an alternative contact number');
+      }
+
       return updateTrainerProfile(profile!.id, {
         verificationStatus: 'PENDING',
         idDocumentUrl: finalId,
         kraPinUrl: finalKra,
         passportPhotoUrl: finalPassport,
+        location: location || profile?.location,
+        alternativeContact: alternativeContact || profile?.alternativeContact,
       });
     },
     onSuccess: () => {
@@ -75,7 +87,7 @@ export default function Verification() {
   const status = profile?.verificationStatus || 'NONE';
   const isVerified = profile?.isVerified;
   const feePaid = profile?.verificationFeePaid;
-  const feeAmount = profile?.verificationFeeAmount || 5000;
+  const feeAmount = profile?.verificationFeeAmount || 2000;
 
   const statusConfig: Record<string, { icon: any; color: string; title: string; desc: string }> = {
     NONE: {
@@ -162,6 +174,36 @@ export default function Verification() {
           <div className="space-y-6 mt-6 pt-6 border-t border-border">
             <div className="flex items-center gap-2 text-sm text-foreground font-medium mb-4 bg-surface px-3 py-2 rounded">
               <CheckCircle size={16} /> Verification fee paid successfully
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-dark mb-1 block">Your Location</label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="e.g. Nairobi, Kenya"
+                className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              />
+              {profile?.location && !location && (
+                <p className="text-xs text-body-foreground mt-1">Current: {profile.location}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-dark mb-1 block">
+                Alternative Contact (Relative / Partner / Business Partner)
+              </label>
+              <input
+                type="tel"
+                value={alternativeContact}
+                onChange={(e) => setAlternativeContact(e.target.value)}
+                placeholder="e.g. +254 712 345 678"
+                className="w-full px-3 py-2.5 border border-border rounded-btn text-sm"
+              />
+              {profile?.alternativeContact && !alternativeContact && (
+                <p className="text-xs text-body-foreground mt-1">Current: {profile.alternativeContact}</p>
+              )}
             </div>
 
             <div>

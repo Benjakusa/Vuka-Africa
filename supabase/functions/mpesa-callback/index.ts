@@ -221,7 +221,7 @@ async function processVerificationPayment(trainerId: string, receipt: string, am
     trainer.user.email,
     'Verification Fee Received — Under Review',
     `<p>Hi ${trainer.user.fullName},</p>
-<p>Your KES 5,000 verification fee has been received (M-Pesa: ${receipt}).</p>
+<p>Your KES 2,000 verification fee has been received (M-Pesa: ${receipt}).</p>
 <p>Our team will review your documents within 2 business days.</p>`,
   );
 
@@ -230,7 +230,7 @@ async function processVerificationPayment(trainerId: string, receipt: string, am
     await sendEmail(
       admin.email,
       `New Verification Fee Paid — ${trainer.user.fullName}`,
-      `<p>Trainer <strong>${trainer.user.fullName}</strong> (${trainer.user.email}) has paid the KES 5,000 verification fee.</p>
+      `<p>Trainer <strong>${trainer.user.fullName}</strong> (${trainer.user.email}) has paid the KES 2,000 verification fee.</p>
 <p>Receipt: ${receipt}</p>
 <p>Review their application in the admin dashboard.</p>`,
     );
@@ -271,7 +271,7 @@ async function handleFailedPayment(callback: StkCallback) {
     await sendEmail(
       trainer.user.email,
       'Verification Payment Failed',
-      `<p>Your verification fee payment of KES 5,000 failed: ${callback.ResultDesc}. Please try again from your dashboard.</p>`,
+      `<p>Your verification fee payment of KES 2,000 failed: ${callback.ResultDesc}. Please try again from your dashboard.</p>`,
     );
   }
 }

@@ -117,8 +117,15 @@ Deno.serve(async (req: Request) => {
 
     const checkoutRequestId = data.CheckoutRequestID;
 
-    if (checkoutRequestId && body.enrolmentId) {
-      await supabase.from('Enrolment').update({ mpesaCheckoutRequestId: checkoutRequestId }).eq('id', body.enrolmentId);
+    if (checkoutRequestId) {
+      if (body.enrolmentId) {
+        await supabase
+          .from('Enrolment')
+          .update({ mpesaCheckoutRequestId: checkoutRequestId })
+          .eq('id', body.enrolmentId);
+      } else if (body.trainerId) {
+        await supabase.from('Trainer').update({ mpesaCheckoutRequestId: checkoutRequestId }).eq('id', body.trainerId);
+      }
     }
 
     return new Response(

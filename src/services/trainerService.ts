@@ -53,7 +53,8 @@ export async function getTrainer(id: string) {
 const TRAINER_PRIVATE_COLUMNS =
   'id, userId, bio, skills, isVerified, verificationStatus, verificationFeePaid, coverPhoto, ' +
   'averageRating, totalReviews, totalStudents, availableBalance, commissionRate, createdAt, updatedAt, ' +
-  'idDocumentUrl, kraPinUrl, passportPhotoUrl, verificationVideoUrl, verificationFeeAmount';
+  'idDocumentUrl, kraPinUrl, passportPhotoUrl, verificationVideoUrl, verificationFeeAmount, ' +
+  'location, alternativeContact';
 
 export async function getMyTrainerProfile(userId: string) {
   const { data, error } = await supabase

@@ -62,6 +62,17 @@ export function VerificationReviewModal({
           <p className="text-sm text-body mt-1">Review documents for {userData.fullName || 'Unknown Trainer'}</p>
         </div>
 
+        <div className="grid md:grid-cols-2 gap-4 mb-6 p-4 bg-surface rounded-card">
+          <div>
+            <h3 className="text-sm font-semibold text-dark mb-1">Location</h3>
+            <p className="text-sm text-body">{verification.location || 'Not provided'}</p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-dark mb-1">Alternative Contact</h3>
+            <p className="text-sm text-body">{verification.alternativeContact || 'Not provided'}</p>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <DocumentPreview title="National ID / Passport" url={verification.idDocumentUrl} />
           <DocumentPreview title="KRA PIN" url={verification.kraPinUrl} />
