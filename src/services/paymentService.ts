@@ -1,3 +1,5 @@
+import { supabase } from '@/lib/supabase';
+
 const FUNCTIONS_URL = 'https://yghndmkuogaepegibxhd.supabase.co/functions/v1';
 
 export async function initiateMpesaPayment(data: {
