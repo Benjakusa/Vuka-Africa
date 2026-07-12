@@ -10,8 +10,11 @@ export interface User {
   avatarUrl: string | null;
   trainer?: {
     id: string;
+    userId: string;
     isVerified: boolean;
     verificationStatus: string;
+    verificationFeePaid: boolean;
+    verificationFeeAmount: number;
     commissionRate: number;
     availableBalance: number;
     averageRating: number;
@@ -19,11 +22,20 @@ export interface User {
     totalStudents: number;
     bio: string | null;
     skills: string[];
+    coverPhoto: string | null;
+    idDocumentUrl: string | null;
+    kraPinUrl: string | null;
+    passportPhotoUrl: string | null;
+    verificationVideoUrl: string | null;
+    location: string | null;
+    alternativeContact: string | null;
+    createdAt: string;
+    updatedAt: string;
   } | null;
 }
 
 const TRAINER_FIELDS =
-  'id, isVerified, verificationStatus, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills';
+  'id, userId, isVerified, verificationStatus, verificationFeePaid, verificationFeeAmount, verificationVideoUrl, commissionRate, availableBalance, averageRating, totalReviews, totalStudents, bio, skills, coverPhoto, idDocumentUrl, kraPinUrl, passportPhotoUrl, location, alternativeContact, createdAt, updatedAt';
 
 function extractTrainer(val: unknown) {
   if (!val) return null;

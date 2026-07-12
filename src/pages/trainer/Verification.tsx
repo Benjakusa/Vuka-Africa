@@ -19,6 +19,8 @@ export default function Verification() {
     queryKey: trainerKeys.profile(user?.id),
     queryFn: () => getMyTrainerProfile(user!.id),
     enabled: !!user?.id,
+    initialData: user?.trainer,
+    staleTime: 60_000,
   });
 
   const [idDocumentUrl, setIdDocumentUrl] = useState<string | null>(null);
@@ -153,30 +155,8 @@ export default function Verification() {
           </div>
         )}
 
-        {(status === 'NONE' || status === 'REJECTED') && !isVerified && !feePaid && (
-          <div className="mt-6 border border-border rounded-card p-6 bg-surface">
-            <div className="flex items-center gap-3 mb-4">
-              <Wallet size={24} className="text-primary" />
-              <div>
-                <h3 className="font-semibold text-dark">Verification Fee</h3>
-                <p className="text-sm text-body">A one-time fee of {formatCurrency(feeAmount)} is required.</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setPaymentModalOpen(true)}
-              className="w-full py-2.5 bg-dark text-white font-medium rounded-btn hover:bg-surface flex items-center justify-center gap-2 transition-colors"
-            >
-              Pay {formatCurrency(feeAmount)} via M-Pesa
-            </button>
-          </div>
-        )}
-
-        {(status === 'NONE' || status === 'REJECTED') && !isVerified && feePaid && (
+        {(status === 'NONE' || status === 'REJECTED') && !isVerified && (
           <div className="space-y-6 mt-6 pt-6 border-t border-border">
-            <div className="flex items-center gap-2 text-sm text-foreground font-medium mb-4 bg-surface px-3 py-2 rounded">
-              <CheckCircle size={16} /> Verification fee paid successfully
-            </div>
-
             <div>
               <label className="text-sm font-medium text-dark mb-1 block">Your Location</label>
               <input
@@ -249,14 +229,24 @@ export default function Verification() {
               )}
             </div>
 
-            <button
-              onClick={() => submitMutation.mutate()}
-              disabled={submitMutation.isPending || !canSubmit}
-              className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {submitMutation.isPending && <Loader2 size={16} className="animate-spin" />}
-              {submitMutation.isPending ? 'Submitting...' : 'Submit for Verification'}
-            </button>
+            {!feePaid ? (
+              <button
+                onClick={() => setPaymentModalOpen(true)}
+                className="w-full py-2.5 bg-dark text-white font-medium rounded-btn hover:bg-surface flex items-center justify-center gap-2 transition-colors"
+              >
+                <Wallet size={18} />
+                Pay {formatCurrency(feeAmount)} via M-Pesa & Submit
+              </button>
+            ) : (
+              <button
+                onClick={() => submitMutation.mutate()}
+                disabled={submitMutation.isPending || !canSubmit}
+                className="w-full py-2.5 bg-primary text-white font-medium rounded-btn hover:bg-surface disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {submitMutation.isPending && <Loader2 size={16} className="animate-spin" />}
+                {submitMutation.isPending ? 'Submitting...' : 'Submit for Verification'}
+              </button>
+            )}
           </div>
         )}
 

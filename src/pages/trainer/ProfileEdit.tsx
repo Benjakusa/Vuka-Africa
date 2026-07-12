@@ -35,6 +35,8 @@ export default function ProfileEdit() {
       return p;
     },
     enabled: !!user?.id,
+    initialData: user?.trainer,
+    staleTime: 60_000,
   });
 
   const saveMutation = useMutation({
