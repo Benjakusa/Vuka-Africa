@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+const FUNCTIONS_URL = 'https://yghndmkuogaepegibxhd.supabase.co/functions/v1';
 
 export async function initiateMpesaPayment(data: {
   phone: string;
@@ -8,10 +8,13 @@ export async function initiateMpesaPayment(data: {
   enrolmentId?: string;
   trainerId?: string;
 }) {
-  const { data: result, error } = await supabase.functions.invoke('mpesa-stkpush', {
-    body: data,
+  const res = await fetch(`${FUNCTIONS_URL}/mpesa-stkpush`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
   });
-  if (error) throw error;
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.error || `HTTP ${res.status}`);
   return result;
 }
 
