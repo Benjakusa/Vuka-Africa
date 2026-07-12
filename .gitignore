@@ -30,6 +30,9 @@ playwright-report/
 # misc
 .cache/
 
+# supabase
+supabase/.temp/
+
 # build artifacts
 tsconfig.tsbuildinfo
 tsconfig.node.tsbuildinfo
