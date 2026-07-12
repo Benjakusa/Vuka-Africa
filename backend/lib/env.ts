@@ -17,7 +17,7 @@ const envSchema = z.object({
   EMAIL_PORT: z.coerce.number().default(587),
   EMAIL_USER: z.string(),
   EMAIL_PASS: z.string(),
-  EMAIL_FROM: z.string().default('Vuka <noreply@vuka.africa>'),
+  EMAIL_FROM: z.string().default('Vuka Afrique <noreply@vukaafrique.com>'),
 
   MPESA_CONSUMER_KEY: z.string(),
   MPESA_CONSUMER_SECRET: z.string(),
@@ -30,7 +30,11 @@ const envSchema = z.object({
   MPESA_CALLBACK_URL: z.string().url().optional(),
   MPESA_B2C_RESULT_URL: z.string().url().optional(),
   MPESA_B2C_TIMEOUT_URL: z.string().url().optional(),
-  MPESA_IP_WHITELIST: z.string().default('196.201.214.200,196.201.214.206,196.201.213.114,196.201.214.208,196.201.213.44,196.201.212.127,196.201.212.138,196.201.212.129,196.201.212.136,196.201.212.74,196.201.212.69'),
+  MPESA_IP_WHITELIST: z
+    .string()
+    .default(
+      '196.201.214.200,196.201.214.206,196.201.213.114,196.201.214.208,196.201.213.44,196.201.212.127,196.201.212.138,196.201.212.129,196.201.212.136,196.201.212.74,196.201.212.69',
+    ),
 
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),

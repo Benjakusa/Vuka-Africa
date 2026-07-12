@@ -289,7 +289,9 @@ export async function getTransactions(filters?: Record<string, any>, page = 1, p
 export async function getPlatformConfig() {
   const { data, error } = await supabase
     .from('PlatformConfig')
-    .select('id, commissionRate, minimumWithdrawalKes, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt')
+    .select(
+      'id, commissionRate, verificationFee, minimumWithdrawalKes, supportEmail, supportPhone, termsUrl, privacyUrl, updatedAt',
+    )
     .maybeSingle();
   if (error) throw error;
   return (

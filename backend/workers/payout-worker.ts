@@ -112,7 +112,7 @@ async function processB2CInitiation(
         await addEmailToQueue({
           to: trainerUser.user.email,
           subject: 'Payout Failed — Funds Returned',
-          html: `<p>Your withdrawal of KES ${amountKes.toLocaleString()} has failed after multiple attempts. The funds have been returned to your Vuka wallet.</p>`,
+          html: `<p>Your withdrawal of KES ${amountKes.toLocaleString()} has failed after multiple attempts. The funds have been returned to your Vuka Afrique wallet.</p>`,
         });
       }
     } else {

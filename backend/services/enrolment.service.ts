@@ -68,7 +68,7 @@ export async function createEnrolment(input: CreateEnrolmentInput) {
       phone: user.phone,
       amount: pricePaidKes,
       accountReference: `ENROL-${enrolment.id}`,
-      transactionDesc: `Vuka Course Enrolment`,
+      transactionDesc: `Vuka Afrique Course Enrolment`,
     });
 
     await supabaseDb.enrolment.update({

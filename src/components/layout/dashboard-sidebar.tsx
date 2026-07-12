@@ -56,7 +56,7 @@ export function DashboardSidebar() {
   return (
     <aside className="hidden md:flex flex-col w-64 bg-white border-r border-border h-screen fixed left-0 top-0">
       <Link to="/" className="flex items-center px-6 h-16 border-b border-border">
-        <img src="/brand/VUKA AFRICA MAIN WHITE BACKGROUND.png" alt="" className="h-10" />
+        <img src="/brand/VUKA AFRIQUE MAIN WHITE BACKGROUND.png" alt="" className="h-10" />
       </Link>
 
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">

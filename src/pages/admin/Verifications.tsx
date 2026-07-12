@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { ShieldCheck, Loader2, CheckCircle, XCircle, Search } from 'lucide-react';
+import { ShieldCheck, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { getVerifications, approveVerification, rejectVerification } from '@/services/adminService';
 import { adminKeys } from '@/lib/query-keys';

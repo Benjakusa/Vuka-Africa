@@ -84,7 +84,7 @@ export default function Verification() {
     );
   }
 
-  const status = profile?.verificationStatus || 'NONE';
+  const status = (profile?.verificationStatus || 'NONE') as 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
   const isVerified = profile?.isVerified;
   const feePaid = profile?.verificationFeePaid;
   const feeAmount = profile?.verificationFeeAmount || 2000;
@@ -116,7 +116,7 @@ export default function Verification() {
     },
   };
 
-  const config = statusConfig[status] ?? statusConfig.NONE;
+  const config = statusConfig[status] ?? statusConfig['NONE'];
   const StatusIcon = config.icon;
 
   const canSubmit =

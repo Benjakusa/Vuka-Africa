@@ -39,7 +39,7 @@ export async function forgotPassword(email: string) {
 
   await addEmailToQueue({
     to: user.email,
-    subject: 'Reset Your Vuka Password',
+    subject: 'Reset Your Vuka Afrique Password',
     html: `<p>You requested a password reset.</p><p><a href="${resetUrl}">Reset Password</a></p><p>This link expires in 1 hour.</p><p>If you didn't request this, ignore this email.</p>`,
   });
 

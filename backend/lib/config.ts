@@ -6,22 +6,22 @@ import { env } from '@backend/lib/env';
  */
 
 export const PLATFORM = {
-  name: 'Vuka',
+  name: 'Vuka Afrique',
   tagline: 'U-Learn, U-Earn',
   domain: env.NEXT_PUBLIC_APP_URL,
 } as const;
 
 export const COMMISSION = {
-  DEFAULT: 20,        // 20% for standard trainers
-  VERIFIED: 12,       // 12% for admin-verified trainers (future)
-  FOUNDING: 0,        // 0% for first 100 trainers
+  DEFAULT: 20, // 20% for standard trainers
+  VERIFIED: 12, // 12% for admin-verified trainers (future)
+  FOUNDING: 0, // 0% for first 100 trainers
   FREE_TRAINER_LIMIT: 100,
 } as const;
 
 export const FEES = {
   VERIFICATION: 5000, // KES
-  MIN_PAYOUT: 100,    // KES — minimum withdrawal
-  MAX_PAYOUT: 50000,  // KES — maximum withdrawal per transaction
+  MIN_PAYOUT: 100, // KES — minimum withdrawal
+  MAX_PAYOUT: 50000, // KES — maximum withdrawal per transaction
 } as const;
 
 export const MILESTONES = [
@@ -37,13 +37,13 @@ export const MILESTONE = {
 } as const;
 
 export const CACHE = {
-  TRAINER_LIST_TTL: 60,       // seconds
+  TRAINER_LIST_TTL: 60, // seconds
   TRAINER_PROFILE_TTL: 120,
   COURSE_LIST_TTL: 60,
   COURSE_DETAIL_TTL: 120,
-  USER_SESSION_TTL: 3600,     // 1h
+  USER_SESSION_TTL: 3600, // 1h
   MPESA_TOKEN_TTL_BUFFER: 60, // seconds before expiry
-  IDEMPOTENCY_TTL: 86_400,    // 24h
+  IDEMPOTENCY_TTL: 86_400, // 24h
   MPESA_RECEIPT_TTL: 2_592_000, // 30 days
 } as const;
 
@@ -63,8 +63,8 @@ export const PAGINATION = {
 } as const;
 
 export const UPLOAD = {
-  MAX_IMAGE_SIZE: 10_485_760,       // 10 MB
-  MAX_VIDEO_SIZE: 52_428_800,       // 50 MB
+  MAX_IMAGE_SIZE: 10_485_760, // 10 MB
+  MAX_VIDEO_SIZE: 52_428_800, // 50 MB
   AVATAR_MAX_DIMENSION: 300,
   COURSE_IMAGE_MAX_DIMENSION: 1200,
   ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'] as string[],
@@ -73,13 +73,13 @@ export const UPLOAD = {
 } as const;
 
 export const RATE_LIMIT = {
-  LOGIN: { max: 5, window: 900_000 },         // 5 per 15min
-  REGISTER: { max: 3, window: 3_600_000 },     // 3 per hour
-  PAYOUT: { max: 2, window: 3_600_000 },       // 2 per hour
-  PAYOUT_2FA: { max: 5, window: 3_600_000 },   // 5 attempts per hour
-  UPLOAD: { max: 20, window: 60_000 },         // 20 per min
-  API_DEFAULT: { max: 100, window: 60_000 },   // 100 per min
-  ADMIN: { max: 60, window: 60_000 },          // 60 per min
+  LOGIN: { max: 5, window: 900_000 }, // 5 per 15min
+  REGISTER: { max: 3, window: 3_600_000 }, // 3 per hour
+  PAYOUT: { max: 2, window: 3_600_000 }, // 2 per hour
+  PAYOUT_2FA: { max: 5, window: 3_600_000 }, // 5 attempts per hour
+  UPLOAD: { max: 20, window: 60_000 }, // 20 per min
+  API_DEFAULT: { max: 100, window: 60_000 }, // 100 per min
+  ADMIN: { max: 60, window: 60_000 }, // 60 per min
 } as const;
 
 export const MPESA = {

@@ -4,7 +4,7 @@ import { corsHeaders, handleCors } from '../_shared/cors.ts';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY')!;
-const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'Vuka <noreply@vuka.africa>';
+const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'Vuka Afrique <noreply@vukaafrique.com>';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
@@ -45,7 +45,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
       personalizations: [{ to: [{ email: to }] }],
       from: {
         email: EMAIL_FROM.replace(/^.*<(.+)>$/, '$1').trim() || EMAIL_FROM,
-        name: EMAIL_FROM.replace(/^(.+)<.*$/, '$1').trim() || 'Vuka',
+        name: EMAIL_FROM.replace(/^(.+)<.*$/, '$1').trim() || 'Vuka Afrique',
       },
       subject,
       content: [{ type: 'text/html', value: html }],

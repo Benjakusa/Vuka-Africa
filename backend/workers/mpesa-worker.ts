@@ -226,7 +226,7 @@ async function processSuccessfulEnrolment(
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
 <tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
-<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka Afrique</h1>
 <p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">Payment Confirmed</p>
 </td></tr>
 <tr><td style="padding:32px">
@@ -243,11 +243,11 @@ Your payment was successful. You are now enrolled in <strong style="color:#1a1a1
 You can now access your course materials and start learning from your dashboard.
 </p>
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-<a href="https://vuka.app/trainee/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Go to Dashboard</a>
+<a href="https://vukaafrique.com/trainee/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Go to Dashboard</a>
 </td></tr></table>
 </td></tr>
 <tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
-<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka Afrique. All rights reserved.</p>
 </td></tr>
 </table>
 </td></tr></table>
@@ -265,7 +265,7 @@ You can now access your course materials and start learning from your dashboard.
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
 <tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
-<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka Afrique</h1>
 <p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">New Enrolment</p>
 </td></tr>
 <tr><td style="padding:32px">
@@ -283,11 +283,11 @@ You can now access your course materials and start learning from your dashboard.
 The payment has been received and is held securely in escrow. It will be released as training milestones are confirmed.
 </p>
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-<a href="https://vuka.app/trainer/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">View Enrolment</a>
+<a href="https://vukaafrique.com/trainer/enrolments" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">View Enrolment</a>
 </td></tr></table>
 </td></tr>
 <tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
-<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka Afrique. All rights reserved.</p>
 </td></tr>
 </table>
 </td></tr></table>
@@ -353,7 +353,7 @@ async function processVerificationFee(trainerId: string, mpesaReceiptNumber: str
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
 <tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
-<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka Afrique</h1>
 <p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">Verification Fee Received</p>
 </td></tr>
 <tr><td style="padding:32px">
@@ -369,7 +369,7 @@ Thank you for your payment. Your trainer verification application is now under r
 <p style="margin:0 0 4px;font-size:14px;color:#4b5563;line-height:1.6">Our team will review your documents within <strong>2 business days</strong>. You will receive an email once your account is verified.</p>
 </td></tr>
 <tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
-<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka Afrique. All rights reserved.</p>
 </td></tr>
 </table>
 </td></tr></table>
@@ -389,7 +389,7 @@ Thank you for your payment. Your trainer verification application is now under r
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
 <table width="540" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06)">
 <tr><td style="background:#FF5349;padding:28px 32px;text-align:center">
-<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka</h1>
+<h1 style="margin:0;color:#fff;font-size:22px;letter-spacing:-.02em">Vuka Afrique</h1>
 <p style="margin:6px 0 0;color:rgba(255,255,255,.8);font-size:13px">New Verification Fee</p>
 </td></tr>
 <tr><td style="padding:32px">
@@ -404,11 +404,11 @@ Trainer <strong style="color:#1a1a1a">${trainer.user.fullName}</strong> has paid
 </table>
 <p style="margin:0 0 20px;font-size:14px;color:#4b5563;line-height:1.6">Review their application in the admin dashboard.</p>
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
-<a href="https://vuka.app/admin/trainers" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Review Application</a>
+<a href="https://vukaafrique.com/admin/trainers" style="display:inline-block;padding:12px 28px;background:#FF5349;color:#fff;text-decoration:none;font-size:14px;font-weight:600;border-radius:6px">Review Application</a>
 </td></tr></table>
 </td></tr>
 <tr><td style="padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
-<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka. All rights reserved.</p>
+<p style="margin:0;font-size:12px;color:#9ca3af">© 2026 Vuka Afrique. All rights reserved.</p>
 </td></tr>
 </table>
 </td></tr></table>
@@ -521,7 +521,7 @@ async function handleB2cResult(data: any) {
       subject: 'Payout Failed — Funds Returned',
       html: `<p>Hi ${payout.trainer.user.fullName},</p>
 <p>Your withdrawal of KES ${Number(payout.amountKes).toLocaleString()} has failed: ${resultDesc.slice(0, 500)}.</p>
-<p>The funds have been returned to your Vuka wallet.</p>`,
+<p>The funds have been returned to your Vuka Afrique wallet.</p>`,
     });
 
     console.log(`[M-Pesa] Payout ${payout.id} failed: ${resultDesc}`);

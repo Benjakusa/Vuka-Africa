@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left">
           <div className="flex flex-col items-center md:items-start">
-            <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-10" />
+            <img src="/brand/VUKA AFRIQUE LOGO ORANGE BACKGROUND.png" alt="" className="h-10" />
             <p className="mt-2 text-sm text-gray-400">Africa&apos;s trusted skill marketplace.</p>
           </div>
           <div>
@@ -39,16 +39,16 @@ export function Footer() {
             <h4 className="font-semibold mb-3">Support</h4>
             <div className="space-y-2 text-sm text-gray-400">
               <a
-                href="mailto:hello@vuka.africa"
+                href="mailto:hello@vukaafrique.com"
                 className="flex items-center justify-center md:justify-start gap-2 hover:text-white"
               >
-                <Mail size={14} /> hello@vuka.africa
+                <Mail size={14} /> hello@vukaafrique.com
               </a>
             </div>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-700 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} Vuka. All rights reserved.
+          &copy; {new Date().getFullYear()} Vuka Afrique. All rights reserved.
         </div>
       </div>
     </footer>

@@ -244,7 +244,7 @@ export default function AuthPage() {
               ← Back
             </Link>
             <div className="ap-mobile-header__logo">
-              <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-11" />
+              <img src="/brand/VUKA AFRIQUE LOGO ORANGE BACKGROUND.png" alt="" className="h-11" />
             </div>
             <div className="ap-mobile-header__sub">{isRegister ? 'Create your account' : 'Sign into your account'}</div>
           </div>
@@ -422,7 +422,7 @@ export default function AuthPage() {
 
           <div className="ap-overlay" style={{ transform: isRegister ? 'translateX(-100%)' : 'translateX(0)' }}>
             <div className="ap-overlay__logo">
-              <img src="/brand/VUKA AFRICA LOGO ORANGE BACKGROUND.png" alt="" className="h-14" />
+              <img src="/brand/VUKA AFRIQUE LOGO ORANGE BACKGROUND.png" alt="" className="h-14" />
             </div>
             <p className="ap-overlay__tagline">
               {isRegister

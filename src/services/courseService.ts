@@ -41,7 +41,7 @@ export async function getTrainerCourses(trainerId: string) {
   const { data, error } = await supabase
     .from('Course')
     .select(
-      'id, title, slug, description, mode, duration, sessionCount, priceKes, isPublished, imageUrl, createdAt, updatedAt',
+      'id, title, slug, description, mode, duration, sessionCount, priceKes, isPublished, imageUrl, category, maxStudents, location, createdAt, updatedAt',
     )
     .eq('trainerId', trainerId);
   if (error) throw error;

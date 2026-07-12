@@ -25,7 +25,7 @@ const TEST_PHONE = '254708374149';
 const TEST_AMOUNT = 10;
 
 async function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function testAccessToken() {
@@ -50,7 +50,7 @@ async function testStkPush() {
       phone: TEST_PHONE,
       amount: TEST_AMOUNT,
       accountReference: `TEST-${Date.now().toString(36)}`,
-      transactionDesc: 'Vuka Test Payment',
+      transactionDesc: 'Vuka Afrique Test Payment',
     });
 
     console.log(`MerchantRequestID: ${response.MerchantRequestID}`);
@@ -81,7 +81,7 @@ async function testB2C() {
     const response = await mpesaClient.b2cPayment({
       amount: TEST_AMOUNT,
       phone: TEST_PHONE,
-      remarks: 'Vuka test payout',
+      remarks: 'Vuka Afrique test payout',
       idempotencyKey: `test-${Date.now()}`,
     });
 

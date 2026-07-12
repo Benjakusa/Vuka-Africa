@@ -108,7 +108,7 @@ async function runMpesaReconciliation() {
         subject: 'Payout Cancelled — No Callback Received',
         html: `<p>Hi ${payout.trainer.user.fullName},</p>
 <p>Your withdrawal of KES ${Number(payout.amountKes).toLocaleString()} was cancelled because we did not receive a confirmation from M-Pesa within 24 hours.</p>
-<p>The funds have been returned to your Vuka wallet. Please try again.</p>`,
+<p>The funds have been returned to your Vuka Afrique wallet. Please try again.</p>`,
       });
     }
   }

@@ -67,7 +67,7 @@ const sections = [
   {
     icon: Mail,
     title: '8. Contact Us',
-    items: ['For privacy-related inquiries, contact our Data Protection Officer at privacy@vuka.africa.'],
+    items: ['For privacy-related inquiries, contact our Data Protection Officer at privacy@vukaafrique.com.'],
   },
 ];
 
@@ -92,7 +92,7 @@ export default function Privacy() {
             </div>
           </div>
           <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
-            Vuka is committed to protecting your privacy.
+            Vuka Afrique is committed to protecting your privacy.
           </p>
         </div>
       </div>

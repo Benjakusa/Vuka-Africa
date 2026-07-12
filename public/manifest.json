@@ -1,13 +1,11 @@
 {
-  "name": "Vuka Africa",
-  "short_name": "Vuka Africa",
+  "name": "Vuka Afrique",
+  "short_name": "Vuka Afrique",
   "description": "Find and enrol in hands-on skill training courses led by verified Kenyan trainers",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#FF5349",
   "orientation": "portrait-primary",
-  "icons": [
-    { "src": "/brand/VUKA ICON.png", "sizes": "any", "type": "image/png" }
-  ]
+  "icons": [{ "src": "/brand/VUKA ICON.png", "sizes": "any", "type": "image/png" }]
 }

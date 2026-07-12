@@ -34,7 +34,7 @@ export function MobileDrawer() {
       {/* Mobile Top Header */}
       <div className="md:hidden flex items-center justify-between px-4 h-16 bg-white border-b border-border sticky top-0 z-40">
         <Link to="/" className="flex items-center">
-          <img src="/brand/VUKA AFRICA MAIN WHITE BACKGROUND.png" alt="" className="h-10" />
+          <img src="/brand/VUKA AFRIQUE MAIN WHITE BACKGROUND.png" alt="" className="h-10" />
         </Link>
         <button
           onClick={() => setIsOpen(true)}

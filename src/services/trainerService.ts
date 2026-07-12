@@ -63,7 +63,7 @@ export async function getMyTrainerProfile(userId: string) {
     .eq('userId', userId)
     .maybeSingle();
   if (error) throw error;
-  return data;
+  return data as any;
 }
 
 export async function applyAsTrainer(data: Record<string, any>) {

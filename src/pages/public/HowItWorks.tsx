@@ -107,8 +107,8 @@ export default function HowItWorks() {
           </Link>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">How It Works</h1>
           <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
-            Vuka connects you with trusted skill trainers across Kenya. Learn in person or online — and your money is
-            safely held until you&apos;re satisfied.
+            Vuka Afrique connects you with trusted skill trainers across Kenya. Learn in person or online — and your
+            money is safely held until you&apos;re satisfied.
           </p>
         </div>
       </div>

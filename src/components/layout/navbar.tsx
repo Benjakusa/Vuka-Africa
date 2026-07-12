@@ -35,7 +35,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-[72px] gap-4">
           <Link to="/" className="flex items-center flex-shrink-0">
-            <img src="/brand/VUKA AFRICA MAIN WHITE BACKGROUND.png" alt="" className="h-10 lg:h-11" />
+            <img src="/brand/VUKA AFRIQUE MAIN WHITE BACKGROUND.png" alt="" className="h-10 lg:h-11" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1 bg-dark text-white px-1.5 py-1.5 rounded-full">
@@ -105,12 +105,12 @@ export function Navbar() {
           <div className="hidden lg:flex items-center gap-4 text-xs text-body-foreground flex-shrink-0">
             <span className="flex items-center gap-1.5">
               <Phone size={12} className="text-primary" />
-              0796144879
+              +254796144879
             </span>
             <span className="text-border">|</span>
             <span className="flex items-center gap-1.5">
               <Mail size={12} className="text-primary" />
-              hello@vuka.africa
+              hello@vukaafrique.com
             </span>
             <span className="text-border">|</span>
             <span className="flex items-center gap-1.5">
@@ -135,11 +135,11 @@ export function Navbar() {
             <div className="space-y-2 text-sm text-body-foreground pb-3 border-b border-border/50">
               <div className="flex items-center gap-2">
                 <Phone size={14} className="text-primary" />
-                0796144879
+                +254796144879
               </div>
               <div className="flex items-center gap-2">
                 <Mail size={14} className="text-primary" />
-                hello@vuka.africa
+                hello@vukaafrique.com
               </div>
               <div className="flex items-center gap-2">
                 <MapPin size={14} className="text-primary" />

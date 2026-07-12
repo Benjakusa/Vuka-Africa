@@ -4,9 +4,9 @@ import { FileText, ArrowLeft, UserCheck, BookOpen, CreditCard, Scale, Ban, Mail 
 const sections = [
   {
     icon: FileText,
-    title: '1. About Vuka',
+    title: '1. About Vuka Afrique',
     items: [
-      'Vuka is a marketplace that connects skill trainers with individuals seeking to learn. We facilitate payments, hold funds in escrow, and provide a platform for communication and reviews.',
+      'Vuka Afrique is a marketplace that connects skill trainers with individuals seeking to learn. We facilitate payments, hold funds in escrow, and provide a platform for communication and reviews.',
     ],
   },
   { icon: UserCheck, title: '2. Eligibility', items: ['You must be at least 18 years old to use the Service.'] },
@@ -48,7 +48,7 @@ const sections = [
     title: '7. Prohibited Conduct',
     items: ['Fraud, harassment, or discrimination.', 'Off-platform payments.', 'Violation of applicable laws.'],
   },
-  { icon: Mail, title: '8. Contact', items: ['For questions, reach us at info@vuka.africa.'] },
+  { icon: Mail, title: '8. Contact', items: ['For questions, reach us at info@vukaafrique.com.'] },
 ];
 
 export default function Terms() {
@@ -69,8 +69,8 @@ export default function Terms() {
             </div>
           </div>
           <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
-            Welcome to Vuka. By accessing or using our website and services, you agree to be bound by these Terms of
-            Service.
+            Welcome to Vuka Afrique. By accessing or using our website and services, you agree to be bound by these
+            Terms of Service.
           </p>
         </div>
       </div>

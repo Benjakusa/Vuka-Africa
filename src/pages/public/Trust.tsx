@@ -66,7 +66,7 @@ export default function TrustSafety() {
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Trust & Safety</h1>
           </div>
           <p className="mt-4 text-lg text-gray-300 max-w-2xl leading-relaxed">
-            Your security is our priority. Vuka is built on transparency, escrow protection, and community
+            Your security is our priority. Vuka Afrique is built on transparency, escrow protection, and community
             accountability.
           </p>
         </div>
@@ -74,7 +74,10 @@ export default function TrustSafety() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 relative z-10 pb-16">
         <div className="grid gap-6">
           {sections.map((section, i) => (
-            <div key={i} className="bg-white rounded-2xl border border-gray-200 p-8 hover:-translate-y-0.5 transition-transform">
+            <div
+              key={i}
+              className="bg-white rounded-2xl border border-gray-200 p-8 hover:-translate-y-0.5 transition-transform"
+            >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white">
                   <section.icon size={22} />
@@ -99,8 +102,8 @@ export default function TrustSafety() {
           <h3 className="font-semibold text-gray-900">Have a safety concern?</h3>
           <p className="mt-1 text-sm text-gray-600">
             Email us at{' '}
-            <a href="mailto:safety@vuka.africa" className="text-primary font-medium hover:underline">
-              safety@vuka.africa
+            <a href="mailto:safety@vukaafrique.com" className="text-primary font-medium hover:underline">
+              safety@vukaafrique.com
             </a>
           </p>
         </div>

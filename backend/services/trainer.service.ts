@@ -77,9 +77,9 @@ export async function apply(input: ApplyInput) {
     to: user.email,
     subject: result.isFoundingTrainer
       ? 'Welcome Founding Trainer — 0% Commission for Life!'
-      : 'Welcome to Vuka — Complete Your Profile',
+      : 'Welcome to Vuka Afrique — Complete Your Profile',
     html: result.isFoundingTrainer
-      ? `<h1>Congratulations ${user.fullName}!</h1><p>You are one of the first 100 trainers on Vuka. You get <strong>0% commission forever</strong> and your <strong>verification badge is free for life</strong>.</p>`
+      ? `<h1>Congratulations ${user.fullName}!</h1><p>You are one of the first 100 trainers on Vuka Afrique. You get <strong>0% commission forever</strong> and your <strong>verification badge is free for life</strong>.</p>`
       : `<h1>Welcome ${user.fullName}!</h1><p>Complete your profile and get verified to start attracting students.</p>`,
   });
 
@@ -165,7 +165,7 @@ export async function initiateVerificationPayment(userId: string) {
     phone: trainer.user.phone,
     amount: FEES.VERIFICATION,
     accountReference: `VERIFY-${trainer.id}`,
-    transactionDesc: 'Vuka Trainer Verification Fee',
+    transactionDesc: 'Vuka Afrique Trainer Verification Fee',
   });
 
   return {

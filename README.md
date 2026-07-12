@@ -1,6 +1,6 @@
-# Vuka Africa
+# Vuka Afrique
 
-Vuka Africa is a modern, comprehensive learning and training management platform designed to connect trainees with expert trainers. It provides robust tools for course management, secure enrolment, milestone tracking, real-time payouts, and dispute resolution.
+Vuka Afrique is a modern, comprehensive learning and training management platform designed to connect trainees with expert trainers. It provides robust tools for course management, secure enrolment, milestone tracking, real-time payouts, and dispute resolution.
 
 ---
 
