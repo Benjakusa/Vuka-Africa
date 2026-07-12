@@ -84,7 +84,8 @@ export default function Verification() {
     );
   }
 
-  const status = (profile?.verificationStatus || 'NONE') as 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
+  const rawStatus = profile?.verificationStatus || 'NONE';
+  const status = (rawStatus === 'UNSUBMITTED' ? 'NONE' : rawStatus) as 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
   const isVerified = profile?.isVerified;
   const feePaid = profile?.verificationFeePaid;
   const feeAmount = profile?.verificationFeeAmount || 2000;
