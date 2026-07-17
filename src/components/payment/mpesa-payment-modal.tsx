@@ -87,7 +87,6 @@ export function MpesaPaymentModal({
           }
           if (existing.status === 'PENDING_ACCEPTANCE') {
             setStep('success');
-            onSuccess?.();
             return;
           }
           throw new Error('You are already enrolled in this course. Please check your enrolled courses or explore other available courses.');
@@ -125,7 +124,6 @@ export function MpesaPaymentModal({
           if (createError.code === '23505') {
             submittingRef.current = false;
             setStep('success');
-            onSuccess?.();
             return;
           }
           throw new Error(createError.message);
@@ -139,6 +137,11 @@ export function MpesaPaymentModal({
           enrolmentId: enrolment.id,
           trainerId,
         });
+
+        if (result.alreadyProcessed) {
+          setStep('success');
+          return;
+        }
 
         if (!result.CheckoutRequestID) {
           throw new Error(result.ResponseDescription || 'Failed to initiate payment');
@@ -192,7 +195,6 @@ export function MpesaPaymentModal({
           cleanup();
           submittingRef.current = false;
           setStep('success');
-          onSuccess?.();
         } else if (data.status === 'CANCELLED') {
           cleanup();
           submittingRef.current = false;
@@ -211,7 +213,6 @@ export function MpesaPaymentModal({
           cleanup();
           submittingRef.current = false;
           setStep('success');
-          onSuccess?.();
         }
       }
     }, POLL_INTERVAL);
@@ -310,13 +311,19 @@ export function MpesaPaymentModal({
         {step === 'success' && (
           <div className="text-center py-8">
             <CheckCircle size={48} className="text-foreground mx-auto mb-4" />
-            <h2 className="text-lg font-semibold text-dark mb-1">You're Enrolled!</h2>
+            <h2 className="text-lg font-semibold text-dark mb-1">
+              {type === 'enrolment' ? 'Enrolment Submitted!' : 'Payment Successful!'}
+            </h2>
             <p className="text-sm text-body mb-2">
-              Your payment of {formatCurrency(amount)} has been processed successfully.
+              {type === 'enrolment'
+                ? 'Your payment has been processed and the trainer will review your enrolment shortly.'
+                : 'Your verification fee payment has been processed successfully.'}
             </p>
-            <p className="text-sm text-primary font-medium mb-6">The trainer will contact you soon to coordinate.</p>
+            <p className="text-sm text-primary font-medium mb-6">
+              {type === 'enrolment' ? 'Awaiting trainer approval.' : 'Your verification is under review.'}
+            </p>
             <button
-              onClick={onClose}
+              onClick={() => { onSuccess?.(); onClose(); }}
               className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Done
