@@ -42,7 +42,7 @@ async function getAccessToken(): Promise<string> {
   console.log('[mpesa-stkpush] Requesting OAuth token from M-Pesa');
   const auth = btoa(`${CONSUMER_KEY}:${CONSUMER_SECRET}`);
   const res = await fetch(`${BASE_URL}/oauth/v1/generate?grant_type=client_credentials`, {
-    method: 'POST',
+    method: 'GET',
     headers: { Authorization: `Basic ${auth}` },
   });
 
@@ -52,8 +52,22 @@ async function getAccessToken(): Promise<string> {
     throw new Error(`M-Pesa authentication failed (HTTP ${res.status}): ${body}`);
   }
 
-  const data = await res.json();
-  const token = data.access_token;
+  const resText = await res.text();
+  if (!resText) {
+    throw new Error('M-Pesa OAuth returned empty response body');
+  }
+
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(resText);
+  } catch {
+    throw new Error(`M-Pesa OAuth returned non-JSON response: ${resText.slice(0, 200)}`);
+  }
+
+  const token = data.access_token as string | undefined;
+  if (!token) {
+    throw new Error(`M-Pesa OAuth response missing access_token: ${JSON.stringify(data)}`);
+  }
   const expiresIn = (data.expires_in || 3599) - 60;
   cachedToken = { token, expiresAt: Date.now() + expiresIn * 1000 };
   console.log('[mpesa-stkpush] OAuth token obtained successfully');
@@ -90,16 +104,21 @@ Deno.serve(async (req: Request) => {
   if (cors) return cors;
 
   try {
+    const rawBody = await req.text();
+    if (!rawBody) {
+      return new Response(
+        JSON.stringify({ success: false, error: 'Request body is empty' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
     let body: StkPushRequest;
     try {
-      body = await req.json();
+      body = JSON.parse(rawBody);
     } catch {
       return new Response(
         JSON.stringify({ success: false, error: 'Invalid JSON in request body' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        },
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -157,9 +176,9 @@ Deno.serve(async (req: Request) => {
       TransactionDesc: (body.description || 'Payment').slice(0, 13),
     };
 
-    console.log(`[mpesa-stkpush:${requestId}] Sending STK push request to ${BASE_URL}/mpesa/stkpush/v3/simulate`);
+    console.log(`[mpesa-stkpush:${requestId}] Sending STK push request to ${BASE_URL}/mpesa/stkpush/v1/processrequest`);
 
-    const stkRes = await fetch(`${BASE_URL}/mpesa/stkpush/v3/simulate`, {
+    const stkRes = await fetch(`${BASE_URL}/mpesa/stkpush/v1/processrequest`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -168,12 +187,20 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify(stkPayload),
     });
 
+    const stkRaw = await stkRes.text();
+    if (!stkRaw) {
+      console.error(`[mpesa-stkpush:${requestId}] STK push returned empty response (HTTP ${stkRes.status})`);
+      return new Response(
+        JSON.stringify({ success: false, error: `M-Pesa returned empty response (HTTP ${stkRes.status})` }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
     let stkData: Record<string, unknown>;
     try {
-      stkData = await stkRes.json();
+      stkData = JSON.parse(stkRaw);
     } catch {
-      const text = await stkRes.text();
-      console.error(`[mpesa-stkpush:${requestId}] STK push non-JSON response: ${stkRes.status} ${text}`);
+      console.error(`[mpesa-stkpush:${requestId}] STK push non-JSON response: ${stkRes.status} ${stkRaw.slice(0, 500)}`);
       return new Response(
         JSON.stringify({ success: false, error: `M-Pesa returned non-JSON response (HTTP ${stkRes.status})` }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
