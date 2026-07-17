@@ -11,7 +11,7 @@ DECLARE
 BEGIN
   INSERT INTO public."User" (id, email, phone, "fullName", role, "updatedAt")
   VALUES (
-    NEW.id,
+    NEW.id::text,
     COALESCE(NEW.email, ''),
     COALESCE(NEW.phone, COALESCE(NEW.raw_user_meta_data ->> 'phone', '')),
     COALESCE(NEW.raw_user_meta_data ->> 'full_name', split_part(NEW.email, '@', 1), 'User'),
@@ -23,7 +23,7 @@ BEGIN
   -- If the role is TRAINER, also create the Trainer record
   IF _role = 'TRAINER' THEN
     INSERT INTO public."Trainer" ("userId", "updatedAt")
-    VALUES (NEW.id, now())
+    VALUES (NEW.id::text, now())
     ON CONFLICT ("userId") DO NOTHING;
   END IF;
 
