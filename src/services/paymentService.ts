@@ -15,6 +15,9 @@ export async function initiateMpesaPayment(data: {
   if (error) {
     throw new Error(error.message || 'Payment initiation failed');
   }
+  if (result?.alreadyProcessed) {
+    return result;
+  }
   if (!result || !result.CheckoutRequestID) {
     throw new Error(result?.ResponseDescription || 'Failed to initiate payment');
   }

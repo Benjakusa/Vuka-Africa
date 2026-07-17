@@ -289,6 +289,29 @@ Deno.serve(async (req: Request) => {
     const password = generatePassword(timestamp);
     const phone = formatPhone(body.phone);
 
+    // ── Idempotency: check for existing pending payment ──
+    if (body.enrolmentId) {
+      const { data: existing } = await supabase
+        .from('Enrolment')
+        .select('status')
+        .eq('id', body.enrolmentId)
+        .maybeSingle();
+
+      if (existing && existing.status !== 'PENDING_PAYMENT') {
+        console.log(`[mpesa-stkpush:${requestId}] Enrolment ${body.enrolmentId} already ${existing.status}, skipping`);
+        if (existing.status === 'PENDING_ACCEPTANCE') {
+          return new Response(
+            JSON.stringify({ success: true, alreadyProcessed: true, message: 'Payment already completed' }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+          );
+        }
+        return new Response(
+          JSON.stringify({ success: false, error: `Cannot process payment: enrolment is ${existing.status}` }),
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+    }
+
     if (!phone.startsWith('254') || phone.length !== 12) {
       return new Response(
         JSON.stringify({ success: false, error: `Invalid phone number format: ${phone}` }),

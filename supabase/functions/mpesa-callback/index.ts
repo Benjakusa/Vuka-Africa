@@ -13,7 +13,7 @@ const SUPABASE_URL = requireEnv('SUPABASE_URL');
 const SUPABASE_SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-const SENDGRID_API_KEY = Deno.env.get('SENDGRID_API_KEY');
+const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const EMAIL_FROM = Deno.env.get('EMAIL_FROM') || 'Vuka Afrique <noreply@vukaafrique.com>';
 
 interface StkCallbackMetaItem {
@@ -38,31 +38,31 @@ interface CallbackPayload {
 }
 
 async function sendEmail(to: string, subject: string, html: string): Promise<void> {
-  if (!SENDGRID_API_KEY) {
-    console.warn('[mpesa-callback] SENDGRID_API_KEY not set, skipping email');
+  if (!RESEND_API_KEY) {
+    console.warn('[mpesa-callback] RESEND_API_KEY not set, skipping email');
     return;
   }
 
-  const res = await fetch('https://api.sendgrid.com/v3/mail/send', {
+  const fromEmail = EMAIL_FROM.replace(/^.*<(.+)>$/, '$1').trim() || EMAIL_FROM;
+  const fromName = EMAIL_FROM.replace(/^(.+)<.*$/, '$1').trim() || 'Vuka Afrique';
+
+  const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${SENDGRID_API_KEY}`,
+      Authorization: `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      personalizations: [{ to: [{ email: to }] }],
-      from: {
-        email: EMAIL_FROM.replace(/^.*<(.+)>$/, '$1').trim() || EMAIL_FROM,
-        name: EMAIL_FROM.replace(/^(.+)<.*$/, '$1').trim() || 'Vuka Afrique',
-      },
+      from: fromName ? `${fromName} <${fromEmail}>` : fromEmail,
+      to: [to],
       subject,
-      content: [{ type: 'text/html', value: html }],
+      html,
     }),
   });
 
   if (!res.ok) {
     const body = await res.text();
-    console.error(`[mpesa-callback] SendGrid error: ${res.status} ${body}`);
+    console.error(`[mpesa-callback] Resend error: ${res.status} ${body}`);
   }
 }
 

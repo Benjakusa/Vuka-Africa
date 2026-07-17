@@ -32,6 +32,7 @@ export function MpesaPaymentModal({
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stepRef = useRef(step);
+  const submittingRef = useRef(false);
   const { user } = useAuthStore();
 
   stepRef.current = step;
@@ -51,12 +52,17 @@ export function MpesaPaymentModal({
     if (!open) {
       setStep('form');
       setMessage('');
+      submittingRef.current = false;
       cleanup();
     }
   }, [open, cleanup]);
 
+  const isSubmitting = step === 'processing' || step === 'polling';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setStep('processing');
     setMessage('');
 
@@ -64,6 +70,26 @@ export function MpesaPaymentModal({
       const cleanPhone = phone.replace(/[^0-9]/g, '');
       if (cleanPhone.length < 10) {
         throw new Error('Please enter a valid M-Pesa phone number');
+      }
+
+      // Check for existing pending enrolment for this user + course
+      if (type === 'enrolment') {
+        const { data: existing } = await supabase
+          .from('Enrolment')
+          .select('status')
+          .eq('courseId', courseId)
+          .eq('traineeId', user!.id)
+          .in('status', ['PENDING_PAYMENT', 'PENDING_ACCEPTANCE'])
+          .maybeSingle();
+
+        if (existing?.status === 'PENDING_PAYMENT') {
+          throw new Error('Your payment request is still pending. Please complete the M-Pesa prompt on your phone or wait for the current request to finish.');
+        }
+        if (existing?.status === 'PENDING_ACCEPTANCE') {
+          setStep('success');
+          onSuccess?.();
+          return;
+        }
       }
 
       if (type === 'enrolment') {
@@ -95,6 +121,7 @@ export function MpesaPaymentModal({
 
         if (createError) {
           if (createError.code === '23505') {
+            submittingRef.current = false;
             setStep('success');
             onSuccess?.();
             return;
@@ -102,7 +129,6 @@ export function MpesaPaymentModal({
           throw new Error(createError.message);
         }
 
-        // Invoke M-Pesa STK Push
         const result = await initiateMpesaPayment({
           phone: cleanPhone,
           amount,
@@ -116,13 +142,11 @@ export function MpesaPaymentModal({
           throw new Error(result.ResponseDescription || 'Failed to initiate payment');
         }
 
-        // Transition to polling and wait for M-Pesa callback
         setStep('polling');
         startPolling(enrolment.id);
         return;
       }
 
-      // Verification flow kept as-is but invoke STK Push
       const result = await initiateMpesaPayment({
         phone: cleanPhone,
         amount,
@@ -138,6 +162,7 @@ export function MpesaPaymentModal({
       setStep('polling');
       startPolling(trainerId!);
     } catch (err: any) {
+      submittingRef.current = false;
       setStep('error');
       setMessage(err.message || 'Payment failed. Please try again.');
     }
@@ -149,6 +174,7 @@ export function MpesaPaymentModal({
 
     timeoutRef.current = setTimeout(() => {
       cleanup();
+      submittingRef.current = false;
       if (stepRef.current === 'polling') {
         setStep('error');
         setMessage('Payment confirmation timed out. Please check again later.');
@@ -162,12 +188,14 @@ export function MpesaPaymentModal({
 
         if (data.status === 'PENDING_ACCEPTANCE') {
           cleanup();
+          submittingRef.current = false;
           setStep('success');
           onSuccess?.();
         } else if (data.status === 'CANCELLED') {
           cleanup();
+          submittingRef.current = false;
           setStep('error');
-          setMessage('Payment was cancelled. Please try again.');
+          setMessage('Your previous payment did not go through. Please try again.');
         }
       } else {
         const { data, error } = await supabase
@@ -179,6 +207,7 @@ export function MpesaPaymentModal({
 
         if (data.verificationFeePaid) {
           cleanup();
+          submittingRef.current = false;
           setStep('success');
           onSuccess?.();
         }
@@ -248,9 +277,10 @@ export function MpesaPaymentModal({
 
               <button
                 type="submit"
-                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface transition-colors"
+                disabled={isSubmitting}
+                className="w-full py-3 bg-primary text-white font-medium rounded-btn hover:bg-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Pay {formatCurrency(amount)}
+                {isSubmitting ? 'Processing...' : `Pay ${formatCurrency(amount)}`}
               </button>
             </form>
           </>
@@ -298,7 +328,7 @@ export function MpesaPaymentModal({
             <h2 className="text-lg font-semibold text-dark mb-1">Payment Failed</h2>
             <p className="text-sm text-body mb-4">{message}</p>
             <button
-              onClick={() => setStep('form')}
+              onClick={() => { submittingRef.current = false; setStep('form'); }}
               className="px-6 py-2 bg-primary text-white font-medium rounded-btn hover:bg-surface"
             >
               Try Again
