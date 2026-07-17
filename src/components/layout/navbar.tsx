@@ -48,12 +48,15 @@ export function Navbar() {
             >
               Home
             </Link>
-            <button
-              onClick={scrollToCourses}
-              className="px-4 py-1.5 text-sm font-medium rounded-full transition-colors text-white/70 hover:text-white hover:bg-white/10"
+            <Link
+              to="/courses"
+              className={cn(
+                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
+                isActive('/courses') ? 'bg-white/15 text-white' : 'text-white/70 hover:text-white hover:bg-white/10',
+              )}
             >
               Browse Courses
-            </button>
+            </Link>
             <Link
               to="/trainers"
               className={cn(
@@ -158,12 +161,16 @@ export function Navbar() {
               >
                 Home
               </Link>
-              <button
-                onClick={scrollToCourses}
-                className="block w-full text-left px-3 py-2.5 text-sm font-medium rounded-lg text-dark hover:bg-surface/80 transition-colors"
+              <Link
+                to="/courses"
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                  isActive('/courses') ? 'bg-surface text-primary' : 'text-dark hover:bg-surface/80',
+                )}
               >
                 Browse Courses
-              </button>
+              </Link>
               <Link
                 to="/trainers"
                 onClick={() => setMobileOpen(false)}

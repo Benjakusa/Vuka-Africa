@@ -64,20 +64,20 @@ export const CourseCard = React.memo(function CourseCard({
 
   if (detailed) {
     return (
-      <div className="bg-white rounded-card shadow-card card-hover overflow-hidden border border-border flex flex-col">
-        <Link to={`/course/${slug}`} onMouseEnter={prefetch}>
-          <div className="h-40 bg-surface flex items-center justify-center">
-            {imageUrl && !imgError ? (
-              <img src={imageUrl} alt={title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
-            ) : (
-              <span className="text-4xl font-bold text-body">{title[0]}</span>
-            )}
-          </div>
-        </Link>
+      <Link
+        to={`/course/${slug}`}
+        onMouseEnter={prefetch}
+        className="block bg-white rounded-card shadow-card card-hover overflow-hidden border border-border flex flex-col"
+      >
+        <div className="h-40 bg-surface flex items-center justify-center">
+          {imageUrl && !imgError ? (
+            <img src={imageUrl} alt={title} className="w-full h-full object-cover" onError={() => setImgError(true)} />
+          ) : (
+            <span className="text-4xl font-bold text-body">{title[0]}</span>
+          )}
+        </div>
         <div className="p-4 flex flex-col flex-1">
-          <Link to={`/course/${slug}`} onMouseEnter={prefetch}>
-            <h3 className="font-semibold text-dark text-sm mb-1 line-clamp-2">{title}</h3>
-          </Link>
+          <h3 className="font-semibold text-dark text-sm mb-1 line-clamp-2">{title}</h3>
           {trainerName && (
             <p className="text-xs text-body-foreground mb-2 flex items-center gap-1">
               <BookOpen size={12} />
@@ -108,16 +108,12 @@ export const CourseCard = React.memo(function CourseCard({
           )}
           <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
             <p className="text-primary font-bold text-sm">{formatCurrency(priceKes)}</p>
-            <Link
-              to={`/course/${slug}`}
-              onMouseEnter={prefetch}
-              className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn hover:bg-surface transition-colors flex items-center gap-1"
-            >
+            <span className="px-3 py-1.5 bg-primary text-white text-xs font-medium rounded-btn inline-flex items-center gap-1">
               <Eye size={12} /> View Course
-            </Link>
+            </span>
           </div>
         </div>
-      </div>
+      </Link>
     );
   }
 
