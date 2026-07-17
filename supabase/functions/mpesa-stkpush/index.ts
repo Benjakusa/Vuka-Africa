@@ -96,6 +96,140 @@ function formatPhone(phone: string): string {
   return '254' + cleaned;
 }
 
+async function processEnrolmentPayment(
+  enrolmentId: string,
+  receipt: string,
+  checkoutRequestId: string,
+) {
+  console.log(`[mpesa-stkpush] Auto-processing enrolment payment for ${enrolmentId}, receipt: ${receipt}`);
+
+  const { data: enrolment, error: fetchError } = await supabase
+    .from('Enrolment')
+    .select('*, course:Course(title), trainer:Trainer!trainerId(user:User!userId(email, fullName)), trainee:User!traineeId(email, fullName)')
+    .eq('id', enrolmentId)
+    .maybeSingle();
+
+  if (fetchError || !enrolment) {
+    console.error(`[mpesa-stkpush] Enrolment ${enrolmentId} not found:`, fetchError);
+    return;
+  }
+
+  if (enrolment.status !== 'PENDING_PAYMENT') {
+    console.log(`[mpesa-stkpush] Enrolment ${enrolmentId} status is ${enrolment.status}, expected PENDING_PAYMENT`);
+    return;
+  }
+
+  const paidAmount = Number(enrolment.pricePaidKes);
+  const trainerPayoutTotal = Number(enrolment.trainerPayoutKes);
+  const commissionAmount = Number(enrolment.commissionKes);
+
+  const { error: updateError } = await supabase
+    .from('Enrolment')
+    .update({
+      status: 'PENDING_ACCEPTANCE',
+      mpesaTransactionId: receipt,
+      mpesaReceiptNumber: receipt,
+      mpesaCheckoutRequestId: checkoutRequestId,
+      startedAt: new Date().toISOString(),
+    })
+    .eq('id', enrolmentId);
+
+  if (updateError) {
+    console.error(`[mpesa-stkpush] Failed to update enrolment:`, updateError);
+    return;
+  }
+
+  const milestones = [
+    { sequence: 1, label: 'Start', percentage: 25.0, amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100 },
+    { sequence: 2, label: 'Progress', percentage: 50.0, amountKes: Math.round(trainerPayoutTotal * 0.5 * 100) / 100 },
+    { sequence: 3, label: 'Completion', percentage: 25.0, amountKes: Math.round(trainerPayoutTotal * 0.25 * 100) / 100 },
+  ];
+
+  for (const m of milestones) {
+    const { error: msErr } = await supabase.from('Milestone').insert({
+      enrolmentId,
+      sequence: m.sequence,
+      label: m.label,
+      percentage: m.percentage,
+      amountKes: m.amountKes,
+    });
+    if (msErr) {
+      console.error(`[mpesa-stkpush] Failed to insert milestone ${m.label}:`, msErr);
+    }
+  }
+
+  await supabase.from('TransactionLedger').insert({
+    userId: enrolment.traineeId,
+    type: 'TRAINEE_PAYMENT',
+    direction: 'CREDIT',
+    amountKes: paidAmount,
+    balanceBefore: 0,
+    balanceAfter: 0,
+    referenceType: 'enrolment',
+    referenceId: enrolmentId,
+    mpesaTransactionId: receipt,
+    description: `Payment for ${enrolment.course.title}`,
+  });
+
+  await supabase.from('TransactionLedger').insert({
+    userId: enrolment.trainer.userId,
+    type: 'COMMISSION',
+    direction: 'CREDIT',
+    amountKes: commissionAmount,
+    balanceBefore: 0,
+    balanceAfter: 0,
+    referenceType: 'enrolment',
+    referenceId: enrolmentId,
+    mpesaTransactionId: receipt,
+    description: `Commission on ${enrolment.course.title}`,
+  });
+
+  console.log(`[mpesa-stkpush] Enrolment ${enrolmentId} auto-processed successfully`);
+}
+
+async function processVerificationPayment(trainerId: string, receipt: string, amount: number) {
+  console.log(`[mpesa-stkpush] Auto-processing verification payment for trainer ${trainerId}, receipt: ${receipt}`);
+
+  const { data: trainer, error: fetchError } = await supabase
+    .from('Trainer')
+    .select('*, user:User!userId(email, fullName)')
+    .eq('id', trainerId)
+    .maybeSingle();
+
+  if (fetchError || !trainer) {
+    console.error(`[mpesa-stkpush] Trainer ${trainerId} not found:`, fetchError);
+    return;
+  }
+
+  if (trainer.verificationFeePaid) {
+    console.log(`[mpesa-stkpush] Verification fee already paid for trainer ${trainerId}, skipping`);
+    return;
+  }
+
+  await supabase
+    .from('Trainer')
+    .update({
+      verificationFeePaid: true,
+      verificationFeeAmount: amount,
+    })
+    .eq('id', trainerId);
+
+  await supabase.from('TransactionLedger').insert({
+    userId: trainer.userId,
+    type: 'VERIFICATION_FEE',
+    direction: 'DEBIT',
+    amountKes: amount,
+    balanceBefore: 0,
+    balanceAfter: 0,
+    referenceType: 'verification',
+    referenceId: trainerId,
+    mpesaTransactionId: receipt,
+    description: 'Verification fee payment',
+  });
+
+  console.log(`[mpesa-stkpush] Trainer ${trainerId} verification auto-processed successfully`);
+}
+
 Deno.serve(async (req: Request) => {
   const requestId = crypto.randomUUID().slice(0, 8);
   console.log(`[mpesa-stkpush:${requestId}] Request received`);
@@ -238,6 +372,26 @@ Deno.serve(async (req: Request) => {
         if (updateErr) {
           console.error(`[mpesa-stkpush:${requestId}] Failed to update trainer:`, updateErr);
         }
+      }
+    }
+
+    // ── Sandbox auto-confirm ──────────────────────────────────
+    // In sandbox mode, the M-Pesa callback won't arrive, so we
+    // process the payment immediately so the frontend can proceed.
+    if (IS_SANDBOX) {
+      console.log(`[mpesa-stkpush:${requestId}] Sandbox mode: auto-processing payment`);
+      if (body.enrolmentId) {
+        await processEnrolmentPayment(
+          body.enrolmentId,
+          `SANDBOX-${checkoutRequestId || 'TEST'}`,
+          checkoutRequestId || 'SANDBOX-TEST',
+        );
+      } else if (body.trainerId) {
+        await processVerificationPayment(
+          body.trainerId,
+          `SANDBOX-${checkoutRequestId || 'TEST'}`,
+          Math.round(body.amount),
+        );
       }
     }
 
