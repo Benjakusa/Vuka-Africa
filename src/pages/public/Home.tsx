@@ -76,7 +76,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
-            <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
+            <Link to="/courses" className="text-sm text-primary hover:underline flex items-center gap-1">
               View all <ArrowRight size={14} />
             </Link>
           </div>

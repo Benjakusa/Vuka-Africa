@@ -21,12 +21,19 @@ export async function getCourses(filters?: Record<string, any>) {
     .from('Course')
     .select('*, trainer:Trainer!trainerId(id, isVerified, averageRating, totalReviews, user:User!userId(fullName))', { count: 'exact' });
   if (filters?.['isPublished']) query = query.eq('isPublished', true);
+  if (filters?.['category']) query = query.eq('category', filters['category']);
+  if (filters?.['mode']) query = query.eq('mode', filters['mode']);
+  if (filters?.['search']) {
+    query = query.or(`title.ilike.%${filters['search']}%,trainer.user.fullName.ilike.%${filters['search']}%`);
+  }
   const page = filters?.['page'] ? Number(filters['page']) : 1;
   const perPage = filters?.['perPage'] ? Number(filters['perPage']) : (filters?.['limit'] ? Number(filters['limit']) : 12);
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
   query = query.range(from, to);
-  query = query.order('createdAt', { ascending: false });
+  const orderCol = filters?.['order'] || 'createdAt';
+  const orderAsc = filters?.['orderAsc'] === true;
+  query = query.order(orderCol, { ascending: orderAsc });
   const { data, error, count } = await query;
   if (error) throw error;
   const mapped = (data || []).map((course: any) => {

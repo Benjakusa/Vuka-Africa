@@ -5,6 +5,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 
 const Home = lazy(() => import('@/pages/public/Home'));
+const BrowseCourses = lazy(() => import('@/pages/public/Courses'));
 const CourseDetail = lazy(() => import('@/pages/public/CourseDetail'));
 const HowItWorks = lazy(() => import('@/pages/public/HowItWorks'));
 const Privacy = lazy(() => import('@/pages/public/Privacy'));
@@ -65,6 +66,7 @@ export function AppRoutes() {
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/courses" element={<BrowseCourses />} />
             <Route path="/course/:slug" element={<CourseDetail />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/privacy" element={<Privacy />} />
