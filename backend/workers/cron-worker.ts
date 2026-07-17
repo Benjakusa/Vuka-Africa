@@ -1,308 +1,342 @@
-import { Queue, Worker, Job } from 'bullmq';
-import { redis } from '@backend/lib/redis';
-import { supabaseDb } from '@backend/lib/db';
-import { addEmailToQueue } from './email-worker';
+import { Queue, Worker, type Job } from 'bullmq';
+import Redis from 'ioredis';
+import { supabaseAdmin } from '../lib/supabase-admin';
 
-const connection = redis as any;
+// ─── Redis Connection ────────────────────────────────────────
 
-export const cronQueue = new Queue('cron-jobs', {
+const redisUrl = process.env.REDIS_URL;
+
+if (!redisUrl) {
+  throw new Error('REDIS_URL environment variable is required');
+}
+
+const connection = new Redis(redisUrl, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+});
+
+// ─── Queue ────────────────────────────────────────────────────
+
+interface CronJobData {
+  task: 'release-milestones' | 'cleanup-sessions' | 'daily-report';
+  scheduledAt: string;
+}
+
+export const cronQueue = new Queue<CronJobData>('cron', {
   connection,
   defaultJobOptions: {
-    removeOnComplete: { age: 3600 * 24 },
-    removeOnFail: { age: 3600 * 24 * 7 },
+    removeOnComplete: 10,
+    removeOnFail: 20,
   },
 });
 
-async function runMpesaReconciliation() {
-  console.log('[Reconciliation] Starting M-Pesa reconciliation...');
+// ─── Task Handlers ────────────────────────────────────────────
 
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+async function releaseCooledOffMilestones(): Promise<{
+  released: number;
+}> {
+  console.log('[cron-worker] Checking for milestones ready for release...');
 
-  const _payments = await supabaseDb.transactionLedger.findMany({
-    where: {
-      createdAt: { gte: twentyFourHoursAgo },
-      mpesaTransactionId: { not: null },
-    },
-    include: { user: { select: { email: true, fullName: true } } },
-  });
+  // Find milestones where both parties confirmed more than 24 hours ago
+  const coolingOffDeadline = new Date(
+    Date.now() - 24 * 60 * 60 * 1000,
+  ).toISOString();
 
-  const internalTransactions = await supabaseDb.transactionLedger.findMany({
-    where: {
-      createdAt: { gte: twentyFourHoursAgo },
-    },
-  });
+  const { data: milestones, error } = await supabaseAdmin
+    .from('Milestone')
+    .select('id, enrolmentId, status, traineeConfirmedAt, trainerConfirmedAt')
+    .eq('status', 'PENDING') // Not yet released
+    .not('traineeConfirmedAt', 'is', null)
+    .not('trainerConfirmedAt', 'is', null)
+    .lte('trainerConfirmedAt', coolingOffDeadline)
+    .lte('traineeConfirmedAt', coolingOffDeadline);
 
-  const orphaned = await supabaseDb.enrolment.findMany({
-    where: {
-      status: 'PENDING_PAYMENT',
-      createdAt: { lt: twentyFourHoursAgo },
-    },
-    include: { trainee: true, course: { select: { title: true } } },
-  });
-
-  for (const enrolment of orphaned) {
-    await supabaseDb.enrolment.update({
-      where: { id: enrolment.id },
-      data: { status: 'CANCELLED', cancelledAt: new Date() },
-    });
-
-    await addEmailToQueue({
-      to: enrolment.trainee.email,
-      subject: 'Enrolment Cancelled — Payment Not Completed',
-      html: `<p>Hi ${enrolment.trainee.fullName},</p>
-<p>Your enrolment for <strong>${enrolment.course.title}</strong> has been cancelled because the payment was not completed within 24 hours.</p>
-<p>You can re-enrol from the course page if you still wish to join.</p>`,
-    });
+  if (error) {
+    console.error('[cron-worker] Failed to fetch milestones:', error);
+    return { released: 0 };
   }
 
-  if (orphaned.length > 0) {
-    console.log(`[Reconciliation] Cancelled ${orphaned.length} stale pending enrolments`);
+  if (!milestones || milestones.length === 0) {
+    console.log('[cron-worker] No milestones ready for release');
+    return { released: 0 };
   }
 
-  const pendingPayouts = await supabaseDb.payout.findMany({
-    where: {
-      status: { in: ['PENDING', 'PROCESSING'] },
-      createdAt: { lt: twentyFourHoursAgo },
-    },
-    include: { trainer: { include: { user: true } } },
-  });
+  console.log(
+    `[cron-worker] Found ${milestones.length} milestones ready for release`,
+  );
 
-  if (pendingPayouts.length > 0) {
-    console.log(`[Reconciliation] Found ${pendingPayouts.length} stuck payouts`);
+  let released = 0;
 
-    for (const payout of pendingPayouts) {
-      await supabaseDb.payout.update({
-        where: { id: payout.id },
-        data: {
-          status: 'FAILED',
-          failureReason: 'Auto-cancelled by reconciliation — no callback received within 24 hours',
-        },
-      });
+  for (const milestone of milestones) {
+    try {
+      // Fetch full milestone data with enrolment
+      const { data: fullMilestone } = await supabaseAdmin
+        .from('Milestone')
+        .select(
+          `*,
+          enrolment:Enrolment!enrolmentId(
+            id, trainerId, pricePaidKes, trainerPayoutKes,
+            trainer:Trainer!trainerId(availableBalance, userId)
+          )`,
+        )
+        .eq('id', milestone.id)
+        .maybeSingle();
 
-      await supabaseDb.$transaction(async (tx: any) => {
-        const trainer = await tx.trainer.findUnique({ where: { id: payout.trainerId } });
-        if (!trainer) return;
+      if (!fullMilestone) continue;
 
-        await tx.trainer.update({
-          where: { id: payout.trainerId },
-          data: { availableBalance: { increment: Number(payout.amountKes) } },
-        });
+      const releaseAmount = fullMilestone.amountKes || 0;
 
-        await tx.transactionLedger.create({
-          data: {
-            userId: payout.trainer.userId,
-            type: 'REFUND',
+      // Update milestone status
+      await supabaseAdmin
+        .from('Milestone')
+        .update({
+          status: 'RELEASED',
+          releasedAt: new Date().toISOString(),
+        })
+        .eq('id', milestone.id);
+
+      // Update trainer's available balance
+      if (releaseAmount > 0 && fullMilestone.enrolment?.trainerId) {
+        await supabaseAdmin
+          .from('Trainer')
+          .update({
+            availableBalance: supabaseAdmin.sql`"availableBalance" + ${releaseAmount}`,
+          })
+          .eq('id', fullMilestone.enrolment.trainerId);
+
+        // Record transaction
+        if (fullMilestone.enrolment?.trainer?.userId) {
+          await supabaseAdmin.from('TransactionLedger').insert({
+            userId: fullMilestone.enrolment.trainer.userId,
+            type: 'MILESTONE_RELEASE',
             direction: 'CREDIT',
-            amountKes: Number(payout.amountKes),
-            balanceBefore: Number(trainer.availableBalance),
-            balanceAfter: Number(trainer.availableBalance) + Number(payout.amountKes),
-            referenceType: 'payout',
-            referenceId: payout.id,
-            description: 'Auto-refund for stuck payout',
-          },
-        });
-      });
+            amountKes: releaseAmount,
+            balanceBefore: 0,
+            balanceAfter: 0,
+            referenceType: 'milestone',
+            referenceId: milestone.id,
+            description: `Milestone ${fullMilestone.sequence}: ${fullMilestone.label}`,
+          });
+        }
+      }
 
-      await addEmailToQueue({
-        to: payout.trainer.user.email,
-        subject: 'Payout Cancelled — No Callback Received',
-        html: `<p>Hi ${payout.trainer.user.fullName},</p>
-<p>Your withdrawal of KES ${Number(payout.amountKes).toLocaleString()} was cancelled because we did not receive a confirmation from M-Pesa within 24 hours.</p>
-<p>The funds have been returned to your Vuka Afrique wallet. Please try again.</p>`,
-      });
+      // Check if all milestones are released
+      const { data: allMilestones } = await supabaseAdmin
+        .from('Milestone')
+        .select('status')
+        .eq('enrolmentId', milestone.enrolmentId);
+
+      const allReleased = allMilestones?.every(
+        (m) => m.status === 'RELEASED',
+      );
+
+      if (allReleased && allMilestones && allMilestones.length > 0) {
+        await supabaseAdmin
+          .from('Enrolment')
+          .update({
+            status: 'COMPLETED',
+            completedAt: new Date().toISOString(),
+          })
+          .eq('id', milestone.enrolmentId);
+      }
+
+      released++;
+    } catch (err) {
+      console.error(
+        `[cron-worker] Failed to release milestone ${milestone.id}:`,
+        err,
+      );
     }
   }
 
-  let discrepancyCount = 0;
-  for (const txn of internalTransactions) {
-    if (txn.type === 'TRAINEE_PAYMENT' && txn.amountKes > 0 && !txn.mpesaTransactionId) {
-      discrepancyCount++;
-      console.warn(`[Reconciliation] Ledger entry ${txn.id} has no M-Pesa transaction ID`);
+  console.log(`[cron-worker] Released ${released} milestones`);
+  return { released };
+}
+
+async function cleanupExpiredSessions(): Promise<{ cleaned: number }> {
+  console.log('[cron-worker] Cleaning up expired sessions...');
+
+  // Delete sessions older than 30 days
+  const thirtyDaysAgo = new Date(
+    Date.now() - 30 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
+  const { error, count } = await supabaseAdmin
+    .from('sessions')
+    .delete()
+    .lt('created_at', thirtyDaysAgo)
+    .select('id', { count: 'exact' });
+
+  if (error) {
+    // Sessions table might not exist — that's okay
+    console.warn('[cron-worker] Could not clean sessions:', error.message);
+    return { cleaned: 0 };
+  }
+
+  console.log(`[cron-worker] Cleaned ${count || 0} expired sessions`);
+  return { cleaned: count || 0 };
+}
+
+async function generateDailyReport(): Promise<{ generated: boolean }> {
+  console.log('[cron-worker] Generating daily report...');
+
+  try {
+    // Fetch platform stats
+    const [users, trainers, enrolments, payouts, disputes] =
+      await Promise.all([
+        supabaseAdmin
+          .from('User')
+          .select('*', { count: 'exact', head: true }),
+        supabaseAdmin
+          .from('Trainer')
+          .select('*', { count: 'exact', head: true }),
+        supabaseAdmin
+          .from('Enrolment')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'ACTIVE'),
+        supabaseAdmin
+          .from('Payout')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'COMPLETED'),
+        supabaseAdmin
+          .from('Dispute')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'OPEN'),
+      ]);
+
+    const report = {
+      date: new Date().toISOString().split('T')[0],
+      totalUsers: users.count || 0,
+      totalTrainers: trainers.count || 0,
+      activeEnrolments: enrolments.count || 0,
+      completedPayouts: payouts.count || 0,
+      openDisputes: disputes.count || 0,
+      generatedAt: new Date().toISOString(),
+    };
+
+    // Store report in the database
+    const { error: insertError } = await supabaseAdmin
+      .from('DailyReport')
+      .upsert(
+        { id: report.date, ...report },
+        { onConflict: 'id' },
+      );
+
+    if (insertError) {
+      console.error('[cron-worker] Failed to store daily report:', insertError);
+      return { generated: false };
     }
-  }
 
-  if (discrepancyCount > 0 || orphaned.length > 0 || pendingPayouts.length > 0) {
-    const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
-    if (admin) {
-      let html = `<h2>Daily Reconciliation Report</h2>`;
-      html += `<p>Cancelled stale enrolments: ${orphaned.length}</p>`;
-      html += `<p>Stuck payouts auto-refunded: ${pendingPayouts.length}</p>`;
-      html += `<p>Ledger entries without M-Pesa IDs: ${discrepancyCount}</p>`;
-      html += `<p>Total transactions in last 24h: ${internalTransactions.length}</p>`;
-
-      await addEmailToQueue({
-        to: admin.email,
-        subject: `M-Pesa Reconciliation Report — ${new Date().toLocaleDateString()}`,
-        html,
-      });
-    }
-  }
-
-  console.log('[Reconciliation] Completed');
-}
-
-async function runCleanup() {
-  console.log('[Cleanup] Running weekly cleanup...');
-
-  const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-  const stale = await supabaseDb.enrolment.findMany({
-    where: {
-      status: 'PENDING_PAYMENT',
-      createdAt: { lt: thirtyMinutesAgo },
-    },
-    include: { trainee: true, course: { include: { trainer: { include: { user: true } } } } },
-  });
-
-  for (const enrolment of stale) {
-    await supabaseDb.enrolment.update({
-      where: { id: enrolment.id },
-      data: { status: 'CANCELLED', cancelledAt: new Date() },
-    });
-  }
-
-  const threeDaysAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
-  const staleConfirmations = await supabaseDb.milestone.findMany({
-    where: {
-      status: 'TRAINER_CONFIRMED',
-      trainerConfirmedAt: { lt: threeDaysAgo },
-    },
-    include: { enrolment: { include: { course: true } } },
-  });
-
-  if (staleConfirmations.length > 0) {
-    const admin = await supabaseDb.user.findFirst({ where: { role: 'ADMIN' } });
-    if (admin) {
-      await addEmailToQueue({
-        to: admin.email,
-        subject: `Escalated Milestones (${staleConfirmations.length})`,
-        html: `<p>${staleConfirmations.length} milestones have been waiting for trainee confirmation for over 72 hours and require admin attention.</p>`,
-      });
-    }
-  }
-
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const staleCheckout = await supabaseDb.enrolment.findMany({
-    where: {
-      status: 'PENDING_PAYMENT',
-      createdAt: { lt: sevenDaysAgo },
-    },
-  });
-
-  for (const enrolment of staleCheckout) {
-    await supabaseDb.enrolment.update({
-      where: { id: enrolment.id },
-      data: { status: 'CANCELLED', cancelledAt: new Date() },
-    });
+    console.log('[cron-worker] Daily report generated:', report);
+    return { generated: true };
+  } catch (err) {
+    console.error('[cron-worker] Failed to generate daily report:', err);
+    return { generated: false };
   }
 }
 
-export async function scheduleCronJobs() {
-  await cronQueue.upsertJobScheduler(
-    'mpesa-reconciliation',
-    {
-      pattern: '0 2 * * *',
-      tz: 'Africa/Nairobi',
-    },
-    {
-      name: 'run-mpesa-reconciliation',
-      data: {},
-    },
-  );
+// ─── Worker ───────────────────────────────────────────────────
 
-  await cronQueue.upsertJobScheduler(
-    'cleanup',
-    {
-      pattern: '0 3 * * 0',
-      tz: 'Africa/Nairobi',
-    },
-    {
-      name: 'run-cleanup',
-      data: {},
-    },
-  );
+const worker = new Worker<CronJobData>(
+  'cron',
+  async (job: Job<CronJobData>) => {
+    console.log(
+      `[cron-worker] Running task: ${job.data.task} (scheduled: ${job.data.scheduledAt})`,
+    );
 
-  await cronQueue.upsertJobScheduler(
-    'session-reminders',
-    {
-      pattern: '0 * * * *',
-      tz: 'Africa/Nairobi',
-    },
-    {
-      name: 'run-session-reminders',
-      data: {},
-    },
-  );
+    switch (job.data.task) {
+      case 'release-milestones':
+        return await releaseCooledOffMilestones();
 
-  console.log('[Cron] Jobs scheduled');
-}
+      case 'cleanup-sessions':
+        return await cleanupExpiredSessions();
 
-async function sendSessionReminders() {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
+      case 'daily-report':
+        return await generateDailyReport();
 
-  const dayAfter = new Date(tomorrow);
-  dayAfter.setDate(dayAfter.getDate() + 1);
-
-  const sessions = await supabaseDb.sessionLog.findMany({
-    where: {
-      sessionDate: {
-        gte: tomorrow,
-        lt: dayAfter,
-      },
-    },
-    include: {
-      enrolment: {
-        include: {
-          course: { select: { title: true } },
-          trainee: { select: { email: true, fullName: true } },
-          trainer: { include: { user: { select: { email: true, fullName: true } } } },
-        },
-      },
-    },
-  });
-
-  for (const session of sessions) {
-    await addEmailToQueue({
-      to: session.enrolment.trainee.email,
-      subject: `Reminder: Session Tomorrow — ${session.enrolment.course.title}`,
-      html: `<p>Hi ${session.enrolment.trainee.fullName},</p><p>You have a session tomorrow at ${session.sessionDate.toLocaleTimeString()}.</p>`,
-    });
-
-    await addEmailToQueue({
-      to: session.enrolment.trainer.user.email,
-      subject: `Reminder: Session Tomorrow — ${session.enrolment.course.title}`,
-      html: `<p>Hi ${session.enrolment.trainer.user.fullName},</p><p>You have a session with ${session.enrolment.trainee.fullName} tomorrow at ${session.sessionDate.toLocaleTimeString()}.</p>`,
-    });
-  }
-}
-
-const worker = new Worker(
-  'cron-jobs',
-  async (job: Job) => {
-    switch (job.name) {
-      case 'run-mpesa-reconciliation':
-        await runMpesaReconciliation();
-        break;
-      case 'run-cleanup':
-        await runCleanup();
-        break;
-      case 'run-session-reminders':
-        await sendSessionReminders();
-        break;
       default:
-        console.warn(`[Cron] Unknown job: ${job.name}`);
+        console.warn(`[cron-worker] Unknown task: ${job.data.task}`);
+        return { skipped: true };
     }
   },
-  { connection },
+  { connection, concurrency: 1 }, // Single concurrency for cron tasks
 );
 
-worker.on('completed', (job) => {
-  console.log(`[Cron] Job ${job.name} completed`);
+// ─── Job Scheduler ────────────────────────────────────────────
+
+export async function scheduleCronTasks(): Promise<void> {
+  // Schedule milestone release check — every 15 minutes
+  await cronQueue.upsertJobScheduler(
+    'release-milestones-schedule',
+    { every: 15 * 60 * 1000 }, // 15 minutes
+    {
+      name: 'cron-task',
+      data: {
+        task: 'release-milestones',
+        scheduledAt: new Date().toISOString(),
+      },
+      opts: {
+        removeOnComplete: true,
+        removeOnFail: 5,
+      },
+    },
+  );
+
+  // Schedule session cleanup — every 24 hours
+  await cronQueue.upsertJobScheduler(
+    'cleanup-sessions-schedule',
+    { every: 24 * 60 * 60 * 1000 }, // 24 hours
+    {
+      name: 'cron-task',
+      data: {
+        task: 'cleanup-sessions',
+        scheduledAt: new Date().toISOString(),
+      },
+      opts: {
+        removeOnComplete: true,
+        removeOnFail: 3,
+      },
+    },
+  );
+
+  // Schedule daily report — every 24 hours at midnight
+  await cronQueue.upsertJobScheduler(
+    'daily-report-schedule',
+    {
+      pattern: '0 0 * * *', // Midnight every day
+    },
+    {
+      name: 'cron-task',
+      data: {
+        task: 'daily-report',
+        scheduledAt: new Date().toISOString(),
+      },
+      opts: {
+        removeOnComplete: true,
+        removeOnFail: 3,
+      },
+    },
+  );
+
+  console.log('[cron-worker] Cron schedules registered');
+}
+
+// ─── Graceful Shutdown ────────────────────────────────────────
+
+process.on('SIGTERM', async () => {
+  console.log('[cron-worker] Shutting down...');
+  await worker.close();
+  await cronQueue.close();
+  connection.disconnect();
+  process.exit(0);
 });
 
-worker.on('failed', (job, err) => {
-  console.error(`[Cron] Job ${job?.name} failed:`, err);
+process.on('SIGINT', async () => {
+  console.log('[cron-worker] Shutting down...');
+  await worker.close();
+  await cronQueue.close();
+  connection.disconnect();
+  process.exit(0);
 });
 
-console.log('[Cron] Worker started');
+console.log('[cron-worker] Worker started. Call scheduleCronTasks() to register schedules.');

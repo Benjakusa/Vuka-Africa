@@ -12,6 +12,7 @@ import { RatingStars } from '@/components/shared/rating-stars';
 import { ErrorState } from '@/components/shared/error-state';
 import { ProfileSkeleton } from '@/components/shared/loading-skeleton';
 import { MpesaPaymentModal } from '@/components/payment/mpesa-payment-modal';
+import { CourseDescription } from '@/components/shared/course-description';
 import { useAuthStore } from '@/stores/auth-store';
 import { formatCurrency } from '@/lib/utils';
 
@@ -137,7 +138,7 @@ export default function CourseDetail() {
 
             <section>
               <h2 className="text-lg font-semibold text-dark mb-2">About this course</h2>
-              <p className="text-body text-sm leading-relaxed">{course.description}</p>
+              <CourseDescription content={course.description} />
             </section>
 
             {course.learningOutcomes?.length > 0 && (

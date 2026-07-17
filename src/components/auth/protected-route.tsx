@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
-import { Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '@/components/shared/loading-spinner';
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
@@ -10,27 +9,41 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, isLoading, isAuthenticated } = useAuthStore();
-  const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/auth/login');
-    }
-    if (!isLoading && isAuthenticated && allowedRoles && user && !allowedRoles.includes(user.role)) {
-      navigate('/');
-    }
-  }, [isLoading, isAuthenticated, user, allowedRoles, navigate]);
-
+  // ── Loading state ──────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen bg-surface">
+        <LoadingSpinner size="md" />
       </div>
     );
   }
 
-  if (!isAuthenticated) return null;
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) return null;
+  // ── Not authenticated → redirect to login ──────────────────
+  if (!isAuthenticated) {
+    return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
+  }
 
+  // ── Authenticated but wrong role → redirect to dashboard ───
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    const dashboardPath = getDashboardPath(user.role);
+    return <Navigate to={dashboardPath} replace />;
+  }
+
+  // ── Authorized ─────────────────────────────────────────────
   return <>{children || <Outlet />}</>;
+}
+
+/** Returns the dashboard path for a given role */
+function getDashboardPath(role: string): string {
+  switch (role) {
+    case 'ADMIN':
+      return '/admin';
+    case 'TRAINER':
+      return '/trainer';
+    case 'TRAINEE':
+    default:
+      return '/trainee';
+  }
 }

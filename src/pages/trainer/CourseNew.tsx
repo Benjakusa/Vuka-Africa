@@ -264,7 +264,7 @@ export default function CourseNew() {
             <label className="text-sm font-medium text-dark mb-1 block">Category</label>
             <select
               name="category"
-              value={CATEGORIES.includes(form.category) ? form.category : 'OTHER'}
+              value={CATEGORIES.some((c) => c.name === form.category) ? form.category : 'OTHER'}
               onChange={(e) => {
                 handleChange(e);
                 if (e.target.value !== 'OTHER') setCategoryOther('');
@@ -274,13 +274,13 @@ export default function CourseNew() {
             >
               <option value="">Select category</option>
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+                <option key={cat.name} value={cat.name}>
+                  {cat.name}
                 </option>
               ))}
               <option value="OTHER">Other</option>
             </select>
-            {form.category && !CATEGORIES.includes(form.category) && (
+            {form.category && !CATEGORIES.some((c) => c.name === form.category) && (
               <input
                 type="text"
                 value={form.category}

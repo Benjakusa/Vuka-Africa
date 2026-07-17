@@ -42,7 +42,7 @@ export default function CourseDetail() {
   const [categoryOther, setCategoryOther] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const isOther = !CATEGORIES.includes(form.category) && form.category !== '';
+  const isOther = !CATEGORIES.some((c) => c.name === form.category) && form.category !== '';
 
   useEffect(() => {
     if (course) {
@@ -58,7 +58,7 @@ export default function CourseDetail() {
         location: course.location || '',
       });
       setExistingImage(course.imageUrl || null);
-      if (course.category && !CATEGORIES.includes(course.category)) {
+      if (course.category && !CATEGORIES.some((c) => c.name === course.category)) {
         setCategoryOther(course.category);
       }
     }
@@ -243,8 +243,8 @@ export default function CourseDetail() {
             >
               <option value="">Select category</option>
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+                <option key={cat.name} value={cat.name}>
+                  {cat.name}
                 </option>
               ))}
               <option value="OTHER">Other</option>

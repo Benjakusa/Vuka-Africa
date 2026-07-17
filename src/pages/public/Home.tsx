@@ -105,15 +105,15 @@ export default function Home() {
           <h2 className="text-2xl md:text-3xl font-bold text-dark text-center mb-12">Popular Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {CATEGORIES.slice(0, 6).map((cat) => {
-              const Icon = categoryIcons[cat] || BookOpen;
+              const Icon = categoryIcons[cat.name] || BookOpen;
               return (
                 <Link
-                  key={cat}
-                  to={`/trainers?category=${encodeURIComponent(cat)}`}
+                  key={cat.slug}
+                  to={`/trainers?category=${encodeURIComponent(cat.name)}`}
                   className="flex flex-col items-center p-6 bg-white rounded-card shadow-card card-hover"
                 >
                   <Icon size={40} className="text-primary mb-3" />
-                  <span className="text-sm font-medium text-dark text-center">{cat}</span>
+                  <span className="text-sm font-medium text-dark text-center">{cat.name}</span>
                   <span className="text-xs text-primary mt-2">Browse &rarr;</span>
                 </Link>
               );

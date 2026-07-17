@@ -4,10 +4,12 @@ import { Footer } from '@/components/layout/footer';
 
 export function PublicLayout() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="min-h-screen">{<Outlet />}</main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
