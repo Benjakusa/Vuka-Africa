@@ -18,18 +18,6 @@ export function Navbar() {
   const dashboardLink = user?.role === 'TRAINER' ? '/trainer' : user?.role === 'ADMIN' ? '/admin' : '/trainee';
   const isActive = (href: string) => location.pathname === href;
 
-  const scrollToCourses = () => {
-    if (location.pathname === '/') {
-      document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      navigate('/');
-      setTimeout(() => {
-        document.getElementById('courses')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-    setMobileOpen(false);
-  };
-
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
