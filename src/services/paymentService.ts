@@ -1,7 +1,5 @@
 import { supabase } from '@/lib/supabase';
 
-const FUNCTIONS_URL = `${import.meta.env['VITE_SUPABASE_URL']}/functions/v1`;
-
 export async function initiateMpesaPayment(data: {
   phone: string;
   amount: number;
@@ -10,13 +8,17 @@ export async function initiateMpesaPayment(data: {
   enrolmentId?: string;
   trainerId?: string;
 }) {
-  const res = await fetch(`${FUNCTIONS_URL}/mpesa-stkpush`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
+  const { data: result, error } = await supabase.functions.invoke('mpesa-stkpush', {
+    body: data,
   });
-  const result = await res.json();
-  if (!res.ok) throw new Error(result.error || `HTTP ${res.status}`);
+
+  if (error) {
+    throw new Error(error.message || 'Payment initiation failed');
+  }
+  if (!result || !result.CheckoutRequestID) {
+    throw new Error(result?.ResponseDescription || 'Failed to initiate payment');
+  }
+
   return result;
 }
 
