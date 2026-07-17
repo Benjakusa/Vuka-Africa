@@ -19,22 +19,27 @@ export async function getCourseBySlug(slug: string) {
 export async function getCourses(filters?: Record<string, any>) {
   let query = supabase
     .from('Course')
-    .select('*, trainer:Trainer!trainerId(id, isVerified, averageRating, totalReviews, user:User!userId(fullName))');
+    .select('*, trainer:Trainer!trainerId(id, isVerified, averageRating, totalReviews, user:User!userId(fullName))', { count: 'exact' });
   if (filters?.['isPublished']) query = query.eq('isPublished', true);
-  if (filters?.['limit']) {
-    const from = 0;
-    query = query.range(from, (filters['limit'] as number) - 1);
-  }
+  const page = filters?.['page'] ? Number(filters['page']) : 1;
+  const perPage = filters?.['perPage'] ? Number(filters['perPage']) : (filters?.['limit'] ? Number(filters['limit']) : 12);
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
+  query = query.range(from, to);
   query = query.order('createdAt', { ascending: false });
-  const { data, error } = await query;
+  const { data, error, count } = await query;
   if (error) throw error;
-  return (data || []).map((course: any) => {
+  const mapped = (data || []).map((course: any) => {
     if (course.trainer) {
       (course.trainer as Record<string, unknown>)['fullName'] = (course.trainer as any).user?.fullName;
       delete (course.trainer as any).user;
     }
     return course;
   });
+  if (filters?.['includeTotal']) {
+    return { data: mapped, total: count || 0 };
+  }
+  return mapped;
 }
 
 export async function getTrainerCourses(trainerId: string) {

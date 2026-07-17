@@ -46,6 +46,31 @@ export function ProfileSkeleton() {
   );
 }
 
+// ─── Trainer Card Skeleton ───────────────────────────────────
+
+export function TrainerCardSkeleton() {
+  return (
+    <div className="bg-white rounded-card p-5" style={{ boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06), 0 0 0 1px rgba(255,69,0,0.06)' }}>
+      <div className="flex flex-col items-center text-center">
+        <div className="w-20 h-20 rounded-full bg-gray-200 animate-shimmer mb-4" />
+        <div className="flex items-center justify-between w-full mb-3">
+          <div className="h-5 bg-gray-200 rounded animate-shimmer w-24" />
+          <div className="h-4 bg-gray-200 rounded animate-shimmer w-12" />
+        </div>
+        <div className="flex flex-wrap justify-center gap-1.5 mb-4 w-full">
+          <div className="h-6 bg-gray-200 rounded-full animate-shimmer w-20" />
+          <div className="h-6 bg-gray-200 rounded-full animate-shimmer w-24" />
+          <div className="h-6 bg-gray-200 rounded-full animate-shimmer w-16" />
+        </div>
+        <div className="flex items-center justify-between w-full pt-3 border-t border-border">
+          <div className="h-4 bg-gray-200 rounded animate-shimmer w-16" />
+          <div className="h-4 bg-gray-200 rounded animate-shimmer w-14" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Table Row Skeleton ──────────────────────────────────────
 
 export function TableRowSkeleton({ columns = 4 }: { columns?: number }) {

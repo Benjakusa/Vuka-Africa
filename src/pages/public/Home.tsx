@@ -1,23 +1,18 @@
+import { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import {
-  Search,
-  BookOpen,
-  CheckCircle,
-  ChefHat,
-  Camera,
-  Code,
-  Dumbbell,
-  Music,
-  Languages,
-  ArrowRight,
-} from 'lucide-react';
+import { Loader2, Search, BookOpen, CheckCircle, ChefHat, Camera, Code, Dumbbell, Music, Languages, ArrowRight } from 'lucide-react';
 import HeroCarousel from '@/components/shared/hero-carousel';
 import { CourseCard } from '@/components/shared/course-card';
-import { CardSkeleton } from '@/components/shared/loading-skeleton';
+import { TrainerCard } from '@/components/shared/trainer-card';
+import { CardSkeleton, TrainerCardSkeleton } from '@/components/shared/loading-skeleton';
 import { getCourses } from '@/services/courseService';
-import { courseKeys } from '@/lib/query-keys';
+import { getTrainers } from '@/services/trainerService';
+import { courseKeys, trainerKeys } from '@/lib/query-keys';
 import { CATEGORIES } from '@/lib/categories';
+
+const COURSES_PER_PAGE = 8;
+const TRAINERS_TO_SHOW = 8;
 
 const categoryIcons: Record<string, any> = {
   'Baking & Cake Decoration': ChefHat,
@@ -29,11 +24,44 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default function Home() {
-  const { data: courses, isLoading } = useQuery({
+  const [allCourses, setAllCourses] = useState<any[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const nextPageRef = useRef(2);
+  const totalRef = useRef(0);
+
+  const { data: courseResult, isLoading: coursesLoading } = useQuery({
     queryKey: courseKeys.list({ isPublished: true }),
-    queryFn: () => getCourses({ isPublished: true, limit: 4 }),
+    queryFn: async () => {
+      const result = await getCourses({ isPublished: true, page: 1, perPage: COURSES_PER_PAGE, includeTotal: true }) as { data: any[]; total: number };
+      totalRef.current = result.total;
+      return result;
+    },
+    staleTime: 120_000,
+    gcTime: 300_000,
   });
 
+  const { data: trainersData, isLoading: trainersLoading } = useQuery({
+    queryKey: trainerKeys.list({}),
+    queryFn: () => getTrainers({}, 1, TRAINERS_TO_SHOW),
+    staleTime: 120_000,
+    gcTime: 300_000,
+  });
+
+  const courses = allCourses.length > 0 ? allCourses : (courseResult?.data || []);
+  const hasMore = (nextPageRef.current - 1) * COURSES_PER_PAGE < totalRef.current;
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const result = await getCourses({ isPublished: true, page: nextPageRef.current, perPage: COURSES_PER_PAGE, includeTotal: true }) as { data: any[]; total: number };
+      setAllCourses((prev) => [...prev, ...result.data]);
+      nextPageRef.current += 1;
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const trainers = trainersData?.data || [];
   const steps = [
     { icon: Search, step: '1', title: 'Browse', desc: 'Find the perfect skill and trainer for you' },
     { icon: BookOpen, step: '2', title: 'Learn', desc: 'Attend physical or virtual sessions' },
@@ -44,22 +72,22 @@ export default function Home() {
     <div>
       <HeroCarousel />
 
-      {courses && courses.length > 0 && (
-        <section id="courses" className="py-16 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
-              <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
-                View all <ArrowRight size={14} />
-              </Link>
+      <section id="courses" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-dark">Featured Courses</h2>
+            <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
+              View all <ArrowRight size={14} />
+            </Link>
+          </div>
+          {coursesLoading && allCourses.length === 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
             </div>
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <CardSkeleton key={i} />
-                ))}
-              </div>
-            ) : (
+          ) : courses.length > 0 ? (
+            <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {courses.map((course: any) => (
                   <CourseCard
@@ -75,10 +103,64 @@ export default function Home() {
                   />
                 ))}
               </div>
-            )}
+              {hasMore && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="px-6 py-2.5 bg-primary text-white text-sm font-medium rounded-btn hover:bg-surface disabled:opacity-60 transition-colors flex items-center gap-2"
+                  >
+                    {loadingMore && <Loader2 size={16} className="animate-spin" />}
+                    {loadingMore ? 'Loading...' : 'Load More Courses'}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : !coursesLoading && (
+            <p className="text-body text-sm text-center py-8">No courses available yet.</p>
+          )}
+        </div>
+      </section>
+
+      <section id="trainers" className="py-16 bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-dark">Browse Trainers</h2>
+              <p className="text-body text-sm mt-1">Learn from verified experts in your field</p>
+            </div>
+            <Link to="/trainers" className="text-sm text-primary hover:underline flex items-center gap-1">
+              View all <ArrowRight size={14} />
+            </Link>
           </div>
-        </section>
-      )}
+          {trainersLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <TrainerCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : trainers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {trainers.map((trainer: any) => (
+                <TrainerCard
+                  key={trainer.id}
+                  id={trainer.id}
+                  fullName={trainer.fullName || 'Trainer'}
+                  isVerified={trainer.isVerified || false}
+                  averageRating={trainer.averageRating || 0}
+                  totalReviews={trainer.totalReviews || 0}
+                  bio={trainer.bio}
+                  skills={trainer.skills}
+                  user={trainer.user}
+                  courses={trainer.courses}
+                />
+              ))}
+            </div>
+          ) : !trainersLoading && (
+            <p className="text-body text-sm text-center py-8">No trainers available yet.</p>
+          )}
+        </div>
+      </section>
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
