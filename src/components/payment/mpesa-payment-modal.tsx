@@ -129,26 +129,28 @@ export function MpesaPaymentModal({
           throw new Error(createError.message);
         }
 
-        const result = await initiateMpesaPayment({
+        // Start polling immediately — the enrolment exists in PENDING_PAYMENT.
+        // The Edge Function will update it to PENDING_ACCEPTANCE when done.
+        setStep('polling');
+        startPolling(enrolment.id);
+
+        // Fire the payment request in the background (STK push can take 20-30s).
+        // Any errors are logged; the polling already handles success detection.
+        initiateMpesaPayment({
           phone: cleanPhone,
           amount,
           reference: `ENROL-${enrolment.id.slice(0, 6)}`,
           description: 'Course Enrolment',
           enrolmentId: enrolment.id,
           trainerId,
+        }).then((paymentResult) => {
+          if (paymentResult.alreadyProcessed) {
+            // Polling already picked it up, nothing to do
+          }
+        }).catch((err) => {
+          console.error('Payment initiation error (polling still active):', err);
         });
 
-        if (result.alreadyProcessed) {
-          setStep('success');
-          return;
-        }
-
-        if (!result.CheckoutRequestID) {
-          throw new Error(result.ResponseDescription || 'Failed to initiate payment');
-        }
-
-        setStep('polling');
-        startPolling(enrolment.id);
         return;
       }
 
