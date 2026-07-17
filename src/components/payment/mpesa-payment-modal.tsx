@@ -72,23 +72,25 @@ export function MpesaPaymentModal({
         throw new Error('Please enter a valid M-Pesa phone number');
       }
 
-      // Check for existing pending enrolment for this user + course
+      // Check for existing enrolment for this user + course
       if (type === 'enrolment') {
         const { data: existing } = await supabase
           .from('Enrolment')
           .select('status')
           .eq('courseId', courseId)
           .eq('traineeId', user!.id)
-          .in('status', ['PENDING_PAYMENT', 'PENDING_ACCEPTANCE'])
           .maybeSingle();
 
-        if (existing?.status === 'PENDING_PAYMENT') {
-          throw new Error('Your payment request is still pending. Please complete the M-Pesa prompt on your phone or wait for the current request to finish.');
-        }
-        if (existing?.status === 'PENDING_ACCEPTANCE') {
-          setStep('success');
-          onSuccess?.();
-          return;
+        if (existing) {
+          if (existing.status === 'PENDING_PAYMENT') {
+            throw new Error('Your payment request is still pending. Please complete the M-Pesa prompt on your phone or wait for the current request to finish.');
+          }
+          if (existing.status === 'PENDING_ACCEPTANCE') {
+            setStep('success');
+            onSuccess?.();
+            return;
+          }
+          throw new Error('You are already enrolled in this course. Please check your enrolled courses or explore other available courses.');
         }
       }
 

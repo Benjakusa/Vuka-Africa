@@ -23,7 +23,7 @@ BEGIN
     SELECT 
         (SELECT COUNT(*) FROM "User") as total_users,
         (SELECT COUNT(*) FROM "Trainer") as total_trainers,
-        (SELECT COUNT(*) FROM "Course") as total_courses,
+        (SELECT COUNT(*) FROM "Course" WHERE "isPublished" = true AND "deletedAt" IS NULL) as total_courses,
         (SELECT COUNT(*) FROM "Enrolment") as total_enrolments,
         (SELECT COUNT(*) FROM "Dispute" WHERE status = 'OPEN') as open_disputes;
 END;
@@ -47,8 +47,8 @@ BEGIN
 
     RETURN QUERY
     SELECT 
-        COALESCE((SELECT SUM("amountKes") FROM "TransactionLedger" WHERE "entryType" = 'COMMISSION'), 0) as total_commissions,
-        COALESCE((SELECT SUM("amountKes") FROM "TransactionLedger" WHERE "entryType" = 'PAYOUT'), 0) as total_disbursed,
+        COALESCE((SELECT SUM("amountKes") FROM "TransactionLedger" WHERE "type" = 'COMMISSION'), 0) as total_commissions,
+        COALESCE((SELECT SUM("amountKes") FROM "TransactionLedger" WHERE "type" = 'TRAINER_PAYOUT'), 0) as total_disbursed,
         COALESCE((SELECT SUM("amountKes") FROM "Payout" WHERE "status" = 'PENDING'), 0) as pending_payouts,
         (SELECT COUNT(*) FROM "Payout" WHERE "status" = 'PENDING') as pending_payouts_count;
 END;
@@ -72,10 +72,10 @@ BEGIN
     RETURN QUERY
     SELECT 
         to_char("createdAt", 'YYYY-MM') as month,
-        SUM(CASE WHEN "entryType" = 'COMMISSION' THEN "amountKes" ELSE 0 END) as commissions,
-        SUM(CASE WHEN "entryType" = 'PAYOUT' THEN "amountKes" ELSE 0 END) as disbursements
+        SUM(CASE WHEN "type" = 'COMMISSION' THEN "amountKes" ELSE 0 END) as commissions,
+        SUM(CASE WHEN "type" = 'TRAINER_PAYOUT' THEN "amountKes" ELSE 0 END) as disbursements
     FROM "TransactionLedger"
-    WHERE "entryType" IN ('COMMISSION', 'PAYOUT')
+    WHERE "type" IN ('COMMISSION', 'TRAINER_PAYOUT')
     GROUP BY to_char("createdAt", 'YYYY-MM')
     ORDER BY month ASC;
 END;

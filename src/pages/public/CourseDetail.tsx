@@ -1,10 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CheckCircle, MapPin, Monitor, Globe, Clock, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { BackButton } from '@/components/shared/back-button';
-import { courseKeys } from '@/lib/query-keys';
+import { courseKeys, enrolmentKeys, trainerKeys } from '@/lib/query-keys';
 import { getCourseBySlug } from '@/services/courseService';
 import { supabase } from '@/lib/supabase';
 import { VerifiedBadge } from '@/components/shared/verified-badge';
@@ -27,6 +28,7 @@ export default function CourseDetail() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
   const [showPayment, setShowPayment] = useState(false);
+  const queryClient = useQueryClient();
 
   const {
     data: course,
@@ -60,8 +62,21 @@ export default function CourseDetail() {
       return;
     }
     if (user?.role !== 'TRAINEE') return;
-    if (isEnrolled) return;
+    if (isEnrolled) {
+      toast.error('You are already enrolled in this course. Please check your enrolled courses or explore other available courses.');
+      return;
+    }
     setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    queryClient.invalidateQueries({ queryKey: ['enrolment', 'check', course?.id, user?.id] });
+    queryClient.invalidateQueries({ queryKey: enrolmentKeys.list({ traineeId: user?.id }) });
+    queryClient.invalidateQueries({ queryKey: courseKeys.detail(slug!) });
+    if (course?.trainerId) {
+      queryClient.invalidateQueries({ queryKey: trainerKeys.stats(course.trainerId) });
+    }
   };
 
   if (isLoading)
@@ -201,7 +216,7 @@ export default function CourseDetail() {
           trainerId={course.trainerId}
           amount={Number(course.priceKes)}
           phone={user?.phone}
-          onSuccess={() => setShowPayment(false)}
+          onSuccess={handlePaymentSuccess}
         />
       )}
     </>
