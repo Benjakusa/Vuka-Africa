@@ -54,17 +54,7 @@ export function Navbar() {
             >
               Browse Trainers
             </Link>
-            <Link
-              to="/become-a-trainer"
-              className={cn(
-                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
-                isActive('/become-a-trainer')
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/70 hover:text-white hover:bg-white/10',
-              )}
-            >
-              Become a Trainer
-            </Link>
+
             <Link
               to="/about"
               className={cn(
@@ -200,16 +190,7 @@ export function Navbar() {
               >
                 Browse Trainers
               </Link>
-              <Link
-                to="/become-a-trainer"
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
-                  isActive('/become-a-trainer') ? 'bg-surface text-primary' : 'text-dark hover:bg-surface/80',
-                )}
-              >
-                Become a Trainer
-              </Link>
+
               <Link
                 to="/about"
                 onClick={() => setMobileOpen(false)}
