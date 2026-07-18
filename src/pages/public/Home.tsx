@@ -1,7 +1,19 @@
 import { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Loader2, Search, BookOpen, CheckCircle, ChefHat, Camera, Code, Dumbbell, Music, Languages, ArrowRight } from 'lucide-react';
+import {
+  Loader2,
+  Search,
+  BookOpen,
+  CheckCircle,
+  ChefHat,
+  Camera,
+  Code,
+  Dumbbell,
+  Music,
+  Languages,
+  ArrowRight,
+} from 'lucide-react';
 import HeroCarousel from '@/components/shared/hero-carousel';
 import { CourseCard } from '@/components/shared/course-card';
 import { TrainerCard } from '@/components/shared/trainer-card';
@@ -10,6 +22,7 @@ import { getCourses } from '@/services/courseService';
 import { getTrainers } from '@/services/trainerService';
 import { courseKeys, trainerKeys } from '@/lib/query-keys';
 import { CATEGORIES } from '@/lib/categories';
+import { usePageTitle } from '@/hooks/use-page-title';
 
 const COURSES_PER_PAGE = 8;
 const TRAINERS_TO_SHOW = 8;
@@ -24,6 +37,7 @@ const categoryIcons: Record<string, any> = {
 };
 
 export default function Home() {
+  usePageTitle('Find Verified Trainers & Skill Courses in Kenya');
   const [allCourses, setAllCourses] = useState<any[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
   const nextPageRef = useRef(2);
@@ -32,7 +46,12 @@ export default function Home() {
   const { data: courseResult, isLoading: coursesLoading } = useQuery({
     queryKey: courseKeys.list({ isPublished: true }),
     queryFn: async () => {
-      const result = await getCourses({ isPublished: true, page: 1, perPage: COURSES_PER_PAGE, includeTotal: true }) as { data: any[]; total: number };
+      const result = (await getCourses({
+        isPublished: true,
+        page: 1,
+        perPage: COURSES_PER_PAGE,
+        includeTotal: true,
+      })) as { data: any[]; total: number };
       totalRef.current = result.total;
       return result;
     },
@@ -47,13 +66,18 @@ export default function Home() {
     gcTime: 300_000,
   });
 
-  const courses = allCourses.length > 0 ? allCourses : (courseResult?.data || []);
+  const courses = allCourses.length > 0 ? allCourses : courseResult?.data || [];
   const hasMore = (nextPageRef.current - 1) * COURSES_PER_PAGE < totalRef.current;
 
   const handleLoadMore = async () => {
     setLoadingMore(true);
     try {
-      const result = await getCourses({ isPublished: true, page: nextPageRef.current, perPage: COURSES_PER_PAGE, includeTotal: true }) as { data: any[]; total: number };
+      const result = (await getCourses({
+        isPublished: true,
+        page: nextPageRef.current,
+        perPage: COURSES_PER_PAGE,
+        includeTotal: true,
+      })) as { data: any[]; total: number };
       setAllCourses((prev) => [...prev, ...result.data]);
       nextPageRef.current += 1;
     } finally {
@@ -116,8 +140,8 @@ export default function Home() {
                 </div>
               )}
             </>
-          ) : !coursesLoading && (
-            <p className="text-body text-sm text-center py-8">No courses available yet.</p>
+          ) : (
+            !coursesLoading && <p className="text-body text-sm text-center py-8">No courses available yet.</p>
           )}
         </div>
       </section>
@@ -156,8 +180,8 @@ export default function Home() {
                 />
               ))}
             </div>
-          ) : !trainersLoading && (
-            <p className="text-body text-sm text-center py-8">No trainers available yet.</p>
+          ) : (
+            !trainersLoading && <p className="text-body text-sm text-center py-8">No trainers available yet.</p>
           )}
         </div>
       </section>

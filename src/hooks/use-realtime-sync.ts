@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
-import { enrolmentKeys, trainerKeys, adminKeys, courseKeys } from '@/lib/query-keys';
+import { enrolmentKeys, trainerKeys, adminKeys, courseKeys, messageKeys } from '@/lib/query-keys';
 
 export function useRealtimeSync() {
   const queryClient = useQueryClient();
@@ -46,6 +46,11 @@ export function useRealtimeSync() {
     // 5. Course changes → update course lists
     channel.on('postgres_changes', { event: '*', schema: 'public', table: 'Course' }, (_payload) => {
       queryClient.invalidateQueries({ queryKey: courseKeys.all });
+    });
+
+    // 6. Message changes → update chats and unread counts
+    channel.on('postgres_changes', { event: '*', schema: 'public', table: 'Message' }, (_payload) => {
+      queryClient.invalidateQueries({ queryKey: messageKeys.all });
     });
 
     channel.subscribe((status) => {

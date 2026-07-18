@@ -59,3 +59,10 @@ export const miscKeys = {
   platformConfig: ['platform', 'config'] as const,
   userTransactions: (userId?: string, role?: string) => ['transactions', userId, role] as const,
 };
+
+export const messageKeys = {
+  all: ['messages'] as const,
+  contacts: (userId?: string) => [...messageKeys.all, 'contacts', userId] as const,
+  chat: (userId?: string, contactId?: string) => [...messageKeys.all, 'chat', userId, contactId] as const,
+  unreadCount: (userId?: string) => [...messageKeys.all, 'unread', userId] as const,
+};

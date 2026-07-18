@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/shared/empty-state';
 import { getCourses } from '@/services/courseService';
 import { courseKeys } from '@/lib/query-keys';
 import { CATEGORIES } from '@/lib/categories';
+import { usePageTitle } from '@/hooks/use-page-title';
 
 const COURSES_PER_PAGE = 12;
 
@@ -26,6 +27,7 @@ const SORT_OPTIONS = [
 ];
 
 export default function Courses() {
+  usePageTitle('Browse Skill Courses in Kenya');
   const [searchParams, setSearchParams] = useSearchParams();
   const [allCourses, setAllCourses] = useState<any[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -42,12 +44,17 @@ export default function Courses() {
     [search, category, mode, sort],
   );
 
-  const { data: courseResult, isLoading, isError, refetch } = useQuery({
+  const {
+    data: courseResult,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey,
     queryFn: async () => {
       const order = sort === 'price_asc' ? 'priceKes' : sort === 'price_desc' ? 'priceKes' : 'createdAt';
       const orderAsc = sort === 'price_asc';
-      const result = await getCourses({
+      const result = (await getCourses({
         isPublished: true,
         page: 1,
         perPage: COURSES_PER_PAGE,
@@ -57,7 +64,7 @@ export default function Courses() {
         mode: mode || undefined,
         order,
         orderAsc,
-      }) as { data: any[]; total: number };
+      })) as { data: any[]; total: number };
       totalRef.current = result.total;
       nextPageRef.current = 2;
       setAllCourses([]);
@@ -67,7 +74,7 @@ export default function Courses() {
     gcTime: 300_000,
   });
 
-  const courses = allCourses.length > 0 ? allCourses : (courseResult?.data || []);
+  const courses = allCourses.length > 0 ? allCourses : courseResult?.data || [];
   const hasMore = (nextPageRef.current - 1) * COURSES_PER_PAGE < totalRef.current;
 
   const handleLoadMore = async () => {
@@ -75,7 +82,7 @@ export default function Courses() {
     try {
       const order = sort === 'price_asc' ? 'priceKes' : sort === 'price_desc' ? 'priceKes' : 'createdAt';
       const orderAsc = sort === 'price_asc';
-      const result = await getCourses({
+      const result = (await getCourses({
         isPublished: true,
         page: nextPageRef.current,
         perPage: COURSES_PER_PAGE,
@@ -85,7 +92,7 @@ export default function Courses() {
         mode: mode || undefined,
         order,
         orderAsc,
-      }) as { data: any[]; total: number };
+      })) as { data: any[]; total: number };
       setAllCourses((prev) => [...prev, ...result.data]);
       nextPageRef.current += 1;
     } finally {
@@ -133,7 +140,9 @@ export default function Courses() {
           >
             <option value="">All Categories</option>
             {CATEGORIES.map((cat) => (
-              <option key={cat.name} value={cat.name}>{cat.name}</option>
+              <option key={cat.name} value={cat.name}>
+                {cat.name}
+              </option>
             ))}
           </select>
           <select
@@ -143,7 +152,9 @@ export default function Courses() {
             aria-label="Filter by mode"
           >
             {MODES.map((m) => (
-              <option key={m.value} value={m.value}>{m.label}</option>
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
             ))}
           </select>
           <select
@@ -153,7 +164,9 @@ export default function Courses() {
             aria-label="Sort by"
           >
             {SORT_OPTIONS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
             ))}
           </select>
           {hasActiveFilters && (

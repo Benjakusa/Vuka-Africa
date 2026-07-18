@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   LayoutDashboard,
   BookOpen,
@@ -14,14 +15,17 @@ import {
   Search,
   Settings,
   UserCircle,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/stores/auth-store';
+import { supabase } from '@/lib/supabase';
 
 export const traineeLinks = [
   { href: '/trainee', label: 'Overview', icon: LayoutDashboard },
   { href: '/trainee/enrolments', label: 'My Enrolments', icon: BookOpen },
   { href: '/trainee/payments', label: 'Payments', icon: Receipt },
+  { href: '/trainee/messages', label: 'Messages', icon: MessageSquare },
   { href: '/trainee/reviews', label: 'Reviews', icon: Star },
   { href: '/trainers', label: 'Browse Trainers', icon: Search },
 ];
@@ -31,6 +35,7 @@ export const trainerLinks = [
   { href: '/trainer/courses', label: 'My Courses', icon: Book },
   { href: '/trainer/enrolments', label: 'Enrolments', icon: Users },
   { href: '/trainer/earnings', label: 'Earnings', icon: Wallet },
+  { href: '/trainer/messages', label: 'Messages', icon: MessageSquare },
   { href: '/trainer/profile', label: 'Profile', icon: UserCircle },
   { href: '/trainer/verification', label: 'Verification', icon: ShieldCheck },
   { href: '/trainer/reviews', label: 'Reviews', icon: Star },
@@ -44,6 +49,7 @@ export const adminLinks = [
   { href: '/admin/disputes', label: 'Disputes', icon: AlertTriangle },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/transactions', label: 'Transactions', icon: List },
+  { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/config', label: 'Platform Config', icon: Settings },
 ];
 
@@ -52,6 +58,24 @@ export function DashboardSidebar() {
   const { user, logout } = useAuthStore();
 
   const links = user?.role === 'TRAINER' ? trainerLinks : user?.role === 'ADMIN' ? adminLinks : traineeLinks;
+
+  // Fetch unread message count for badge
+  const { data: unreadCount } = useQuery({
+    queryKey: ['messages', 'unread', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Message')
+        .select('id', { count: 'exact', head: true })
+        .eq('receiverId', user!.id)
+        .eq('isRead', false);
+      if (error) return 0;
+      return data as unknown as number;
+    },
+    enabled: !!user?.id,
+    refetchInterval: 30000, // poll every 30s as a fallback
+  });
+
+  const messagesPath = `/${user?.role?.toLowerCase()}/messages`;
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-white border-r border-border h-screen fixed left-0 top-0">
@@ -62,6 +86,8 @@ export function DashboardSidebar() {
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
         {links.map((link) => {
           const isActive = location.pathname === link.href || location.pathname.startsWith(link.href + '/');
+          const isMessages = link.href === messagesPath;
+          const badgeCount = isMessages && unreadCount ? unreadCount : 0;
           return (
             <Link
               key={link.href}
@@ -72,7 +98,17 @@ export function DashboardSidebar() {
               )}
             >
               <link.icon size={18} />
-              {link.label}
+              <span className="flex-1">{link.label}</span>
+              {badgeCount > 0 && (
+                <span
+                  className={cn(
+                    'text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center',
+                    isActive ? 'bg-white text-primary' : 'bg-primary text-white',
+                  )}
+                >
+                  {badgeCount > 99 ? '99+' : badgeCount}
+                </span>
+              )}
             </Link>
           );
         })}

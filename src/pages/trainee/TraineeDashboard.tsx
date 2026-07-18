@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { BookOpen, CheckCircle, Wallet, Star, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '@/stores/auth-store';
+import { supabase } from '@/lib/supabase';
 import { getEnrolments } from '@/services/enrolmentService';
 import { enrolmentKeys } from '@/lib/query-keys';
 import { OfflineBanner } from '@/components/shared/offline-banner';
@@ -20,12 +21,22 @@ export default function TraineeDashboard() {
     enabled: !!user?.id,
   });
 
+  const { data: serverTotalSpent } = useQuery({
+    queryKey: ['trainee-total-spent', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_trainee_total_spent', { p_trainee_id: user?.id });
+      if (error) throw error;
+      return data as number;
+    },
+    enabled: !!user?.id,
+  });
+
   const eList = (enrolments || []) as any[];
   const pendingEnrolments = eList.filter((e: any) => e.status === 'PENDING_ACCEPTANCE');
   const activeEnrolments = eList.filter((e: any) => e.status === 'ACTIVE');
   const completedEnrolments = eList.filter((e: any) => e.status === 'COMPLETED');
   const rejectedEnrolments = eList.filter((e: any) => e.status === 'REJECTED');
-  const totalSpent = eList.reduce((sum: number, e: any) => sum + (e.pricePaidKes || 0), 0);
+  const totalSpent = serverTotalSpent || 0;
   const pendingReviews = eList.filter((e: any) => e.status === 'COMPLETED' && (!e.reviews || e.reviews.length === 0));
 
   return (

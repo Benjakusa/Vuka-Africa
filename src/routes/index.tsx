@@ -45,6 +45,8 @@ const AdminTransactions = lazy(() => import('@/pages/admin/Transactions'));
 const AdminUsers = lazy(() => import('@/pages/admin/Users'));
 const AdminVerifications = lazy(() => import('@/pages/admin/Verifications'));
 
+const Messages = lazy(() => import('@/pages/shared/Messages'));
+
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
 // Fix: stable reference so ProtectedRoute's useEffect doesn't re-run on every
@@ -87,6 +89,7 @@ export function AppRoutes() {
             <Route path="/trainee/enrolments/:id" element={<EnrolmentDetail />} />
             <Route path="/trainee/payments" element={<Payments />} />
             <Route path="/trainee/reviews" element={<Reviews />} />
+            <Route path="/trainee/messages" element={<Messages />} />
 
             <Route path="/trainer" element={<TrainerDashboard />} />
             <Route path="/trainer/courses" element={<Courses />} />
@@ -99,6 +102,7 @@ export function AppRoutes() {
             <Route path="/trainer/reviews" element={<TrainerReviews />} />
             <Route path="/trainer/profile" element={<ProfileEdit />} />
             <Route path="/trainer/verification" element={<Verification />} />
+            <Route path="/trainer/messages" element={<Messages />} />
 
             <Route element={<ProtectedRoute allowedRoles={ADMIN_ONLY} />}>
               <Route path="/admin" element={<AdminDashboard />} />
@@ -109,6 +113,7 @@ export function AppRoutes() {
               <Route path="/admin/transactions" element={<AdminTransactions />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/verifications" element={<AdminVerifications />} />
+              <Route path="/admin/messages" element={<Messages />} />
             </Route>
           </Route>
 

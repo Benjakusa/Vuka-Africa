@@ -11,6 +11,7 @@ import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { Pagination } from '@/components/shared/pagination';
 import { Search } from 'lucide-react';
 import { BackButton } from '@/components/shared/back-button';
+import { usePageTitle } from '@/hooks/use-page-title';
 
 const PER_PAGE = 12;
 
@@ -93,6 +94,7 @@ function TrainerListing() {
 }
 
 export default function TrainersPage() {
+  usePageTitle('Find Verified Trainers in Kenya');
   return (
     <Suspense
       fallback={
