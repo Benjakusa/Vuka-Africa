@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Plus, MoreVertical, Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
@@ -13,12 +13,73 @@ import { ErrorState } from '@/components/shared/error-state';
 import { CardSkeleton } from '@/components/shared/loading-skeleton';
 import { ConfirmationDialog } from '@/components/shared/confirmation-dialog';
 
+const TrainerCourseListItem = React.memo(({ course, onToggleVisibility, onDeleteRequest }: any) => {
+  const [openMenu, setOpenMenu] = useState(false);
+  const navigate = useNavigate();
+  return (
+    <div className="relative group">
+      <CourseCard
+        id={course.id}
+        title={course.title}
+        slug={course.slug}
+        mode={course.mode}
+        duration={course.duration}
+        sessionCount={course.sessionCount}
+        priceKes={course.priceKes}
+        imageUrl={course.imageUrl}
+      />
+      <div className="absolute top-2 right-2 z-10">
+        <button
+          onClick={() => setOpenMenu(!openMenu)}
+          className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+        >
+          <MoreVertical size={14} className="text-body-foreground" />
+        </button>
+      </div>
+
+      {openMenu && (
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => setOpenMenu(false)} />
+          <div className="absolute top-10 right-2 z-30 bg-white rounded-card border border-border py-1 w-44">
+            <button
+              onClick={() => {
+                onToggleVisibility(course.id, !course.isPublished);
+                setOpenMenu(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-accent transition-colors"
+            >
+              {course.isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
+              {course.isPublished ? 'Mute' : 'Unmute'}
+            </button>
+            <button
+              onClick={() => {
+                navigate(`/trainer/courses/${course.id}/edit`);
+                setOpenMenu(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-accent transition-colors"
+            >
+              <Pencil size={14} /> Edit
+            </button>
+            <button
+              onClick={() => {
+                onDeleteRequest(course);
+                setOpenMenu(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary text-white/5 transition-colors"
+            >
+              <Trash2 size={14} /> Delete
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+
 export default function Courses() {
   const { user } = useAuthStore();
   const trainerId = user?.trainer?.id;
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -91,62 +152,12 @@ export default function Courses() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {courses.map((course: any) => (
-            <div key={course.id} className="relative group">
-              <CourseCard
-                id={course.id}
-                title={course.title}
-                slug={course.slug}
-                mode={course.mode}
-                duration={course.duration}
-                sessionCount={course.sessionCount}
-                priceKes={course.priceKes}
-                imageUrl={course.imageUrl}
-              />
-              <div className="absolute top-2 right-2 z-10">
-                <button
-                  onClick={() => setOpenMenu(openMenu === course.id ? null : course.id)}
-                  className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
-                >
-                  <MoreVertical size={14} className="text-body-foreground" />
-                </button>
-              </div>
-
-              {openMenu === course.id && (
-                <>
-                  <div className="fixed inset-0 z-20" onClick={() => setOpenMenu(null)} />
-                  <div className="absolute top-10 right-2 z-30 bg-white rounded-card border border-border py-1 w-44">
-                    <button
-                      onClick={() => {
-                        toggleMutation.mutate({ id: course.id, isPublished: !course.isPublished });
-                        setOpenMenu(null);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-accent transition-colors"
-                    >
-                      {course.isPublished ? <EyeOff size={14} /> : <Eye size={14} />}
-                      {course.isPublished ? 'Mute' : 'Unmute'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        navigate(`/trainer/courses/${course.id}/edit`);
-                        setOpenMenu(null);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-accent transition-colors"
-                    >
-                      <Pencil size={14} /> Edit
-                    </button>
-                    <button
-                      onClick={() => {
-                        setDeleteTarget(course);
-                        setOpenMenu(null);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary text-white/5 transition-colors"
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            <TrainerCourseListItem
+              key={course.id}
+              course={course}
+              onToggleVisibility={(id: string, isPublished: boolean) => toggleMutation.mutate({ id, isPublished })}
+              onDeleteRequest={(c: any) => setDeleteTarget(c)}
+            />
           ))}
         </div>
       )}

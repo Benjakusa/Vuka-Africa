@@ -1,6 +1,6 @@
 import { Queue } from 'bullmq';
 import { redis } from '@backend/lib/redis';
-import { supabaseDb } from '@backend/lib/db';
+import { supabaseDb, supabaseAdmin } from '@backend/lib/db';
 import { mpesaClient } from '@backend/lib/mpesa';
 import { addEmailToQueue } from './email-worker';
 import { createManagedWorker, setupGracefulShutdown } from './base';
@@ -76,32 +76,14 @@ async function processB2CInitiation(
       );
 
       await supabaseDb.$transaction(async (tx: any) => {
-        await tx.payout.update({
-          where: { id: payoutId },
-          data: { status: 'FAILED', failureReason: error.message || 'B2C failed after retries', retryCount },
+        const { error: rpcError } = await supabaseAdmin.rpc('handle_failed_payout_refund', {
+          p_payout_id: payoutId,
+          p_trainer_id: trainerId,
+          p_amount_kes: amountKes,
+          p_failure_reason: error.message || 'B2C failed after retries',
+          p_retry_count: retryCount,
         });
-
-        const trainer = await tx.trainer.findUnique({ where: { id: trainerId } });
-        if (!trainer) return;
-
-        await tx.trainer.update({
-          where: { id: trainerId },
-          data: { availableBalance: { increment: amountKes } },
-        });
-
-        await tx.transactionLedger.create({
-          data: {
-            userId: trainer.userId,
-            type: 'REFUND',
-            direction: 'CREDIT',
-            amountKes,
-            balanceBefore: Number(trainer.availableBalance),
-            balanceAfter: Number(trainer.availableBalance) + amountKes,
-            referenceType: 'payout',
-            referenceId: payoutId,
-            description: 'Refund for failed payout after retries',
-          },
-        });
+        if (rpcError) throw rpcError;
       });
 
       const trainerUser = await supabaseDb.trainer.findUnique({

@@ -128,7 +128,7 @@ export default function ProfileEdit() {
     );
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-4 md:px-0">
       <h1 className="text-2xl font-bold text-dark mb-6">Edit Profile</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -155,10 +155,10 @@ export default function ProfileEdit() {
             />
           </div>
 
-          <div className="px-6 pb-6 -mt-12 flex items-end gap-4">
+          <div className="px-4 sm:px-6 pb-6 -mt-12 flex flex-wrap sm:flex-nowrap items-end gap-4">
             <div
               onClick={() => avatarInputRef.current?.click()}
-              className="w-24 h-24 rounded-full border-4 border-white bg-surface flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 cursor-pointer relative group overflow-hidden"
+              className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-4 border-white bg-surface flex items-center justify-center text-primary text-3xl font-bold flex-shrink-0 cursor-pointer relative group overflow-hidden"
             >
               {avatarPreview ? (
                 <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
