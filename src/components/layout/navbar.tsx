@@ -56,15 +56,6 @@ export function Navbar() {
             </Link>
 
             <Link
-              to="/about"
-              className={cn(
-                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
-                isActive('/about') ? 'bg-white/15 text-white' : 'text-white/70 hover:text-white hover:bg-white/10',
-              )}
-            >
-              About Us
-            </Link>
-            <Link
               to="/auth/register"
               className={cn(
                 'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
@@ -191,16 +182,6 @@ export function Navbar() {
                 Browse Trainers
               </Link>
 
-              <Link
-                to="/about"
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors',
-                  isActive('/about') ? 'bg-surface text-primary' : 'text-dark hover:bg-surface/80',
-                )}
-              >
-                About Us
-              </Link>
               <Link
                 to="/auth/register"
                 onClick={() => setMobileOpen(false)}
