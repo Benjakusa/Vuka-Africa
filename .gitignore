@@ -1,0 +1,41 @@
+node_modules/
+.next/
+out/
+
+# env
+.env
+.env.local
+.env*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+npm-debug.log*
+
+# test
+coverage/
+test-results/
+playwright-report/
+
+# misc
+.cache/
+
+# supabase
+supabase/.temp/
+
+# build artifacts
+tsconfig.tsbuildinfo
+tsconfig.node.tsbuildinfo
+vite.config.d.ts
+vite.config.js
+dist/

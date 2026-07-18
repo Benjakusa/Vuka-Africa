@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /courses
+Allow: /trainers
+Allow: /how-it-works
+Allow: /trust
+Allow: /privacy
+Allow: /terms
+Allow: /auth/register
+Allow: /about
+Allow: /become-a-trainer
+Disallow: /trainee/
+Disallow: /trainer/
+Disallow: /admin/
+
+Sitemap: https://www.vukaafrique.com/sitemap.xml
